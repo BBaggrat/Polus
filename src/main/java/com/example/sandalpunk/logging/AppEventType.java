@@ -1,0 +1,17 @@
+package com.example.sandalpunk.logging;
+
+public enum AppEventType {
+    APP_STARTUP,
+    BOT_STARTUP,
+    BOT_START_COMMAND,
+    PLAYER_SESSION,
+    PLAYER_UPDATED,
+    MATCHMAKING_JOIN,
+    MATCHMAKING_CANCEL,
+    DUEL_CREATED,
+    ROUND_ACTION_SUBMIT,
+    ROUND_RESOLUTION,
+    MATCH_FINISH,
+    ERROR
+}
+

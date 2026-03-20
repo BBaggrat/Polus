@@ -1,0 +1,28 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: ${APP_NAME:sandalpunk}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+app:
+  name: ${APP_NAME:sandalpunk}
+  base-url: ${BASE_URL:http://localhost:8080}
+  storage: ${APP_STORAGE:inmemory}
+  allow-dev-sessions: ${ALLOW_DEV_SESSIONS:true}
+  bot:
+    token: ${BOT_TOKEN:}
+    username: ${BOT_USERNAME:}
+  db:
+    url: ${DB_URL:}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.example.sandalpunk: ${LOG_LEVEL:INFO}
