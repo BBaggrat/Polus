@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>РџРѕР»СЋСЃ</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-1">
+    <title>Полюс</title>
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-2">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -16,14 +16,14 @@
                 <div class="cover-glow cover-glow-right"></div>
                 <div class="cover-ridges"></div>
                 <div class="avatar-card">
-                    <div class="avatar-portrait" id="profile-avatar">Р</div>
+                    <div class="avatar-portrait" id="profile-avatar">И</div>
                 </div>
             </div>
 
             <div class="panel-header">
                 <div>
-                    <p class="panel-kicker">РџСЂРѕС„РёР»СЊ</p>
-                    <h1 class="panel-title" id="profile-name">РќРѕРІС‹Р№ РёРіСЂРѕРє</h1>
+                    <p class="panel-kicker">Профиль</p>
+                    <h1 class="panel-title" id="profile-name">Новый игрок</h1>
                 </div>
                 <div class="profile-side">
                     <div class="stat-chip">
@@ -31,33 +31,33 @@
                             <div class="level-progress-mini-fill" id="profile-level-progress-fill"></div>
                         </div>
                         <small class="level-progress-mini-text" id="profile-level-progress-text">0 / 100</small>
-                        <span>РЈСЂРѕРІРµРЅСЊ</span>
+                        <span>Уровень</span>
                         <strong id="profile-level">1</strong>
                     </div>
                     <div class="stat-chip stat-chip-accent">
-                        <span>РњРѕРЅРµС‚С‹</span>
+                        <span>Монеты</span>
                         <strong id="profile-money">0</strong>
                     </div>
                 </div>
             </div>
 
             <div class="action-row">
-                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">РќР°Р№С‚Рё РјР°С‚С‡</button>
-                <button class="secondary-button" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()">Р‘С‹СЃС‚СЂР°СЏ РґСѓСЌР»СЊ (Р±РѕС‚)</button>
+                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Найти матч</button>
+                <button class="secondary-button" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()">Быстрая дуэль (бот)</button>
             </div>
 
             <section class="queue-status hidden" id="queue-status-card" aria-live="polite">
                 <div class="queue-status-copy">
-                    <p class="queue-status-label">РџРѕРёСЃРє РґСѓСЌР»Рё</p>
-                    <strong class="queue-status-time" id="queue-status-time">0 СЃРµРє</strong>
-                    <p class="queue-status-note" id="queue-status-note">Р–РґС‘Рј СЃРѕРїРµСЂРЅРёРєР° РІ РѕС‡РµСЂРµРґРё.</p>
+                    <p class="queue-status-label">Поиск дуэли</p>
+                    <strong class="queue-status-time" id="queue-status-time">0 сек</strong>
+                    <p class="queue-status-note" id="queue-status-note">Ждём соперника в очереди.</p>
                 </div>
-                <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">РћС‚РјРµРЅРёС‚СЊ</button>
+                <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
             </section>
 
             <section class="stats-panel">
                 <div class="stats-panel-header">
-                    <h2 class="panel-title panel-title-small">РҐР°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё</h2>
+                    <h2 class="panel-title panel-title-small">Характеристики</h2>
                     <span class="badge badge-muted" id="stat-points-badge">0</span>
                 </div>
                 <div class="hero-stats" id="hero-stats"></div>
@@ -66,7 +66,7 @@
 
         <button class="panel quest-teaser" id="quest-teaser" type="button" onclick="window.PolusApp && window.PolusApp.navigate('quests')">
             <div>
-                <p class="panel-title panel-title-small quest-teaser-title">РўРµРєСЃС‚РѕРІС‹Рµ РєРІРµСЃС‚С‹</p>
+                <p class="panel-title panel-title-small quest-teaser-title">Текстовые квесты</p>
             </div>
             <span class="badge" id="quest-badge">0</span>
         </button>
@@ -74,9 +74,9 @@
         <section class="panel journal-panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title panel-title-small">Р”РЅРµРІРЅРёРє</h2>
+                    <h2 class="panel-title panel-title-small">Дневник</h2>
                 </div>
-                <button class="ghost-button" id="journal-event-button" type="button" onclick="window.PolusApp && window.PolusApp.triggerJournalEvent()">РЎР»СѓС‡Р°Р№РЅРѕРµ СЃРѕР±С‹С‚РёРµ</button>
+                <button class="ghost-button" id="journal-event-button" type="button" onclick="window.PolusApp && window.PolusApp.triggerJournalEvent()">Случайное событие</button>
             </div>
 
             <div class="journal-list" id="journal-list"></div>
@@ -87,12 +87,12 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">РўРµРєСЃС‚РѕРІС‹Рµ РєРІРµСЃС‚С‹</h2>
-                    <p class="panel-copy">РЈСЃРїРµР№ РІС‹РїРѕР»РЅРёС‚СЊ РґРѕ РёСЃС‚РµС‡РµРЅРёСЏ С‚Р°Р№РјРµСЂР°</p>
+                    <h2 class="panel-title">Текстовые квесты</h2>
+                    <p class="panel-copy">Успей выполнить до истечения таймера</p>
                 </div>
                 <div class="header-actions">
                     <span class="badge" id="quest-counter">0</span>
-                    <button class="ghost-button" data-nav-target="home" type="button" onclick="window.PolusApp && window.PolusApp.navigate('home')">РќР°Р·Р°Рґ</button>
+                    <button class="ghost-button" data-nav-target="home" type="button" onclick="window.PolusApp && window.PolusApp.navigate('home')">Назад</button>
                 </div>
             </div>
 
@@ -104,10 +104,10 @@
         <section class="panel quest-detail-panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title" id="quest-detail-title">РўРµРєСЃС‚РѕРІС‹Р№ РєРІРµСЃС‚</h2>
-                    <p class="panel-copy" id="quest-detail-subtitle">РњРёРЅРё-РёСЃС‚РѕСЂРёСЏ РІ РјРёСЂРµ РџРѕР»СЋСЃР°</p>
+                    <h2 class="panel-title" id="quest-detail-title">Текстовый квест</h2>
+                    <p class="panel-copy" id="quest-detail-subtitle">Мини-история в мире Полюса</p>
                 </div>
-                <button class="ghost-button" id="quest-back-button" type="button" onclick="window.PolusApp && window.PolusApp.navigate('quests')">Рљ СЃРїРёСЃРєСѓ</button>
+                <button class="ghost-button" id="quest-back-button" type="button" onclick="window.PolusApp && window.PolusApp.navigate('quests')">К списку</button>
             </div>
 
             <div class="scene-art">
@@ -129,7 +129,7 @@
                 <aside class="quest-side">
                     <section class="side-card">
                         <div class="side-header">
-                            <h3>РЎРѕСЃС‚РѕСЏРЅРёРµ</h3>
+                            <h3>Состояние</h3>
                             <span class="badge badge-muted" id="quest-state-count">0</span>
                         </div>
                         <div class="tag-list" id="quest-state-tags"></div>
@@ -137,7 +137,7 @@
 
                     <section class="side-card">
                         <div class="side-header">
-                            <h3>РљР°СЂРјР°РЅРЅС‹Р№ РёРЅРІРµРЅС‚Р°СЂСЊ</h3>
+                            <h3>Карманный инвентарь</h3>
                             <span class="badge badge-muted" id="quest-pocket-count">0</span>
                         </div>
                         <div class="pocket-list" id="quest-pocket-list"></div>
@@ -151,23 +151,23 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">РРЅРІРµРЅС‚Р°СЂСЊ</h2>
+                    <h2 class="panel-title">Инвентарь</h2>
                 </div>
             </div>
 
             <div class="inventory-layout">
                 <section class="inventory-block">
-                    <h3>РђСѓРіРјРµРЅС‚Р°С†РёРё</h3>
+                    <h3>Аугментации</h3>
                     <div class="inventory-list" id="equipped-list"></div>
                 </section>
 
                 <section class="inventory-block">
-                    <h3>РњРѕРґСѓР»Рё РІ С…СЂР°РЅРёР»РёС‰Рµ</h3>
+                    <h3>Модули в хранилище</h3>
                     <div class="inventory-list" id="augment-library-list"></div>
                 </section>
 
                 <section class="inventory-block">
-                    <h3>Р’ СЂСЋРєР·Р°РєРµ</h3>
+                    <h3>В рюкзаке</h3>
                     <div class="inventory-list" id="backpack-list"></div>
                 </section>
             </div>
@@ -178,13 +178,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Р”СЂСѓР·СЊСЏ</h2>
+                    <h2 class="panel-title">Друзья</h2>
                 </div>
                 <span class="badge badge-muted" id="friend-request-badge">0</span>
             </div>
             <form class="friend-search-form" id="friend-search-form">
-                <input class="text-input" id="friend-search-input" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="РќР°Р№С‚Рё РёРіСЂРѕРєР° РїРѕ РЅРёРєРЅРµР№РјСѓ">
-                <button class="primary-button" type="submit">Р”РѕР±Р°РІРёС‚СЊ</button>
+                <input class="text-input" id="friend-search-input" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Найти игрока по никнейму">
+                <button class="primary-button" type="submit">Добавить</button>
             </form>
             <section class="friend-request-panel" id="friend-request-panel"></section>
             <div class="friend-list" id="friend-list"></div>
@@ -195,13 +195,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">РњР°РіР°Р·РёРЅ</h2>
+                    <h2 class="panel-title">Магазин</h2>
                 </div>
-                <span class="badge" id="shop-money">0 РјРѕРЅРµС‚</span>
+                <span class="badge" id="shop-money">0 монет</span>
             </div>
             <div class="shop-tabs" id="shop-tabs">
-                <button class="shop-tab is-active" data-shop-section="standard" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('standard')">РЎРЅР°СЂСЏР¶РµРЅРёРµ</button>
-                <button class="shop-tab" data-shop-section="premium" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('premium')">РџСЂРµРјРёСѓРј</button>
+                <button class="shop-tab is-active" data-shop-section="standard" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('standard')">Снаряжение</button>
+                <button class="shop-tab" data-shop-section="premium" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('premium')">Премиум</button>
             </div>
             <div class="shop-list" id="shop-list"></div>
         </section>
@@ -209,16 +209,16 @@
 
     <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-button is-active" data-nav-target="home" type="button" onclick="window.PolusApp && window.PolusApp.navigate('home')">
-            <span class="nav-title">РҐР°Р±</span>
+            <span class="nav-title">Хаб</span>
         </button>
         <button class="nav-button" data-nav-target="inventory" type="button" onclick="window.PolusApp && window.PolusApp.navigate('inventory')">
-            <span class="nav-title">РРЅРІРµРЅС‚Р°СЂСЊ</span>
+            <span class="nav-title">Инвентарь</span>
         </button>
         <button class="nav-button" data-nav-target="friends" type="button" onclick="window.PolusApp && window.PolusApp.navigate('friends')">
-            <span class="nav-title">Р”СЂСѓР·СЊСЏ</span>
+            <span class="nav-title">Друзья</span>
         </button>
         <button class="nav-button" data-nav-target="shop" type="button" onclick="window.PolusApp && window.PolusApp.navigate('shop')">
-            <span class="nav-title">РњР°РіР°Р·РёРЅ</span>
+            <span class="nav-title">Магазин</span>
         </button>
     </nav>
 </main>
@@ -227,16 +227,16 @@
     <div class="modal-sheet registration-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small">Р РµРіРёСЃС‚СЂР°С†РёСЏ РёРіСЂРѕРєР°</h3>
-                <p class="panel-copy" id="registration-copy">Р’РІРµРґРё РЅРёРєРЅРµР№Рј. РђРєРєР°СѓРЅС‚ Р±СѓРґРµС‚ Р·Р°РєСЂРµРїР»РµРЅ Р·Р° С‚РІРѕРёРј Telegram ID.</p>
+                <h3 class="panel-title panel-title-small">Регистрация игрока</h3>
+                <p class="panel-copy" id="registration-copy">Введи никнейм. Аккаунт будет закреплен за твоим Telegram ID.</p>
             </div>
         </div>
 
         <form class="registration-form" id="registration-form">
-            <label class="field-label" for="registration-nickname">РќРёРєРЅРµР№Рј</label>
-            <input class="text-input" id="registration-nickname" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="РќР°РїСЂРёРјРµСЂ, РЎРµРІРµСЂРЅС‹Р№Р’РѕР»Рє">
+            <label class="field-label" for="registration-nickname">Никнейм</label>
+            <input class="text-input" id="registration-nickname" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Например, СеверныйВолк">
             <p class="field-error hidden" id="registration-error"></p>
-            <button class="primary-button full-width" id="registration-submit" type="submit">РЎРѕР·РґР°С‚СЊ Р°РєРєР°СѓРЅС‚</button>
+            <button class="primary-button full-width" id="registration-submit" type="submit">Создать аккаунт</button>
         </form>
     </div>
 </section>
@@ -245,9 +245,9 @@
     <div class="modal-sheet modal-sheet-compact">
         <div class="modal-header">
             <div>
-                <h3 class="panel-title panel-title-small" id="augment-modal-title">Р›РёРЅРёСЏ</h3>
+                <h3 class="panel-title panel-title-small" id="augment-modal-title">Линия</h3>
             </div>
-            <button class="ghost-button modal-close-button" id="augment-modal-close" type="button" onclick="window.PolusApp && window.PolusApp.closeAugmentPicker()">Р—Р°РєСЂС‹С‚СЊ</button>
+            <button class="ghost-button modal-close-button" id="augment-modal-close" type="button" onclick="window.PolusApp && window.PolusApp.closeAugmentPicker()">Закрыть</button>
         </div>
         <div class="inventory-list" id="augment-modal-list"></div>
     </div>
@@ -257,13 +257,13 @@
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="start-duel-title">РќР°С‡Р°С‚СЊ Р±РѕР№?</h3>
-                <p class="panel-copy duel-exit-copy" id="start-duel-copy">РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ РІРѕР№С‚Рё РІ Р±РѕР№.</p>
+                <h3 class="panel-title panel-title-small" id="start-duel-title">Начать бой?</h3>
+                <p class="panel-copy duel-exit-copy" id="start-duel-copy">Подтверди, что хочешь войти в бой.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
-            <button class="secondary-button full-width" id="start-duel-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelStartDuel()">РќРµС‚, РѕСЃС‚Р°С‚СЊСЃСЏ РІ С…Р°Р±Рµ</button>
-            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Р”Р°, РЅР°С‡Р°С‚СЊ Р±РѕР№</button>
+            <button class="secondary-button full-width" id="start-duel-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelStartDuel()">Нет, остаться в хабе</button>
+            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Да, начать бой</button>
         </div>
     </div>
 </section>
@@ -272,13 +272,13 @@
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small">РџРѕРєРёРЅСѓС‚СЊ Р±РѕР№?</h3>
-                <p class="panel-copy duel-exit-copy">Р•СЃР»Рё РІС‹Р№С‚Рё СЃРµР№С‡Р°СЃ, С‚РµР±Рµ Р±СѓРґРµС‚ Р·Р°СЃС‡РёС‚Р°РЅРѕ Р°РІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ.</p>
+                <h3 class="panel-title panel-title-small">Покинуть бой?</h3>
+                <p class="panel-copy duel-exit-copy">Если выйти сейчас, тебе будет засчитано автопоражение.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
-            <button class="secondary-button full-width" id="duel-exit-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelDuelExit()">РќРµС‚, РІРµСЂРЅСѓС‚СЊСЃСЏ</button>
-            <button class="primary-button full-width" id="duel-exit-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmDuelExit()">Р”Р°, РІС‹Р№С‚Рё</button>
+            <button class="secondary-button full-width" id="duel-exit-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelDuelExit()">Нет, вернуться</button>
+            <button class="primary-button full-width" id="duel-exit-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmDuelExit()">Да, выйти</button>
         </div>
     </div>
 </section>
@@ -424,22 +424,10 @@
         </section>
     </div>
 </section>
-            </div>
-            <div class="duel-chat-pane hidden" id="duel-chat-pane" role="tabpanel" aria-labelledby="duel-tab-chat">
-                <div class="duel-chat-list duel-log-track" id="duel-chat-list"></div>
-                <form class="duel-chat-form" id="duel-chat-form">
-                    <input class="text-input duel-chat-input" id="duel-chat-input" type="text" maxlength="300" placeholder="РќР°РїРёС€Рё СЃРѕРѕР±С‰РµРЅРёРµ СЃРѕРїРµСЂРЅРёРєСѓ">
-                    <button class="primary-button duel-chat-send" id="duel-chat-send-button" type="submit">РћС‚РїСЂР°РІРёС‚СЊ</button>
-                </form>
-                <p class="duel-chat-error hidden" id="duel-chat-error"></p>
-            </div>
-        </section>
-    </div>
-</section>
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/app.js?v=polus-20260321-1"></script>
+<script src="/duel/app.js?v=polus-20260321-2"></script>
 </body>
 </html>
 
