@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-3">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-5">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -210,7 +210,34 @@
             <span class="nav-title">Магазин</span>
         </button>
     </nav>
+
+    <button class="social-chat-fab" id="social-chat-fab" type="button" onclick="window.PolusApp && window.PolusApp.openSocialInbox()">
+        <span class="social-chat-fab-label">Чаты</span>
+        <span class="social-chat-fab-badge hidden" id="social-chat-fab-badge">0</span>
+    </button>
 </main>
+
+<section class="social-chat-panel hidden" id="social-chat-panel" aria-hidden="true">
+    <div class="social-chat-panel-header">
+        <div>
+            <h3 class="panel-title panel-title-small">Чаты</h3>
+        </div>
+        <button class="ghost-button social-chat-close" id="social-chat-close" type="button" onclick="window.PolusApp && window.PolusApp.closeSocialInbox()">Закрыть</button>
+    </div>
+    <div class="social-chat-layout">
+        <aside class="social-chat-thread-list" id="social-chat-thread-list"></aside>
+        <section class="social-chat-thread-view">
+            <div class="social-chat-thread-head" id="social-chat-thread-head">
+                <h4 class="social-chat-thread-title" id="social-chat-thread-title">Выбери чат</h4>
+            </div>
+            <div class="social-chat-messages" id="social-chat-messages"></div>
+            <form class="social-chat-form" id="social-chat-form">
+                <input class="text-input social-chat-input" id="social-chat-input" type="text" maxlength="280" placeholder="Напиши сообщение">
+                <button class="primary-button social-chat-send" id="social-chat-send" type="submit">Отправить</button>
+            </form>
+        </section>
+    </div>
+</section>
 
 <section class="modal-overlay modal-overlay-centered hidden" id="registration-modal" aria-hidden="true">
     <div class="modal-sheet registration-sheet">
@@ -264,10 +291,7 @@
     <div class="duel-sheet">
         <section class="duel-stage">
             <div class="duel-topbar">
-                <div>
-                    <p class="duel-section-label">Арена</p>
-                    <h2 class="duel-stage-title" id="duel-title">Тренировочная дуэль</h2>
-                </div>
+                <h2 class="sr-only" id="duel-title">Дуэль</h2>
                 <div class="duel-topbar-actions">
                     <div class="duel-round-pill" id="duel-round-pill">Раунд 1</div>
                     <p class="duel-round-timer" id="duel-round-timer">02:00</p>
@@ -308,7 +332,7 @@
                     <div class="hp-track">
                         <div class="hp-fill hp-fill-opponent" id="duel-opponent-fill"></div>
                     </div>
-                    <p class="hp-copy hp-copy-opponent" id="duel-opponent-hp">100 HP</p>
+                    <p class="hp-copy" id="duel-opponent-hp">100 HP</p>
                 </div>
             </div>
         </section>
@@ -318,11 +342,8 @@
             <input id="duel-shot-select" type="hidden" value="">
             <input id="duel-dodge-select" type="hidden" value="">
 
-            <div class="duel-form-header">
-                <div>
-                    <h3 class="duel-block-title">Оружие на этот раунд</h3>
-                    <p class="duel-block-copy">Можно менять каждый раунд перед ходом</p>
-                </div>
+            <div class="duel-form-header duel-form-header-centered">
+                <h3 class="duel-block-title">Оружие</h3>
             </div>
 
             <div class="duel-control-stack" id="duel-control-stack">
@@ -376,7 +397,7 @@
                 <p class="duel-auto-note hidden" id="duel-auto-note"></p>
             </div>
 
-            <p class="duel-rule-note" id="duel-round-status">Правило: попадание проходит, если линия выстрела совпала с линией уворота соперника.</p>
+            <p class="duel-rule-note hidden" id="duel-round-status"></p>
         </form>
 
         <section class="panel duel-log-panel">
@@ -426,7 +447,7 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/app.js?v=polus-20260321-3"></script>
+<script src="/duel/app.js?v=polus-20260321-5"></script>
 </body>
 </html>
 

@@ -152,6 +152,21 @@ public class PlayerService {
         playerRepository.save(playerProfile);
     }
 
+    public synchronized void rewardDefeat(String playerId, int experience) {
+        PlayerProfile playerProfile = findRequiredById(playerId);
+        playerProfile.incrementLosses();
+        playerProfile.addExperience(Math.max(0, experience));
+        playerProfile.setUpdatedAt(clock.instant());
+        playerRepository.save(playerProfile);
+    }
+
+    public synchronized void rewardDraw(String playerId, int experience) {
+        PlayerProfile playerProfile = findRequiredById(playerId);
+        playerProfile.addExperience(Math.max(0, experience));
+        playerProfile.setUpdatedAt(clock.instant());
+        playerRepository.save(playerProfile);
+    }
+
     public synchronized void recordLoss(String playerId) {
         PlayerProfile playerProfile = findRequiredById(playerId);
         playerProfile.incrementLosses();

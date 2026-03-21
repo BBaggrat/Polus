@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v11";
+    const STORAGE_KEY = "polus_frontend_prototype_v13";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -9,12 +9,15 @@
     const SHIELD_BLOCK_CHANCE = 0.30;
     const SHOTGUN_EDGE_GRAZE_CHANCE = 0.35;
     const SHOTGUN_EDGE_DAMAGE = 5;
-    const LOCAL_BOT_VICTORY_COINS = 10;
-    const LOCAL_BOT_VICTORY_EXPERIENCE = 4;
-    const LOCAL_PVP_VICTORY_COINS = 24;
-    const LOCAL_PVP_VICTORY_EXPERIENCE = 10;
+    const BATTLE_REWARD_EXPERIENCE = 10;
+    const BATTLE_VICTORY_COINS = 100;
     const CHAT_LINK_PATTERN = /(?:https?:\/\/|www\.|t\.me\/|telegram\.me\/|[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|\b))/i;
     const DIRECTION_TERMS = ["по центру", "влево", "вправо"];
+    const PLACEHOLDER_FRIEND_POOL = [
+        { id: "mock-friend-ice-1", name: "ЛедовыйПульс", level: 3, status: "online", mock: true },
+        { id: "mock-friend-ice-2", name: "ПроводникТумана", level: 2, status: "online", mock: true },
+        { id: "mock-friend-ice-3", name: "СеверныйНож", level: 4, status: "online", mock: true }
+    ];
     const ITEM_LIBRARY = {
         cartridges38: { id: "cartridges38", name: "Патроны .38", description: "Держатся в кармане. Теплые от ладони.", pocket: true },
         medkit: { id: "medkit", name: "Аптечка", description: "Бинты и стим. +30 HP в бою.", pocket: true, usable: true },
@@ -290,6 +293,15 @@
         elements.friendSearchForm = document.getElementById("friend-search-form");
         elements.friendSearchInput = document.getElementById("friend-search-input");
         elements.friendRequestPanel = document.getElementById("friend-request-panel");
+        elements.socialChatFab = document.getElementById("social-chat-fab");
+        elements.socialChatFabBadge = document.getElementById("social-chat-fab-badge");
+        elements.socialChatPanel = document.getElementById("social-chat-panel");
+        elements.socialChatThreadList = document.getElementById("social-chat-thread-list");
+        elements.socialChatThreadTitle = document.getElementById("social-chat-thread-title");
+        elements.socialChatMessages = document.getElementById("social-chat-messages");
+        elements.socialChatForm = document.getElementById("social-chat-form");
+        elements.socialChatInput = document.getElementById("social-chat-input");
+        elements.socialChatSend = document.getElementById("social-chat-send");
         elements.shopList = document.getElementById("shop-list");
         elements.premiumWorkBanner = document.getElementById("premium-work-banner");
         elements.shopTabs = document.getElementById("shop-tabs");
@@ -376,10 +388,13 @@
             selectAugment: selectAugment,
             setShopSection: setShopSection,
             viewFriendProfile: viewFriendProfile,
+            openFriendChat: openFriendChat,
+            openSocialInbox: openSocialInbox,
+            closeSocialInbox: closeSocialInbox,
             selectDuelOption: updateDuelSelection,
             setDuelPanel: setDuelPanel,
             duelFriend: function (friendId) {
-                const friend = state.friends.find(function (entry) { return entry.id === friendId; });
+                const friend = getFriendById(friendId);
                 if (friend) {
                     requestStartDuel({
                         mode: "friend",
@@ -599,6 +614,7 @@
                 status: entry.online ? "online" : "offline"
             };
         }) : [];
+        syncSocialThreadsWithFriends();
         saveState();
     }
 
@@ -847,8 +863,8 @@
         const winnerName = isVictory
             ? (payload.you && payload.you.displayName ? payload.you.displayName : state.player.name)
             : (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "Соперник");
-        const rewardMoney = isVictory ? 100 : 0;
-        const rewardExperience = isVictory ? 10 : 0;
+        const rewardMoney = isVictory ? BATTLE_VICTORY_COINS : 0;
+        const rewardExperience = BATTLE_REWARD_EXPERIENCE;
 
         if (isVictory) {
             addJournal("Победа в PvP. +100 монет и +10 опыта.");
@@ -1038,7 +1054,7 @@
         }
 
         if (target.hasAttribute("data-friend-id")) {
-            const friend = state.friends.find(function (entry) { return entry.id === target.getAttribute("data-friend-id"); });
+            const friend = getFriendById(target.getAttribute("data-friend-id"));
             if (friend) {
                 requestStartDuel({
                     mode: "friend",
@@ -1054,6 +1070,16 @@
 
         if (target.hasAttribute("data-friend-profile-id")) {
             viewFriendProfile(target.getAttribute("data-friend-profile-id"));
+            return;
+        }
+
+        if (target.hasAttribute("data-friend-chat-id")) {
+            openFriendChat(target.getAttribute("data-friend-chat-id"));
+            return;
+        }
+
+        if (target.hasAttribute("data-social-thread-id")) {
+            openSocialInbox(target.getAttribute("data-social-thread-id"));
             return;
         }
 
@@ -1086,6 +1112,11 @@
         if (event.target === elements.duelChatForm) {
             event.preventDefault();
             submitDuelChat();
+            return;
+        }
+        if (event.target === elements.socialChatForm) {
+            event.preventDefault();
+            submitSocialChat();
             return;
         }
         if (event.target !== elements.duelForm) {
@@ -1714,15 +1745,15 @@
             openDuelResultModal({
                 title: "Ничья",
                 copy: "Никто не смог дожать раунд до победы.",
-                experience: 0,
+                experience: BATTLE_REWARD_EXPERIENCE,
                 money: 0
             });
         } else if (duel.opponentHp === 0) {
             duel.finished = true;
             duel.resultText = "Победа. Противник падает в снег.";
             state.player.wins += 1;
-            const rewardMoney = duel.mode === "bot" ? LOCAL_BOT_VICTORY_COINS : LOCAL_PVP_VICTORY_COINS;
-            const rewardExperience = duel.mode === "bot" ? LOCAL_BOT_VICTORY_EXPERIENCE : LOCAL_PVP_VICTORY_EXPERIENCE;
+            const rewardMoney = BATTLE_VICTORY_COINS;
+            const rewardExperience = BATTLE_REWARD_EXPERIENCE;
             state.player.money += rewardMoney;
             applyLocalExperienceGain(rewardExperience);
             addJournal("Победа в бою. +" + rewardMoney + " монет и +" + rewardExperience + " опыта.");
@@ -1736,11 +1767,12 @@
             duel.finished = true;
             duel.resultText = "Поражение. Приходится отступать в темноту.";
             state.player.losses += 1;
+            applyLocalExperienceGain(BATTLE_REWARD_EXPERIENCE);
             addJournal("Поражение в бою. Придется перегруппироваться и вернуться позже.");
             openDuelResultModal({
                 title: "Ты проиграл",
                 copy: "Победил " + opponentName + ".",
-                experience: 0,
+                experience: BATTLE_REWARD_EXPERIENCE,
                 money: 0
             });
         } else {
@@ -1944,6 +1976,8 @@
         renderQuestDetail();
         renderInventory();
         renderFriends();
+        decorateFriendCards();
+        renderSocialInbox();
         renderShop();
         renderDuel();
         renderStartDuelModal();
@@ -1999,13 +2033,12 @@
             return [
                 '<article class="hero-stat-card">',
                 '<div class="hero-stat-head">',
-                "<div>",
-                '<span class="augment-type">' + escapeHtml(stat.label) + "</span>",
+                '<div class="hero-stat-line">',
+                '<span class="hero-stat-name">' + escapeHtml(stat.label) + "</span>",
                 '<strong class="hero-stat-value">' + escapeHtml(String(stat.value)) + "</strong>",
                 "</div>",
-                '<button class="utility-button hero-stat-button" type="button" data-stat="' + escapeHtml(stat.id) + '"' + (available > 0 ? "" : " disabled") + ">+1</button>",
+                available > 0 ? '<button class="hero-stat-button" type="button" data-stat="' + escapeHtml(stat.id) + '">+1</button>' : "",
                 "</div>",
-                '<p class="hero-stat-copy">' + escapeHtml(stat.hint) + "</p>",
                 "</article>"
             ].join("");
         }).join("");
@@ -2122,6 +2155,7 @@
 
     function renderFriends() {
         const requests = Array.isArray(state.friendRequests) ? state.friendRequests : [];
+        const friends = getDisplayFriends();
         elements.friendRequestBadge.textContent = String(Math.min(9, requests.length));
         elements.friendRequestPanel.innerHTML = requests.length ? [
             '<section class="friend-request-stack">',
@@ -2141,7 +2175,7 @@
             }).join(""),
             "</section>"
         ].join("") : "";
-        elements.friendList.innerHTML = state.friends.length ? state.friends.map(function (friend) {
+        elements.friendList.innerHTML = friends.length ? friends.map(function (friend) {
             const online = friend.status === "online";
             return [
                 '<article class="friend-card">',
@@ -2154,6 +2188,196 @@
                 "</article>"
             ].join("");
         }).join("") : '<article class="friend-card"><p>Пока никого нет в друзьях. Найди игрока по никнейму и отправь запрос.</p></article>';
+    }
+
+    function decorateFriendCards() {
+        if (!elements.friendList) {
+            return;
+        }
+        elements.friendList.querySelectorAll("[data-friend-profile-id]").forEach(function (button) {
+            button.classList.add("friend-action-profile");
+            const actions = button.closest(".friend-actions");
+            if (!actions || actions.querySelector("[data-friend-chat-id]")) {
+                return;
+            }
+            const friendId = button.getAttribute("data-friend-profile-id");
+            const chatButton = document.createElement("button");
+            chatButton.type = "button";
+            chatButton.className = "secondary-button full-width";
+            chatButton.setAttribute("data-friend-chat-id", friendId);
+            chatButton.textContent = "Р§Р°С‚";
+            button.before(chatButton);
+        });
+    }
+
+    function ensureSocialThread(friend) {
+        state.social = state.social || {};
+        state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
+        const existing = state.social.threads.find(function (thread) { return thread.friendId === friend.id; });
+        if (existing) {
+            existing.friendName = friend.name;
+            existing.level = friend.level;
+            existing.status = friend.status;
+            return existing;
+        }
+        const thread = {
+            id: uid("social-thread"),
+            friendId: friend.id,
+            friendName: friend.name,
+            level: friend.level,
+            status: friend.status,
+            messages: [
+                {
+                    id: uid("social-message"),
+                    author: "friend",
+                    text: "РљР°РЅР°Р» РѕС‚РєСЂС‹С‚. РњРѕР¶РµРј СЃРІРµСЂРёС‚СЊ РїР»Р°РЅС‹ РёР»Рё РѕР±СЃСѓРґРёС‚СЊ РґСѓСЌР»СЊ.",
+                    createdAt: Date.now()
+                }
+            ]
+        };
+        state.social.threads.unshift(thread);
+        return thread;
+    }
+
+    function syncSocialThreadsWithFriends() {
+        if (!state.social || !Array.isArray(state.social.threads)) {
+            return;
+        }
+        state.social.threads.forEach(function (thread) {
+            const friend = getFriendById(thread.friendId);
+            if (friend) {
+                thread.friendName = friend.name;
+                thread.level = friend.level;
+                thread.status = friend.status;
+            }
+        });
+    }
+
+    function openFriendChat(friendId) {
+        const friend = getFriendById(friendId);
+        if (!friend) {
+            return;
+        }
+        const thread = ensureSocialThread(friend);
+        state.social.isOpen = true;
+        state.social.activeThreadId = thread.id;
+        saveState();
+        renderSocialInbox();
+    }
+
+    function openSocialInbox(threadId) {
+        state.social = state.social || {};
+        state.social.isOpen = true;
+        if (threadId) {
+            state.social.activeThreadId = threadId;
+        } else if (!state.social.activeThreadId && Array.isArray(state.social.threads) && state.social.threads.length) {
+            state.social.activeThreadId = state.social.threads[0].id;
+        }
+        saveState();
+        renderSocialInbox();
+    }
+
+    function closeSocialInbox() {
+        if (!state.social) {
+            return;
+        }
+        state.social.isOpen = false;
+        saveState();
+        renderSocialInbox();
+    }
+
+    function submitSocialChat() {
+        if (!state.social || !Array.isArray(state.social.threads)) {
+            return;
+        }
+        const activeThread = state.social.threads.find(function (thread) {
+            return thread.id === state.social.activeThreadId;
+        });
+        const text = elements.socialChatInput.value.trim();
+        if (!activeThread || !text) {
+            return;
+        }
+        activeThread.messages = Array.isArray(activeThread.messages) ? activeThread.messages : [];
+        activeThread.messages.push({
+            id: uid("social-message"),
+            author: "you",
+            text: text,
+            createdAt: Date.now()
+        });
+        elements.socialChatInput.value = "";
+        const friend = getFriendById(activeThread.friendId);
+        if (friend && friend.mock) {
+            activeThread.messages.push({
+                id: uid("social-message"),
+                author: "friend",
+                text: randomFrom([
+                    "РџРѕРЅСЏР», РґРµСЂР¶Сѓ СЃРІСЏР·СЊ.",
+                    "Р’РёР¶Сѓ. Р•СЃР»Рё С‡С‚Рѕ, Р±СЂРѕСЃСЊ РІС‹Р·РѕРІ.",
+                    "РџСЂРёРЅСЏС‚Рѕ. Р‘СѓРґСѓ РЅР° Р»РёРЅРёРё."
+                ]),
+                createdAt: Date.now() + 100
+            });
+        }
+        saveState();
+        renderSocialInbox();
+    }
+
+    function renderSocialInbox() {
+        if (!elements.socialChatPanel) {
+            return;
+        }
+        state.social = state.social || {};
+        state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
+        const threads = state.social.threads;
+        const activeThread = threads.find(function (thread) { return thread.id === state.social.activeThreadId; }) || null;
+
+        elements.socialChatFabBadge.textContent = String(Math.min(9, threads.length));
+        elements.socialChatFabBadge.classList.toggle("hidden", threads.length === 0);
+        elements.socialChatPanel.classList.toggle("hidden", !state.social.isOpen);
+        elements.socialChatPanel.setAttribute("aria-hidden", state.social.isOpen ? "false" : "true");
+
+        if (!threads.length) {
+            elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Р§Р°С‚С‹ РїРѕСЏРІСЏС‚СЃСЏ Р·РґРµСЃСЊ РїРѕСЃР»Рµ РїРµСЂРІРѕРіРѕ РґРёР°Р»РѕРіР° СЃ РґСЂСѓРіРѕРј.</article>';
+            elements.socialChatThreadTitle.textContent = "Р’С‹Р±РµСЂРё С‡Р°С‚";
+            elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">РћС‚РєСЂРѕР№ С‡Р°С‚ С‡РµСЂРµР· РєР°СЂС‚РѕС‡РєСѓ РґСЂСѓРіР°.</div>';
+            elements.socialChatInput.disabled = true;
+            elements.socialChatSend.disabled = true;
+            return;
+        }
+
+        elements.socialChatThreadList.innerHTML = threads.map(function (thread) {
+            return [
+                '<button class="social-chat-thread-card' + (activeThread && activeThread.id === thread.id ? ' is-active' : '') + '" type="button" data-social-thread-id="' + escapeHtml(thread.id) + '">',
+                '<strong>' + escapeHtml(thread.friendName || "Р”СЂСѓРі") + '</strong>',
+                '<span>' + escapeHtml((thread.status === "online" ? "РћРЅР»Р°Р№РЅ" : "РћС„С„Р»Р°Р№РЅ") + " В· СѓСЂ. " + (thread.level || 1)) + '</span>',
+                '</button>'
+            ].join("");
+        }).join("");
+
+        if (!activeThread) {
+            elements.socialChatThreadTitle.textContent = "Р’С‹Р±РµСЂРё С‡Р°С‚";
+            elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Р’С‹Р±РµСЂРё РґРёР°Р»РѕРі СЃР»РµРІР°.</div>';
+            elements.socialChatInput.disabled = true;
+            elements.socialChatSend.disabled = true;
+            return;
+        }
+
+        elements.socialChatThreadTitle.textContent = activeThread.friendName || "Р”СЂСѓРі";
+        elements.socialChatMessages.innerHTML = (activeThread.messages || []).map(function (message) {
+            const own = message.author === "you";
+            return [
+                '<div class="social-chat-message' + (own ? ' social-chat-message-own' : '') + '">',
+                '<div class="social-chat-message-bubble">',
+                '<strong>' + escapeHtml(own ? state.player.name : (activeThread.friendName || "Р”СЂСѓРі")) + '</strong>',
+                '<p>' + escapeHtml(message.text || "") + '</p>',
+                '<small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small>',
+                '</div>',
+                '</div>'
+            ].join("");
+        }).join("");
+        elements.socialChatInput.disabled = false;
+        elements.socialChatSend.disabled = false;
+        elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
     }
 
     function renderShop() {
@@ -2212,7 +2436,7 @@
     }
 
     function viewFriendProfile(friendId) {
-        const friend = state.friends.find(function (entry) { return entry.id === friendId; });
+        const friend = getFriendById(friendId);
         if (!friend) {
             return;
         }
@@ -2256,14 +2480,14 @@
         duel.chatMessages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
         duel.chatError = duel.chatError || "";
         syncDuelInputs(duel);
-        elements.duelTitle.textContent = duel.title;
+        elements.duelTitle.textContent = "Дуэль";
         elements.duelRoundPill.textContent = "Раунд " + duel.round;
         elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
         elements.duelYouName.textContent = duel.playerName || "Игрок";
-        elements.duelYouMeta.textContent = buildDuelMeta();
+        elements.duelYouMeta.textContent = "";
         elements.duelYouAvatar.textContent = (duel.playerName || "Ты").slice(0, 1).toUpperCase();
         elements.duelOpponentName.textContent = duel.opponentName;
-        elements.duelOpponentMeta.textContent = buildDuelMeta();
+        elements.duelOpponentMeta.textContent = "";
         elements.duelOpponentAvatar.textContent = duel.opponentName.slice(0, 1).toUpperCase();
         elements.duelYouHp.textContent = duel.playerHp + " HP";
         elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
@@ -2620,6 +2844,7 @@
             duel.playerHp = 0;
             duel.resultText = "Поражение. Бой остановлен до следующего выхода.";
             state.player.losses += 1;
+            applyLocalExperienceGain(BATTLE_REWARD_EXPERIENCE);
             duel.logs.push({
                 round: duel.round,
                 lines: [
@@ -2631,7 +2856,7 @@
             openDuelResultModal({
                 title: "Ты проиграл",
                 copy: "Победил " + opponentName + ".",
-                experience: 0,
+                experience: BATTLE_REWARD_EXPERIENCE,
                 money: 0
             });
             saveState();
@@ -2733,7 +2958,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 11;
+        next.version = 13;
         next.player = Object.assign({ name: "Новый игрок", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 }, next.player || {});
         const progressSnapshot = getLevelProgressSnapshot(typeof next.player.experience === "number" ? next.player.experience : 0);
         next.player.level = progressSnapshot.level;
@@ -2770,13 +2995,21 @@
         next.premium = next.premium || { owned: [] };
         next.friends = Array.isArray(next.friends) ? next.friends : [];
         next.friendRequests = Array.isArray(next.friendRequests) ? next.friendRequests : [];
+        next.social = Object.assign({
+            isOpen: false,
+            activeThreadId: null,
+            threads: [],
+            placeholderFriend: buildPlaceholderFriend()
+        }, next.social || {});
+        next.social.threads = Array.isArray(next.social.threads) ? next.social.threads : [];
+        next.social.placeholderFriend = next.social.placeholderFriend || buildPlaceholderFriend();
         next.shop = buildShopCatalog();
         return next;
     }
 
     function buildInitialState() {
         return {
-            version: 11,
+            version: 13,
             auth: {
                 sessionToken: null,
                 playerId: null,
@@ -2812,6 +3045,12 @@
             },
             friends: [],
             friendRequests: [],
+            social: {
+                isOpen: false,
+                activeThreadId: null,
+                threads: [],
+                placeholderFriend: buildPlaceholderFriend()
+            },
             premium: { owned: [] },
             shop: buildShopCatalog(),
             quests: [
@@ -2823,6 +3062,22 @@
         };
     }
 
+    function buildPlaceholderFriend() {
+        const template = randomFrom(PLACEHOLDER_FRIEND_POOL);
+        return Object.assign({}, template);
+    }
+
+    function getDisplayFriends() {
+        if (Array.isArray(state.friends) && state.friends.length) {
+            return state.friends.slice();
+        }
+        return state.social && state.social.placeholderFriend ? [state.social.placeholderFriend] : [];
+    }
+
+    function getFriendById(friendId) {
+        return getDisplayFriends().find(function (entry) { return entry.id === friendId; }) || null;
+    }
+
     function loadState() {
         try {
             const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -2830,7 +3085,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && (parsed.version === 4 || parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8 || parsed.version === 9 || parsed.version === 10 || parsed.version === 11) ? parsed : buildInitialState();
+            return parsed && (parsed.version === 4 || parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8 || parsed.version === 9 || parsed.version === 10 || parsed.version === 11 || parsed.version === 12 || parsed.version === 13) ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();

@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DuelService {
 
-    private static final int PVP_VICTORY_COINS = 100;
-    private static final int PVP_VICTORY_EXPERIENCE = 10;
+    private static final int BATTLE_EXPERIENCE = 10;
+    private static final int VICTORY_COINS = 100;
     private static final int MAX_CHAT_MESSAGES = 80;
     private static final int ROUND_TIMEOUT_SECONDS = 120;
     private static final Pattern LINK_PATTERN = Pattern.compile(
@@ -219,8 +219,8 @@ public class DuelService {
                     now
             ));
 
-            playerService.rewardVictory(winnerPlayerId, PVP_VICTORY_COINS, PVP_VICTORY_EXPERIENCE);
-            playerService.recordLoss(actorId);
+            playerService.rewardVictory(winnerPlayerId, VICTORY_COINS, BATTLE_EXPERIENCE);
+            playerService.rewardDefeat(actorId, BATTLE_EXPERIENCE);
 
             appEventLogger.info(
                     AppEventType.MATCH_FINISH,
@@ -351,8 +351,11 @@ public class DuelService {
             duel.setFinishedAt(clock.instant());
             if (resolution.winnerPlayerId() != null) {
                 String loserPlayerId = duel.opponentId(resolution.winnerPlayerId());
-                playerService.rewardVictory(resolution.winnerPlayerId(), PVP_VICTORY_COINS, PVP_VICTORY_EXPERIENCE);
-                playerService.recordLoss(loserPlayerId);
+                playerService.rewardVictory(resolution.winnerPlayerId(), VICTORY_COINS, BATTLE_EXPERIENCE);
+                playerService.rewardDefeat(loserPlayerId, BATTLE_EXPERIENCE);
+            } else {
+                playerService.rewardDraw(duel.getPlayerOneId(), BATTLE_EXPERIENCE);
+                playerService.rewardDraw(duel.getPlayerTwoId(), BATTLE_EXPERIENCE);
             }
             appEventLogger.info(
                     AppEventType.MATCH_FINISH,
