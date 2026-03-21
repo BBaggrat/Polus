@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v10";
+    const STORAGE_KEY = "polus_frontend_prototype_v11";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -9,6 +9,10 @@
     const SHIELD_BLOCK_CHANCE = 0.30;
     const SHOTGUN_EDGE_GRAZE_CHANCE = 0.35;
     const SHOTGUN_EDGE_DAMAGE = 5;
+    const LOCAL_BOT_VICTORY_COINS = 10;
+    const LOCAL_BOT_VICTORY_EXPERIENCE = 4;
+    const LOCAL_PVP_VICTORY_COINS = 24;
+    const LOCAL_PVP_VICTORY_EXPERIENCE = 10;
     const CHAT_LINK_PATTERN = /(?:https?:\/\/|www\.|t\.me\/|telegram\.me\/|[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|\b))/i;
     const DIRECTION_TERMS = ["по центру", "влево", "вправо"];
     const ITEM_LIBRARY = {
@@ -280,15 +284,14 @@
         elements.questStateCount = document.getElementById("quest-state-count");
         elements.questPocketList = document.getElementById("quest-pocket-list");
         elements.questPocketCount = document.getElementById("quest-pocket-count");
-        elements.equippedList = document.getElementById("equipped-list");
-        elements.augmentLibraryList = document.getElementById("augment-library-list");
-        elements.backpackList = document.getElementById("backpack-list");
+        elements.inventoryPlaceholder = document.getElementById("inventory-placeholder");
         elements.friendList = document.getElementById("friend-list");
         elements.friendRequestBadge = document.getElementById("friend-request-badge");
         elements.friendSearchForm = document.getElementById("friend-search-form");
         elements.friendSearchInput = document.getElementById("friend-search-input");
         elements.friendRequestPanel = document.getElementById("friend-request-panel");
         elements.shopList = document.getElementById("shop-list");
+        elements.premiumWorkBanner = document.getElementById("premium-work-banner");
         elements.shopTabs = document.getElementById("shop-tabs");
         elements.shopTabButtons = Array.from(document.querySelectorAll("[data-shop-section]"));
         elements.toast = document.getElementById("toast");
@@ -303,6 +306,11 @@
         elements.startDuelConfirmButton = document.getElementById("start-duel-confirm");
         elements.duelExitCancelButton = document.getElementById("duel-exit-cancel");
         elements.duelExitConfirmButton = document.getElementById("duel-exit-confirm");
+        elements.duelResultModal = document.getElementById("duel-result-modal");
+        elements.duelResultTitle = document.getElementById("duel-result-title");
+        elements.duelResultCopy = document.getElementById("duel-result-copy");
+        elements.duelResultExp = document.getElementById("duel-result-exp");
+        elements.duelResultMoney = document.getElementById("duel-result-money");
         elements.duelOverlay = document.getElementById("duel-overlay");
         elements.duelTitle = document.getElementById("duel-title");
         elements.duelRoundPill = document.getElementById("duel-round-pill");
@@ -396,7 +404,8 @@
             rejectFriendRequest: rejectFriendRequest,
             cancelStartDuel: cancelStartDuel,
             confirmStartDuel: confirmStartDuel,
-            toggleAutoBattle: toggleAutoBattle
+            toggleAutoBattle: toggleAutoBattle,
+            closeDuelResult: closeDuelResult
         };
     }
 
@@ -802,6 +811,7 @@
         };
         if (justFinished) {
             await syncPlayerProfileFromApi();
+            openLiveDuelResult(payload);
         }
         if (!elements.duelOverlay.classList.contains("hidden") || state.matchmaking.status === "IN_DUEL") {
             elements.duelOverlay.classList.remove("hidden");
@@ -810,9 +820,6 @@
         }
         saveState();
         renderDuel();
-        if (justFinished && liveDuelEndedByForfeit(payload)) {
-            handleLiveForfeitOutcome(payload);
-        }
     }
 
     function buildLiveResultText(payload) {
@@ -832,6 +839,33 @@
             return "Оба хода заперты. Раунд сейчас раскроется.";
         }
         return "Выбери ход на раунд.";
+    }
+
+    function openLiveDuelResult(payload) {
+        const isVictory = payload.resultLabel === "VICTORY";
+        const isDefeat = payload.resultLabel === "DEFEAT";
+        const winnerName = isVictory
+            ? (payload.you && payload.you.displayName ? payload.you.displayName : state.player.name)
+            : (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "Соперник");
+        const rewardMoney = isVictory ? 100 : 0;
+        const rewardExperience = isVictory ? 10 : 0;
+
+        if (isVictory) {
+            addJournal("Победа в PvP. +100 монет и +10 опыта.");
+        } else if (isDefeat) {
+            addJournal("Поражение в PvP. На этот раз без награды.");
+        } else {
+            addJournal("Матч завершился ничьей.");
+        }
+
+        openDuelResultModal({
+            title: isVictory ? "Ты победил" : (isDefeat ? "Ты проиграл" : "Ничья"),
+            copy: isVictory
+                ? "Побежден " + (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "соперник") + "."
+                : (isDefeat ? "Победил " + winnerName + "." : "Оба бойца удержали линию до конца."),
+            experience: rewardExperience,
+            money: rewardMoney
+        });
     }
 
     function normalizeSubmittedAction(action) {
@@ -866,33 +900,6 @@
             return currentDraft;
         }
         return submittedAction;
-    }
-
-    function liveDuelEndedByForfeit(payload) {
-        if (!payload || payload.status !== "FINISHED" || !Array.isArray(payload.logs) || !payload.logs.length) {
-            return false;
-        }
-        const latest = payload.logs[payload.logs.length - 1];
-        const lines = Array.isArray(latest.lines) ? latest.lines : [];
-        return lines.some(function (line) {
-            return String(line).indexOf("покидает бой") >= 0 || String(line).indexOf("автопобеду") >= 0;
-        });
-    }
-
-    function handleLiveForfeitOutcome(payload) {
-        const resultLabel = payload && payload.resultLabel ? payload.resultLabel : "";
-        if (resultLabel === "VICTORY") {
-            addJournal("Победа в PvP. +100 монет и +10 опыта.");
-            showToast("Победа. +100 монет и +10 опыта.");
-        } else if (resultLabel === "DEFEAT") {
-            addJournal("Автопоражение в PvP засчитано.");
-            showToast("Автопоражение засчитано.");
-        } else {
-            showToast("Матч завершен.");
-        }
-        state.matchmaking.status = "COMPLETED";
-        state.matchmaking.duelId = null;
-        closeCurrentDuelToMenu();
     }
 
     function triggerScheduledJournalEvent() {
@@ -1221,15 +1228,7 @@
             return;
         }
         if (item.section === "premium") {
-            if (state.premium.owned.indexOf(item.id) >= 0) {
-                showToast("Этот премиальный лот уже открыт.");
-                return;
-            }
-            state.premium.owned.push(item.id);
-            addJournal('Премиальная витрина открыла "' + item.name + '".');
-            showToast("Открыто: " + item.name + ".");
-            saveState();
-            renderAll();
+            showToast("Премиальный раздел временно в работе.");
             return;
         }
 
@@ -1241,25 +1240,16 @@
             return;
         }
 
-        if (item.kind === "augment" && hasAugment(item.augmentId)) {
-            showToast("Эта аугментация уже в арсенале.");
-            return;
-        }
-
         state.player.money -= item.price;
-        if (item.kind === "augment") {
-            unlockAugment(item.augmentId);
-            addJournal('Куплена аугментация "' + item.name + '". -' + item.price + " монет.");
-        } else {
-            addItem(item.itemId, 1);
-            addJournal('Куплен предмет "' + item.name + '". -' + item.price + " монет.");
-        }
+        addItem(item.itemId, 1);
+        addJournal('Куплен предмет "' + item.name + '". -' + item.price + " монет.");
         showToast("Куплено: " + item.name + ".");
         saveState();
         renderAll();
     }
 
     function requestStartDuel(config) {
+        state.ui.duelResult = null;
         state.ui.startDuelConfirm = {
             mode: config.mode,
             title: config.title,
@@ -1475,6 +1465,7 @@
             showToast("Сначала зарегистрируй аккаунт.");
             return;
         }
+        state.ui.duelResult = null;
         state.duel = {
             title: config.title,
             mode: config.mode,
@@ -1622,20 +1613,16 @@
         };
     }
 
-    function appendLocalSystemChat(text) {
+    function appendLocalSystemLog(text) {
         if (!state.duel) {
             return;
         }
-        state.duel.chatMessages.push({
-            messageId: uid("chat"),
-            playerId: "system",
-            displayName: "Система",
-            text: text,
-            systemMessage: true,
-            createdAt: Date.now()
+        state.duel.logs.push({
+            round: state.duel.round,
+            lines: [text]
         });
-        if (state.duel.chatMessages.length > 80) {
-            state.duel.chatMessages = state.duel.chatMessages.slice(-80);
+        if (state.duel.logs.length > 24) {
+            state.duel.logs = state.duel.logs.slice(-24);
         }
     }
 
@@ -1646,7 +1633,7 @@
         if (!isInitial && typeof duel.autoBattlePendingEnabled === "boolean") {
             duel.autoBattleEnabled = duel.autoBattlePendingEnabled;
             duel.autoBattlePendingEnabled = null;
-            appendLocalSystemChat(
+            appendLocalSystemLog(
                 duel.autoBattleEnabled
                     ? "С этого раунда ходы игрока " + (duel.playerName || "Игрок") + " будут автоматическими."
                     : "С этого раунда автоматические ходы игрока " + (duel.playerName || "Игрок") + " отключены."
@@ -1723,20 +1710,39 @@
         if (duel.playerHp === 0 && duel.opponentHp === 0) {
             duel.finished = true;
             duel.resultText = "Ничья. Оба остаются на линии.";
-            state.player.money = Math.max(0, state.player.money - 4);
-            addJournal("Ничья в бою. -4 монеты на перевязку и замену щита.");
+            addJournal("Ничья в бою. Обе стороны выдыхают и расходятся по снегу.");
+            openDuelResultModal({
+                title: "Ничья",
+                copy: "Никто не смог дожать раунд до победы.",
+                experience: 0,
+                money: 0
+            });
         } else if (duel.opponentHp === 0) {
             duel.finished = true;
             duel.resultText = "Победа. Противник падает в снег.";
             state.player.wins += 1;
-            state.player.money += duel.mode === "bot" ? 10 : 24;
-            addJournal("Победа в бою. +" + (duel.mode === "bot" ? 10 : 24) + " монет и крепче хватка.");
+            const rewardMoney = duel.mode === "bot" ? LOCAL_BOT_VICTORY_COINS : LOCAL_PVP_VICTORY_COINS;
+            const rewardExperience = duel.mode === "bot" ? LOCAL_BOT_VICTORY_EXPERIENCE : LOCAL_PVP_VICTORY_EXPERIENCE;
+            state.player.money += rewardMoney;
+            applyLocalExperienceGain(rewardExperience);
+            addJournal("Победа в бою. +" + rewardMoney + " монет и +" + rewardExperience + " опыта.");
+            openDuelResultModal({
+                title: "Ты победил",
+                copy: "Побежден " + opponentName + ".",
+                experience: rewardExperience,
+                money: rewardMoney
+            });
         } else if (duel.playerHp === 0) {
             duel.finished = true;
             duel.resultText = "Поражение. Приходится отступать в темноту.";
             state.player.losses += 1;
-            state.player.money = Math.max(0, state.player.money - (duel.mode === "bot" ? 4 : 12));
-            addJournal("Поражение в бою. -" + (duel.mode === "bot" ? 4 : 12) + " монет на починку и ледяной чай.");
+            addJournal("Поражение в бою. Придется перегруппироваться и вернуться позже.");
+            openDuelResultModal({
+                title: "Ты проиграл",
+                copy: "Победил " + opponentName + ".",
+                experience: 0,
+                money: 0
+            });
         } else {
             duel.round += 1;
             startLocalRound(duel, false);
@@ -1806,25 +1812,11 @@
     }
 
     function applySupportRegen(duel, lines) {
-        const support = getActiveAugment("support");
-        if (!support || !support.regenPerRound || duel.playerHp <= 0) {
-            return;
-        }
-        const maxHp = getPlayerMaxHp();
-        const restored = Math.min(support.regenPerRound, Math.max(0, maxHp - duel.playerHp));
-        if (!restored) {
-            return;
-        }
-        duel.playerHp += restored;
-        lines.push(support.name + ": +" + restored + " HP после размена.");
+        return;
     }
 
     function shouldSupportEvade(side) {
-        if (side !== "player") {
-            return false;
-        }
-        const support = getActiveAugment("support");
-        return Boolean(support && support.evadeChance && Math.random() < support.evadeChance);
+        return false;
     }
 
     function projectileBlocked(attackerSide, defenderWeapon, weaponCode, shotCode) {
@@ -1836,75 +1828,27 @@
     }
 
     function ignoresBlocking(side) {
-        if (side !== "player") {
-            return false;
-        }
-        const weaponAugment = getActiveAugment("weapon");
-        return Boolean(weaponAugment && weaponAugment.ignoreBlocking);
+        return false;
     }
 
     function getWeaponHitBonus(side, weaponCode, shotCode) {
-        if (side !== "player") {
-            return 0;
-        }
-        const weaponAugment = getActiveAugment("weapon");
-        const supportAugment = getActiveAugment("support");
-        let bonus = 0;
-        if (weaponAugment && weaponAugment.hitChanceBonus && (!weaponAugment.weapons || weaponAugment.weapons.indexOf(weaponCode) >= 0)) {
-            bonus += weaponAugment.hitChanceBonus;
-        }
-        if (supportAugment && supportAugment.centerHitBonus && shotCode === "CENTER") {
-            bonus += supportAugment.centerHitBonus;
-        }
-        return bonus;
+        return 0;
     }
 
     function getWeaponGrazeBonus(side, weaponCode) {
-        if (side !== "player") {
-            return 0;
-        }
-        const weaponAugment = getActiveAugment("weapon");
-        if (weaponAugment && weaponAugment.grazeChanceBonus && (!weaponAugment.weapons || weaponAugment.weapons.indexOf(weaponCode) >= 0)) {
-            return weaponAugment.grazeChanceBonus;
-        }
         return 0;
     }
 
     function getWeaponDamageBonus(side, weaponCode) {
-        if (side !== "player") {
-            return 0;
-        }
-        const weaponAugment = getActiveAugment("weapon");
-        if (weaponAugment && weaponAugment.damageBonus && (!weaponAugment.weapons || weaponAugment.weapons.indexOf(weaponCode) >= 0)) {
-            return weaponAugment.damageBonus;
-        }
         return 0;
     }
 
     function applyDefenseReduction(side, damage, isGraze, lines, defenderName) {
-        if (side !== "player") {
-            return damage;
-        }
-        const defenseAugment = getActiveAugment("defense");
-        if (!defenseAugment) {
-            return damage;
-        }
-        const reduction = isGraze
-            ? (typeof defenseAugment.grazeReduction === "number" ? defenseAugment.grazeReduction : Math.min(2, defenseAugment.damageReduction || 0))
-            : (defenseAugment.damageReduction || 0);
-        if (!reduction) {
-            return damage;
-        }
-        const reduced = Math.max(0, damage - reduction);
-        if (reduced !== damage) {
-            lines.push(defenderName + ": " + defenseAugment.name + " гасит " + (damage - reduced) + " урона.");
-        }
-        return reduced;
+        return damage;
     }
 
     function getPlayerMaxHp() {
-        const defenseAugment = getActiveAugment("defense");
-        return 100 + (defenseAugment && defenseAugment.startHpBonus ? defenseAugment.startHpBonus : 0);
+        return 100;
     }
 
     function triggerRandomJournalEvent(isAutomatic) {
@@ -2001,10 +1945,10 @@
         renderInventory();
         renderFriends();
         renderShop();
-        renderAugmentModal();
         renderDuel();
         renderStartDuelModal();
         renderDuelExitModal();
+        renderDuelResultModal();
     }
 
     function renderScreens() {
@@ -2171,38 +2115,9 @@
     }
 
     function renderInventory() {
-        elements.equippedList.innerHTML = AUGMENT_SLOTS.map(function (slotConfig) {
-            const augment = getActiveAugment(slotConfig.id);
-            return [
-                '<article class="inventory-card augment-card">',
-                '<div class="augment-header">',
-                "<div>",
-                '<span class="augment-type">' + escapeHtml(slotConfig.title) + "</span>",
-                "<h3>" + escapeHtml(augment.name) + "</h3>",
-                '<p class="augment-copy">' + escapeHtml(augment.effectLabel || augment.description || "") + "</p>",
-                "</div>",
-                '<button class="utility-button" data-augment-slot="' + escapeHtml(slotConfig.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.changeAugment(\'' + escapeJs(slotConfig.id) + '\')">Изменить</button>',
-                "</div>",
-                "</article>"
-            ].join("");
-        }).join("");
-        elements.augmentLibraryList.innerHTML = state.inventory.unlockedAugments.map(function (augmentId) {
-            const augment = AUGMENT_LIBRARY[augmentId];
-            const slotConfig = getAugmentSlotConfig(augment.slot);
-            const isActive = state.inventory.augmentSlots[augment.slot] === augment.id;
-            return [
-                '<article class="inventory-card augment-card' + (isActive ? "" : " is-passive") + '">',
-                '<span class="augment-type">' + escapeHtml(slotConfig.title) + "</span>",
-                "<h3>" + escapeHtml(augment.name) + "</h3>",
-                '<p class="augment-copy">' + escapeHtml(augment.effectLabel || augment.description || "") + "</p>",
-                '<span class="augment-status' + (isActive ? " is-active" : "") + '">' + (isActive ? "Установлена" : "В хранилище") + "</span>",
-                "</article>"
-            ].join("");
-        }).join("");
-        elements.backpackList.innerHTML = state.inventory.backpack.map(function (item) {
-            const definition = ITEM_LIBRARY[item.id];
-            return '<article class="inventory-card"><h3>' + escapeHtml(definition.name) + " x" + escapeHtml(String(item.quantity)) + "</h3><p>" + escapeHtml(definition.description) + "</p>" + (definition.usable ? '<div class="inventory-actions"><button class="utility-button is-positive" data-item-action="use" data-item-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.useItem(\'' + escapeJs(item.id) + '\')">Использовать</button></div>' : "") + "</article>";
-        }).join("");
+        if (elements.inventoryPlaceholder) {
+            elements.inventoryPlaceholder.innerHTML = "<h3>Раздел в переработке</h3><p>Инвентарь и аугментации временно скрыты до следующей версии.</p>";
+        }
     }
 
     function renderFriends() {
@@ -2246,6 +2161,9 @@
         elements.shopTabButtons.forEach(function (button) {
             button.classList.toggle("is-active", button.getAttribute("data-shop-section") === activeSection);
         });
+        if (elements.premiumWorkBanner) {
+            elements.premiumWorkBanner.classList.toggle("hidden", activeSection !== "premium");
+        }
         elements.shopList.innerHTML = renderShopSection(activeSection);
     }
 
@@ -2256,10 +2174,9 @@
             '<section class="shop-section">',
             items.map(function (item) {
                 const ownedPremium = item.section === "premium" && state.premium.owned.indexOf(item.id) >= 0;
-                const ownedAugment = item.kind === "augment" && hasAugment(item.augmentId);
-                const alreadyOwned = ownedPremium || ownedAugment;
+                const alreadyOwned = ownedPremium || item.section === "premium";
                 const priceLabel = item.section === "premium" ? item.price + " " + RUBLE_SIGN : item.price + " монет";
-                const buttonLabel = item.section === "premium" ? (ownedPremium ? "В коллекции" : "Купить за " + item.price + " " + RUBLE_SIGN) : (ownedAugment ? "В арсенале" : "Купить");
+                const buttonLabel = item.section === "premium" ? "Скоро" : "Купить";
                 return '<article class="shop-card' + (item.section === "premium" ? " shop-card-premium" : "") + '">' + renderShopPreview(item) + '<h3>' + escapeHtml(item.name) + '</h3><div class="shop-price-row"><strong>' + escapeHtml(priceLabel) + '</strong></div><div class="shop-actions"><button class="' + (item.section === "premium" ? "secondary-button" : "primary-button") + '" data-shop-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.buy(\'' + escapeJs(item.id) + '\')"' + (alreadyOwned ? " disabled" : "") + '>' + escapeHtml(buttonLabel) + "</button></div></article>";
             }).join(""),
             "</section>"
@@ -2277,37 +2194,15 @@
     }
 
     function openAugmentPicker(slot) {
-        const owned = getOwnedAugments(slot);
-        if (!owned.length) {
-            showToast("Сначала купи еще модули для этой линии.");
-            return;
-        }
-        state.ui.augmentPickerSlot = slot;
-        saveState();
-        renderAugmentModal();
+        showToast("Аугментации временно скрыты до переработки.");
     }
 
     function closeAugmentPicker() {
         state.ui.augmentPickerSlot = null;
-        saveState();
-        renderAugmentModal();
     }
 
     function selectAugment(augmentId) {
-        const augment = AUGMENT_LIBRARY[augmentId];
-        if (!augment || !hasAugment(augmentId)) {
-            showToast("Этот модуль еще не разблокирован.");
-            return;
-        }
-        state.inventory.augmentSlots[augment.slot] = augment.id;
-        state.ui.augmentPickerSlot = null;
-        saveState();
-        renderInventory();
-        renderAugmentModal();
-        if (state.duel) {
-            renderDuel();
-        }
-        showToast(getAugmentSlotConfig(augment.slot).title + ": " + augment.name + ".");
+        showToast("Аугментации временно скрыты до переработки.");
     }
 
     function setShopSection(section) {
@@ -2325,22 +2220,11 @@
     }
 
     function getOwnedAugments(slot) {
-        return state.inventory.unlockedAugments
-            .map(function (augmentId) { return AUGMENT_LIBRARY[augmentId]; })
-            .filter(function (augment) { return augment && augment.slot === slot; });
+        return [];
     }
 
     function getActiveAugment(slot) {
-        const selectedId = state.inventory.augmentSlots[slot];
-        const selected = AUGMENT_LIBRARY[selectedId];
-        if (selected) {
-            return selected;
-        }
-        return getOwnedAugments(slot)[0] || Object.keys(AUGMENT_LIBRARY).map(function (augmentId) {
-            return AUGMENT_LIBRARY[augmentId];
-        }).find(function (augment) {
-            return augment.slot === slot;
-        });
+        return null;
     }
 
     function getAugmentSlotConfig(slot) {
@@ -2348,28 +2232,10 @@
     }
 
     function renderAugmentModal() {
-        const slot = state.ui.augmentPickerSlot;
-        if (!slot) {
+        if (elements.augmentModal) {
             elements.augmentModal.classList.add("hidden");
             elements.augmentModal.setAttribute("aria-hidden", "true");
-            return;
         }
-        const slotConfig = getAugmentSlotConfig(slot);
-        const owned = getOwnedAugments(slot);
-        const activeId = state.inventory.augmentSlots[slot];
-        elements.augmentModal.classList.remove("hidden");
-        elements.augmentModal.setAttribute("aria-hidden", "false");
-        elements.augmentModalTitle.textContent = slotConfig.title;
-        elements.augmentModalList.innerHTML = owned.map(function (augment) {
-            const isActive = augment.id === activeId;
-            return [
-                '<button class="inventory-card augment-card augment-option' + (isActive ? " is-active" : "") + '" type="button" data-augment-id="' + escapeHtml(augment.id) + '" onclick="window.PolusApp && window.PolusApp.selectAugment(\'' + escapeJs(augment.id) + '\')">',
-                "<h3>" + escapeHtml(augment.name) + "</h3>",
-                '<p class="augment-copy">' + escapeHtml(augment.effectLabel || augment.description || "") + "</p>",
-                '<span class="augment-status' + (isActive ? " is-active" : "") + '">' + (isActive ? "Установлена" : "Выбрать") + "</span>",
-                "</button>"
-            ].join("");
-        }).join("");
     }
 
     function hasAugment(augmentId) {
@@ -2377,14 +2243,7 @@
     }
 
     function unlockAugment(augmentId) {
-        if (hasAugment(augmentId)) {
-            return;
-        }
-        state.inventory.unlockedAugments.push(augmentId);
-        const augment = AUGMENT_LIBRARY[augmentId];
-        if (!state.inventory.augmentSlots[augment.slot]) {
-            state.inventory.augmentSlots[augment.slot] = augmentId;
-        }
+        return;
     }
 
     function renderDuel() {
@@ -2642,6 +2501,7 @@
 
     function closeCurrentDuelToMenu() {
         state.ui.duelExitConfirmOpen = false;
+        state.ui.duelResult = null;
         state.ui.screen = "home";
         state.matchmaking.queuedAt = null;
         state.duel = null;
@@ -2674,6 +2534,41 @@
         }
         elements.duelExitModal.classList.remove("hidden");
         elements.duelExitModal.setAttribute("aria-hidden", "false");
+    }
+
+    function renderDuelResultModal() {
+        const result = state.ui.duelResult;
+        const shouldOpen = Boolean(result);
+        if (!elements.duelResultModal) {
+            return;
+        }
+        elements.duelResultModal.classList.toggle("hidden", !shouldOpen);
+        elements.duelResultModal.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+        if (!shouldOpen) {
+            return;
+        }
+        elements.duelResultTitle.textContent = result.title || "Бой завершен";
+        elements.duelResultCopy.textContent = result.copy || "";
+        elements.duelResultExp.textContent = formatSignedReward(result.experience || 0, " опыта");
+        elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
+    }
+
+    function openDuelResultModal(config) {
+        state.ui.duelExitConfirmOpen = false;
+        state.ui.duelResult = {
+            title: config.title || "Бой завершен",
+            copy: config.copy || "",
+            experience: Number(config.experience) || 0,
+            money: Number(config.money) || 0
+        };
+        saveState();
+        renderDuelResultModal();
+    }
+
+    function closeDuelResult() {
+        state.matchmaking.status = "COMPLETED";
+        state.matchmaking.duelId = null;
+        closeCurrentDuelToMenu();
     }
 
     function closeDuel() {
@@ -2710,22 +2605,37 @@
         }
         try {
             if (state.duel.mode === "pvp-live" && !state.duel.finished && state.duel.duelId) {
-                await apiFetch("/api/duel/" + encodeURIComponent(state.duel.duelId) + "/forfeit", { method: "POST" });
+                const duelId = state.duel.duelId;
+                await apiFetch("/api/duel/" + encodeURIComponent(duelId) + "/forfeit", { method: "POST" });
                 addJournal("Ты покинул бой. Засчитано автопоражение.");
                 state.matchmaking.status = "COMPLETED";
                 state.matchmaking.duelId = null;
-                closeCurrentDuelToMenu();
-                showToast("Засчитано автопоражение.");
+                await refreshLiveDuel(duelId);
                 return;
             }
 
             const duel = state.duel;
-            const penalty = duel.mode === "bot" ? 4 : 12;
+            const opponentName = duel.opponentName || "Соперник";
+            duel.finished = true;
+            duel.playerHp = 0;
+            duel.resultText = "Поражение. Бой остановлен до следующего выхода.";
             state.player.losses += 1;
-            state.player.money = Math.max(0, state.player.money - penalty);
-            addJournal("Автопоражение в дуэли. -" + penalty + "₽ на патроны и лед.");
-            closeCurrentDuelToMenu();
-            showToast("Засчитано автопоражение.");
+            duel.logs.push({
+                round: duel.round,
+                lines: [
+                    "Раунд " + duel.round + ": " + (duel.playerName || "Игрок") + " покидает бой.",
+                    "Итог: " + opponentName + " получает автопобеду."
+                ]
+            });
+            addJournal("Автопоражение в дуэли засчитано.");
+            openDuelResultModal({
+                title: "Ты проиграл",
+                copy: "Победил " + opponentName + ".",
+                experience: 0,
+                money: 0
+            });
+            saveState();
+            renderAll();
         } catch (error) {
             showToast(error && error.message ? error.message : "Не удалось покинуть бой.");
         } finally {
@@ -2816,11 +2726,6 @@
             { id: "shop-medkit", section: "standard", kind: "item", itemId: "medkit", name: "Аптечка", description: "Бинты, стим и запас прочности на один грязный бой.", price: 20 },
             { id: "shop-gear", section: "standard", kind: "item", itemId: "brassGear", name: "Латунная шестерня", description: "Редкая деталь для квестов, ремонта и тех, кто вечно что-то чинит.", price: 18 },
             { id: "shop-ammo", section: "standard", kind: "item", itemId: "cartridges38", name: "Патроны .38", description: "Сухие, чистые и пока еще теплые.", price: 9 },
-            { id: "shop-weapon-sights", section: "standard", kind: "augment", augmentId: "weaponBrassSights", name: "Латунный прицел", description: "Оружейная аугментация: выпрямляет мушку и даёт стабильную линию.", price: 34 },
-            { id: "shop-weapon-piercing", section: "standard", kind: "augment", augmentId: "weaponPiercingCore", name: "Бронебойный сердечник", description: "Оружейная аугментация: давит сквозь щитовой блок.", price: 39 },
-            { id: "shop-weapon-scatter", section: "standard", kind: "augment", augmentId: "weaponScatterNozzle", name: "Расширитель дроби", description: "Оружейная аугментация: делает дробовик липким на краю линии.", price: 31 },
-            { id: "shop-defense-mesh", section: "standard", kind: "augment", augmentId: "defenseColdMesh", name: "Хладостойкая сетка", description: "Защитная аугментация: режет даже скользящий урон.", price: 28 },
-            { id: "shop-support-link", section: "standard", kind: "augment", augmentId: "supportTargetLink", name: "Связка меток", description: "Вспомогательная аугментация: помогает держать центр.", price: 26 },
             { id: "premium-skin-crimson", section: "premium", kind: "premium", name: "Скин «Багряный кобальт»", description: "Премиальный скин карточки дуэлянта с рубиновым свечением.", price: 149, previewType: "skin", previewTone: "crimson" },
             { id: "premium-backdrop-polar", section: "premium", kind: "premium", name: "Фон «Полярная латунь»", description: "Премиальный фон хаба с холодной латунью и мягким снеговым свечением.", price: 199, previewType: "backdrop", previewTone: "polar" }
         ];
@@ -2828,7 +2733,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 10;
+        next.version = 11;
         next.player = Object.assign({ name: "Новый игрок", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 }, next.player || {});
         const progressSnapshot = getLevelProgressSnapshot(typeof next.player.experience === "number" ? next.player.experience : 0);
         next.player.level = progressSnapshot.level;
@@ -2854,24 +2759,14 @@
             lastJournalEventAt: Date.now(),
             lastFriendSyncAt: 0
         }, next.world || {});
-        next.ui = Object.assign({ screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null }, next.ui || {});
+        next.ui = Object.assign({ screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, duelResult: null }, next.ui || {});
         next.ui.startDuelAction = null;
+        next.ui.duelResult = next.ui.duelResult || null;
         next.inventory = next.inventory || {};
         next.inventory.backpack = Array.isArray(next.inventory.backpack) ? next.inventory.backpack : [];
-        next.inventory.equipped = Array.isArray(next.inventory.equipped) ? next.inventory.equipped : [];
-        next.inventory.unlockedAugments = Array.from(new Set((next.inventory.unlockedAugments || []).concat([
-            "weaponBrassSights",
-            "weaponDoubleTap",
-            "defensePlating",
-            "defenseHeatSink",
-            "supportSidestep",
-            "supportStimLoop"
-        ])));
-        next.inventory.augmentSlots = Object.assign({
-            weapon: "weaponBrassSights",
-            defense: "defensePlating",
-            support: "supportSidestep"
-        }, next.inventory.augmentSlots || {});
+        next.inventory.equipped = [];
+        next.inventory.unlockedAugments = [];
+        next.inventory.augmentSlots = {};
         next.premium = next.premium || { owned: [] };
         next.friends = Array.isArray(next.friends) ? next.friends : [];
         next.friendRequests = Array.isArray(next.friendRequests) ? next.friendRequests : [];
@@ -2881,7 +2776,7 @@
 
     function buildInitialState() {
         return {
-            version: 10,
+            version: 11,
             auth: {
                 sessionToken: null,
                 playerId: null,
@@ -2902,27 +2797,12 @@
                 lastJournalEventAt: Date.now(),
                 lastFriendSyncAt: 0
             },
-            ui: { screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, startDuelAction: null },
+            ui: { screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, startDuelAction: null, duelResult: null },
             journal: [],
             inventory: {
-                equipped: [
-                    { slot: "Кобура", name: "Пистоль и щит", description: "Короткий ствол и щит для ближней линии." },
-                    { slot: "Спина", name: "Винтовка «Север-3»", description: "Тяжелая, но надежная на длинной линии." },
-                    { slot: "Шея", name: "Плотный шарф", description: "Спасает горло, но не спасает от долгов." }
-                ],
-                augmentSlots: {
-                    weapon: "weaponBrassSights",
-                    defense: "defensePlating",
-                    support: "supportSidestep"
-                },
-                unlockedAugments: [
-                    "weaponBrassSights",
-                    "weaponDoubleTap",
-                    "defensePlating",
-                    "defenseHeatSink",
-                    "supportSidestep",
-                    "supportStimLoop"
-                ],
+                equipped: [],
+                augmentSlots: {},
+                unlockedAugments: [],
                 backpack: [
                     { id: "cartridges38", quantity: 12 },
                     { id: "medkit", quantity: 1 },
@@ -2950,7 +2830,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && (parsed.version === 4 || parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8 || parsed.version === 9 || parsed.version === 10) ? parsed : buildInitialState();
+            return parsed && (parsed.version === 4 || parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8 || parsed.version === 9 || parsed.version === 10 || parsed.version === 11) ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -3065,8 +2945,29 @@
         };
     }
 
+    function applyLocalExperienceGain(amount) {
+        const gain = Math.max(0, Number(amount) || 0);
+        if (!gain) {
+            return;
+        }
+        const previousLevel = Number(state.player.level) || 1;
+        state.player.experience = Math.max(0, Number(state.player.experience) || 0) + gain;
+        const snapshot = getLevelProgressSnapshot(state.player.experience);
+        state.player.level = snapshot.level;
+        state.player.levelProgressCurrent = snapshot.current;
+        state.player.levelProgressTarget = snapshot.target;
+        if (snapshot.level > previousLevel) {
+            state.player.availableStatPoints = Math.max(0, (state.player.availableStatPoints || 0) + (snapshot.level - previousLevel));
+        }
+    }
+
     function formatMoney(amount) {
         return String(amount);
+    }
+
+    function formatSignedReward(amount, suffix) {
+        const value = Number(amount) || 0;
+        return (value > 0 ? "+" : "") + value + suffix;
     }
 
     function formatDuration(milliseconds) {
@@ -3136,7 +3037,6 @@
 
     function getRewardTerms() {
         return Object.keys(ITEM_LIBRARY).map(function (key) { return ITEM_LIBRARY[key].name; })
-            .concat(Object.keys(AUGMENT_LIBRARY).map(function (key) { return AUGMENT_LIBRARY[key].name; }))
             .concat((state.shop || []).map(function (item) { return item.name; }));
     }
 

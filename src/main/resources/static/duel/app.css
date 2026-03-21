@@ -710,6 +710,32 @@ button {
     font-family: var(--font-head);
 }
 
+.work-banner,
+.empty-state-card {
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1px dashed rgba(216, 176, 123, 0.26);
+    background: linear-gradient(180deg, rgba(216, 176, 123, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.work-banner {
+    margin-bottom: 12px;
+    color: #f7d7ba;
+    font-weight: 700;
+    text-align: center;
+}
+
+.empty-state-card h3,
+.empty-state-card p {
+    margin: 0;
+}
+
+.empty-state-card p {
+    margin-top: 8px;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
 .inventory-actions,
 .friend-actions,
 .shop-actions,
@@ -1588,6 +1614,38 @@ body.duel-open .bottom-nav {
         radial-gradient(circle at top right, rgba(216, 176, 123, 0.12), transparent 26%),
         linear-gradient(180deg, rgba(23, 30, 49, 0.98), rgba(17, 22, 36, 0.98));
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+}
+
+.duel-result-sheet {
+    display: grid;
+    gap: 14px;
+}
+
+.duel-result-rewards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.duel-result-chip {
+    padding: 12px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.duel-result-chip span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.duel-result-chip strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--brass);
+    font-size: 1.18rem;
+    line-height: 1;
 }
 
 .modal-sheet-compact {

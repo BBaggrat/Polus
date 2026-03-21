@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-2">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-3">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -155,21 +155,9 @@
                 </div>
             </div>
 
-            <div class="inventory-layout">
-                <section class="inventory-block">
-                    <h3>Аугментации</h3>
-                    <div class="inventory-list" id="equipped-list"></div>
-                </section>
-
-                <section class="inventory-block">
-                    <h3>Модули в хранилище</h3>
-                    <div class="inventory-list" id="augment-library-list"></div>
-                </section>
-
-                <section class="inventory-block">
-                    <h3>В рюкзаке</h3>
-                    <div class="inventory-list" id="backpack-list"></div>
-                </section>
+            <div class="empty-state-card" id="inventory-placeholder">
+                <h3>Раздел в переработке</h3>
+                <p>Инвентарь и аугментации временно убраны до следующей версии.</p>
             </div>
         </section>
     </section>
@@ -203,6 +191,7 @@
                 <button class="shop-tab is-active" data-shop-section="standard" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('standard')">Снаряжение</button>
                 <button class="shop-tab" data-shop-section="premium" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('premium')">Премиум</button>
             </div>
+            <div class="work-banner hidden" id="premium-work-banner">Временно в работе</div>
             <div class="shop-list" id="shop-list"></div>
         </section>
     </section>
@@ -238,18 +227,6 @@
             <p class="field-error hidden" id="registration-error"></p>
             <button class="primary-button full-width" id="registration-submit" type="submit">Создать аккаунт</button>
         </form>
-    </div>
-</section>
-
-<section class="modal-overlay hidden" id="augment-modal" aria-hidden="true">
-    <div class="modal-sheet modal-sheet-compact">
-        <div class="modal-header">
-            <div>
-                <h3 class="panel-title panel-title-small" id="augment-modal-title">Линия</h3>
-            </div>
-            <button class="ghost-button modal-close-button" id="augment-modal-close" type="button" onclick="window.PolusApp && window.PolusApp.closeAugmentPicker()">Закрыть</button>
-        </div>
-        <div class="inventory-list" id="augment-modal-list"></div>
     </div>
 </section>
 
@@ -374,8 +351,8 @@
                         <h4>Выстрел</h4>
                         <div class="toggle-row">
                             <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')">Лево</button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')">Право</button>
                             <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')">Центр</button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')">Право</button>
                         </div>
                     </section>
 
@@ -383,8 +360,8 @@
                         <h4>Уворот</h4>
                         <div class="toggle-row">
                             <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')">Лево</button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')">Право</button>
                             <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')">Центр</button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')">Право</button>
                         </div>
                     </section>
                 </div>
@@ -425,9 +402,31 @@
     </div>
 </section>
 
+<section class="modal-overlay modal-overlay-centered hidden" id="duel-result-modal" aria-hidden="true">
+    <div class="modal-sheet modal-sheet-compact duel-result-sheet">
+        <div class="modal-header modal-header-stack">
+            <div>
+                <h3 class="panel-title panel-title-small" id="duel-result-title">Бой завершён</h3>
+                <p class="panel-copy duel-exit-copy" id="duel-result-copy">Победа за тобой.</p>
+            </div>
+        </div>
+        <div class="duel-result-rewards">
+            <div class="duel-result-chip">
+                <span>Опыт</span>
+                <strong id="duel-result-exp">+0</strong>
+            </div>
+            <div class="duel-result-chip">
+                <span>Монеты</span>
+                <strong id="duel-result-money">+0</strong>
+            </div>
+        </div>
+        <button class="primary-button full-width" id="duel-result-close" type="button" onclick="window.PolusApp && window.PolusApp.closeDuelResult()">В хаб</button>
+    </div>
+</section>
+
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/app.js?v=polus-20260321-2"></script>
+<script src="/duel/app.js?v=polus-20260321-3"></script>
 </body>
 </html>
 

@@ -393,19 +393,17 @@ public class DuelService {
         String text = pending
                 ? "С этого раунда ходы игрока " + playerName + " будут автоматическими."
                 : "С этого раунда автоматические ходы игрока " + playerName + " отключены.";
-        addSystemChatMessage(duel, text, now);
+        addSystemRoundLog(duel, text, now);
     }
 
-    private void addSystemChatMessage(Duel duel, String text, Instant now) {
-        duel.getChatMessages().add(new DuelChatMessage(
-                UUID.randomUUID().toString(),
-                null,
-                "Система",
-                text,
-                true,
+    private void addSystemRoundLog(Duel duel, String text, Instant now) {
+        duel.getRoundLogs().add(new RoundLog(
+                duel.getRoundNumber(),
+                List.of("Раунд " + duel.getRoundNumber() + ": " + text),
+                duel.getPlayerOneHp(),
+                duel.getPlayerTwoHp(),
                 now
         ));
-        trimChatIfNeeded(duel);
         duel.setUpdatedAt(now);
     }
 
