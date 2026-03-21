@@ -1740,6 +1740,7 @@
         duel.logs.push({ round: duel.round, lines: lines });
         if (duel.playerHp === 0 && duel.opponentHp === 0) {
             duel.finished = true;
+            applyLocalExperienceGain(BATTLE_REWARD_EXPERIENCE);
             duel.resultText = "Ничья. Оба остаются на линии.";
             addJournal("Ничья в бою. Обе стороны выдыхают и расходятся по снегу.");
             openDuelResultModal({
