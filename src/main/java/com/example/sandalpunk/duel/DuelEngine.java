@@ -122,9 +122,7 @@ public class DuelEngine {
         StringBuilder summary = new StringBuilder(attackerName)
                 .append(" попадает ")
                 .append(pelletsHit)
-                .append(" дробин")
-                .append(pelletsHit == 1 ? "ой" : "ами")
-                .append(" и наносит ")
+                .append(" дробинами и наносит ")
                 .append(damage)
                 .append(" урона.");
         if (pelletsBlocked > 0) {
@@ -141,8 +139,15 @@ public class DuelEngine {
     }
 
     private String buildIntentLine(String playerName, DuelRoundAction action) {
-        return playerName + " стреляет " + shotDirectionPhrase(action.shotDirection())
-                + " " + weaponInstrument(action.weapon()) + " и " + dodgeDirectionPhrase(action.dodgeDirection()) + ".";
+        return switch (action.source()) {
+            case MANUAL -> playerName + " стреляет " + shotDirectionPhrase(action.shotDirection())
+                    + " " + weaponInstrument(action.weapon()) + " и " + dodgeDirectionPhrase(action.dodgeDirection()) + ".";
+            case AUTO_BATTLE -> playerName + " действует автоматически: стреляет " + shotDirectionPhrase(action.shotDirection())
+                    + " " + weaponInstrument(action.weapon()) + " и " + dodgeDirectionPhrase(action.dodgeDirection()) + ".";
+            case TIMEOUT_DEFAULT -> playerName + " не успевает выбрать ход и по таймеру стреляет "
+                    + shotDirectionPhrase(action.shotDirection()) + " " + weaponInstrument(action.weapon())
+                    + " и " + dodgeDirectionPhrase(action.dodgeDirection()) + ".";
+        };
     }
 
     private String shotDirectionPhrase(ShotDirection shotDirection) {
@@ -156,14 +161,14 @@ public class DuelEngine {
     private String dodgeDirectionPhrase(DodgeDirection dodgeDirection) {
         return switch (dodgeDirection) {
             case LEFT -> "смещается влево";
-            case STAY -> "стоит по центру";
+            case STAY -> "остается по центру";
             case RIGHT -> "смещается вправо";
         };
     }
 
     private String weaponInstrument(WeaponType weaponType) {
         return switch (weaponType) {
-            case PISTOLS -> "из пистоля";
+            case PISTOLS -> "из пистоля и щита";
             case RIFLE -> "из винтовки";
             case SHOTGUN -> "из дробовика";
         };

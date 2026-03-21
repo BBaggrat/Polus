@@ -7,6 +7,7 @@ public record DuelChatMessage(
         String playerId,
         String displayName,
         String text,
+        boolean systemMessage,
         Instant createdAt
 ) {
 }

@@ -7,6 +7,7 @@ public record DuelChatMessageView(
         String playerId,
         String displayName,
         String text,
+        boolean systemMessage,
         Instant createdAt
 ) {
     public static DuelChatMessageView from(DuelChatMessage message) {
@@ -15,6 +16,7 @@ public record DuelChatMessageView(
                 message.playerId(),
                 message.displayName(),
                 message.text(),
+                message.systemMessage(),
                 message.createdAt()
         );
     }

@@ -52,6 +52,16 @@ public class DuelController {
         return duelService.submitChat(duelId, playerProfile, request);
     }
 
+    @PostMapping("/{duelId}/automation")
+    public DuelStateResponse configureAutomation(
+            @PathVariable String duelId,
+            @RequestHeader("X-Session-Token") String sessionToken,
+            @RequestBody DuelAutomationRequest request
+    ) {
+        PlayerProfile playerProfile = sessionService.requirePlayer(sessionToken);
+        return duelService.configureAutomation(duelId, playerProfile, request);
+    }
+
     @PostMapping("/{duelId}/forfeit")
     public DuelStateResponse forfeit(
             @PathVariable String duelId,

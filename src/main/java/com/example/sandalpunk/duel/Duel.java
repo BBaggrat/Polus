@@ -23,8 +23,14 @@ public class Duel {
     private final List<RoundLog> roundLogs = new ArrayList<>();
     private final List<DuelChatMessage> chatMessages = new ArrayList<>();
     private final Instant createdAt;
+    private Instant roundStartedAt;
+    private Instant roundDeadlineAt;
     private Instant updatedAt;
     private Instant finishedAt;
+    private boolean playerOneAutoBattleEnabled;
+    private boolean playerTwoAutoBattleEnabled;
+    private Boolean playerOneAutoBattlePendingEnabled;
+    private Boolean playerTwoAutoBattlePendingEnabled;
 
     public Duel(String id, String playerOneId, String playerOneName, String playerTwoId, String playerTwoName, Instant createdAt) {
         this.id = id;
@@ -33,6 +39,7 @@ public class Duel {
         this.playerTwoId = playerTwoId;
         this.playerTwoName = playerTwoName;
         this.createdAt = createdAt;
+        this.roundStartedAt = createdAt;
         this.updatedAt = createdAt;
     }
 
@@ -120,12 +127,60 @@ public class Duel {
         this.updatedAt = updatedAt;
     }
 
+    public Instant getRoundStartedAt() {
+        return roundStartedAt;
+    }
+
+    public void setRoundStartedAt(Instant roundStartedAt) {
+        this.roundStartedAt = roundStartedAt;
+    }
+
+    public Instant getRoundDeadlineAt() {
+        return roundDeadlineAt;
+    }
+
+    public void setRoundDeadlineAt(Instant roundDeadlineAt) {
+        this.roundDeadlineAt = roundDeadlineAt;
+    }
+
     public Instant getFinishedAt() {
         return finishedAt;
     }
 
     public void setFinishedAt(Instant finishedAt) {
         this.finishedAt = finishedAt;
+    }
+
+    public boolean isPlayerOneAutoBattleEnabled() {
+        return playerOneAutoBattleEnabled;
+    }
+
+    public void setPlayerOneAutoBattleEnabled(boolean playerOneAutoBattleEnabled) {
+        this.playerOneAutoBattleEnabled = playerOneAutoBattleEnabled;
+    }
+
+    public boolean isPlayerTwoAutoBattleEnabled() {
+        return playerTwoAutoBattleEnabled;
+    }
+
+    public void setPlayerTwoAutoBattleEnabled(boolean playerTwoAutoBattleEnabled) {
+        this.playerTwoAutoBattleEnabled = playerTwoAutoBattleEnabled;
+    }
+
+    public Boolean getPlayerOneAutoBattlePendingEnabled() {
+        return playerOneAutoBattlePendingEnabled;
+    }
+
+    public void setPlayerOneAutoBattlePendingEnabled(Boolean playerOneAutoBattlePendingEnabled) {
+        this.playerOneAutoBattlePendingEnabled = playerOneAutoBattlePendingEnabled;
+    }
+
+    public Boolean getPlayerTwoAutoBattlePendingEnabled() {
+        return playerTwoAutoBattlePendingEnabled;
+    }
+
+    public void setPlayerTwoAutoBattlePendingEnabled(Boolean playerTwoAutoBattlePendingEnabled) {
+        this.playerTwoAutoBattlePendingEnabled = playerTwoAutoBattlePendingEnabled;
     }
 
     public boolean isParticipant(String playerId) {

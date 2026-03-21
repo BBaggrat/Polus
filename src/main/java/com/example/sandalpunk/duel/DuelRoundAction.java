@@ -8,7 +8,7 @@ public record DuelRoundAction(
         WeaponType weapon,
         ShotDirection shotDirection,
         DodgeDirection dodgeDirection,
+        DuelActionSource source,
         Instant submittedAt
 ) {
 }
-

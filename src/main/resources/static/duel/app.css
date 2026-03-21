@@ -1067,6 +1067,13 @@ body.duel-open .bottom-nav {
     gap: 8px;
 }
 
+.duel-round-timer {
+    margin: 0;
+    color: var(--icy);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
 .duel-topbar-close {
     min-height: 40px;
     padding: 8px 14px;
@@ -1209,6 +1216,28 @@ body.duel-open .bottom-nav {
     padding: 10px;
 }
 
+.duel-control-stack {
+    position: relative;
+    display: grid;
+    gap: 12px;
+}
+
+.duel-auto-cover {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: rgba(12, 17, 30, 0.62);
+    backdrop-filter: blur(2px);
+    color: rgba(255, 255, 255, 0.92);
+    font-family: var(--font-head);
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
 .duel-form-header {
     display: flex;
     align-items: center;
@@ -1332,6 +1361,34 @@ body.duel-open .bottom-nav {
     display: grid;
     grid-template-columns: 1fr;
     gap: 8px;
+}
+
+.duel-auto-row {
+    display: grid;
+    gap: 8px;
+}
+
+.duel-auto-toggle {
+    min-height: 44px;
+}
+
+.duel-auto-toggle.is-active {
+    border-color: rgba(203, 142, 118, 0.42);
+    color: #ffd5dd;
+    background: rgba(137, 51, 77, 0.14);
+}
+
+.duel-auto-toggle.is-pending {
+    border-color: rgba(95, 187, 215, 0.34);
+    color: var(--icy);
+    background: rgba(39, 91, 122, 0.16);
+}
+
+.duel-auto-note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.4;
 }
 
 .full-width {
@@ -1468,6 +1525,11 @@ body.duel-open .bottom-nav {
 
 .duel-chat-entry-system .duel-chat-text {
     color: #d87385;
+}
+
+.duel-chat-entry-info .duel-chat-meta,
+.duel-chat-entry-info .duel-chat-text {
+    color: var(--icy);
 }
 
 .duel-chat-form {

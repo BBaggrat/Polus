@@ -1,226 +1,227 @@
-(function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v9";
+﻿(function () {
+    const STORAGE_KEY = "polus_frontend_prototype_v10";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
     const JOURNAL_EVENT_MS = 90000;
+    const DUEL_ROUND_TIMEOUT_MS = 2 * 60 * 1000;
     const LEVEL_THRESHOLDS = [100, 200, 350, 500];
     const SHIELD_BLOCK_CHANCE = 0.30;
     const SHOTGUN_EDGE_GRAZE_CHANCE = 0.35;
     const SHOTGUN_EDGE_DAMAGE = 5;
     const CHAT_LINK_PATTERN = /(?:https?:\/\/|www\.|t\.me\/|telegram\.me\/|[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|\b))/i;
-    const DIRECTION_TERMS = ["по центру", "влево", "вправо"];
+    const DIRECTION_TERMS = ["РїРѕ С†РµРЅС‚СЂСѓ", "РІР»РµРІРѕ", "РІРїСЂР°РІРѕ"];
     const ITEM_LIBRARY = {
-        cartridges38: { id: "cartridges38", name: "Патроны .38", description: "Держатся в кармане. Теплые от ладони.", pocket: true },
-        medkit: { id: "medkit", name: "Аптечка", description: "Бинты и стим. +30 HP в бою.", pocket: true, usable: true },
-        brassGear: { id: "brassGear", name: "Латунная шестерня", description: "Тяжелая, зубастая, пахнет маслом." },
-        relicBox: { id: "relicBox", name: "Шкатулка с гравировкой", description: "Семейная вещь из трактира. За нее много спорят." },
-        iceToken: { id: "iceToken", name: "Ледяной жетон", description: "Открывает старые камеры и чужие разговоры.", pocket: true },
-        scrapMap: { id: "scrapMap", name: "Мятая карта льда", description: "На полях отмечены безопасные тропы.", pocket: true }
+        cartridges38: { id: "cartridges38", name: "РџР°С‚СЂРѕРЅС‹ .38", description: "Р”РµСЂР¶Р°С‚СЃСЏ РІ РєР°СЂРјР°РЅРµ. РўРµРїР»С‹Рµ РѕС‚ Р»Р°РґРѕРЅРё.", pocket: true },
+        medkit: { id: "medkit", name: "РђРїС‚РµС‡РєР°", description: "Р‘РёРЅС‚С‹ Рё СЃС‚РёРј. +30 HP РІ Р±РѕСЋ.", pocket: true, usable: true },
+        brassGear: { id: "brassGear", name: "Р›Р°С‚СѓРЅРЅР°СЏ С€РµСЃС‚РµСЂРЅСЏ", description: "РўСЏР¶РµР»Р°СЏ, Р·СѓР±Р°СЃС‚Р°СЏ, РїР°С…РЅРµС‚ РјР°СЃР»РѕРј." },
+        relicBox: { id: "relicBox", name: "РЁРєР°С‚СѓР»РєР° СЃ РіСЂР°РІРёСЂРѕРІРєРѕР№", description: "РЎРµРјРµР№РЅР°СЏ РІРµС‰СЊ РёР· С‚СЂР°РєС‚РёСЂР°. Р—Р° РЅРµРµ РјРЅРѕРіРѕ СЃРїРѕСЂСЏС‚." },
+        iceToken: { id: "iceToken", name: "Р›РµРґСЏРЅРѕР№ Р¶РµС‚РѕРЅ", description: "РћС‚РєСЂС‹РІР°РµС‚ СЃС‚Р°СЂС‹Рµ РєР°РјРµСЂС‹ Рё С‡СѓР¶РёРµ СЂР°Р·РіРѕРІРѕСЂС‹.", pocket: true },
+        scrapMap: { id: "scrapMap", name: "РњСЏС‚Р°СЏ РєР°СЂС‚Р° Р»СЊРґР°", description: "РќР° РїРѕР»СЏС… РѕС‚РјРµС‡РµРЅС‹ Р±РµР·РѕРїР°СЃРЅС‹Рµ С‚СЂРѕРїС‹.", pocket: true }
     };
     const QUEST_SCENES = {
         familyRelic: {
             start: {
-                subtitle: "Трактирщик просит вернуть запертую шкатулку",
+                subtitle: "РўСЂР°РєС‚РёСЂС‰РёРє РїСЂРѕСЃРёС‚ РІРµСЂРЅСѓС‚СЊ Р·Р°РїРµСЂС‚СѓСЋ С€РєР°С‚СѓР»РєСѓ",
                 text: [
-                    "Трактирщик из «Северного Ветра» мнет фартук и шепчет, что фамильная реликвия снова ушла не в те руки.",
-                    "Если вернешь шкатулку без лишнего шума, будет награда. Если полезешь внутрь сам, риск и холод останутся с тобой."
+                    "РўСЂР°РєС‚РёСЂС‰РёРє РёР· В«РЎРµРІРµСЂРЅРѕРіРѕ Р’РµС‚СЂР°В» РјРЅРµС‚ С„Р°СЂС‚СѓРє Рё С€РµРїС‡РµС‚, С‡С‚Рѕ С„Р°РјРёР»СЊРЅР°СЏ СЂРµР»РёРєРІРёСЏ СЃРЅРѕРІР° СѓС€Р»Р° РЅРµ РІ С‚Рµ СЂСѓРєРё.",
+                    "Р•СЃР»Рё РІРµСЂРЅРµС€СЊ С€РєР°С‚СѓР»РєСѓ Р±РµР· Р»РёС€РЅРµРіРѕ С€СѓРјР°, Р±СѓРґРµС‚ РЅР°РіСЂР°РґР°. Р•СЃР»Рё РїРѕР»РµР·РµС€СЊ РІРЅСѓС‚СЂСЊ СЃР°Рј, СЂРёСЃРє Рё С…РѕР»РѕРґ РѕСЃС‚Р°РЅСѓС‚СЃСЏ СЃ С‚РѕР±РѕР№."
                 ],
-                tags: ["долг", "холод", "слухи"],
+                tags: ["РґРѕР»Рі", "С…РѕР»РѕРґ", "СЃР»СѓС…Рё"],
                 choices: [
-                    { id: "return-box", label: "Вернуть шкатулку трактирщику", note: "Если шкатулка под рукой.", requiresItem: "relicBox", consumeItem: "relicBox", rewardMoney: 38, successText: "Успех. Трактирщик молча кивает. +38₽ и новая наводка на склад.", complete: true },
-                    { id: "open-box", label: "Вскрыть шкатулку монетой", note: "Шанс 50%.", chance: 0.5, successGoto: "opened", failText: "Провал. Замок хрустит слишком громко, шум поднимается, -6₽ на отмычки.", penaltyMoney: 6 }
+                    { id: "return-box", label: "Р’РµСЂРЅСѓС‚СЊ С€РєР°С‚СѓР»РєСѓ С‚СЂР°РєС‚РёСЂС‰РёРєСѓ", note: "Р•СЃР»Рё С€РєР°С‚СѓР»РєР° РїРѕРґ СЂСѓРєРѕР№.", requiresItem: "relicBox", consumeItem: "relicBox", rewardMoney: 38, successText: "РЈСЃРїРµС…. РўСЂР°РєС‚РёСЂС‰РёРє РјРѕР»С‡Р° РєРёРІР°РµС‚. +38в‚Ѕ Рё РЅРѕРІР°СЏ РЅР°РІРѕРґРєР° РЅР° СЃРєР»Р°Рґ.", complete: true },
+                    { id: "open-box", label: "Р’СЃРєСЂС‹С‚СЊ С€РєР°С‚СѓР»РєСѓ РјРѕРЅРµС‚РѕР№", note: "РЁР°РЅСЃ 50%.", chance: 0.5, successGoto: "opened", failText: "РџСЂРѕРІР°Р». Р—Р°РјРѕРє С…СЂСѓСЃС‚РёС‚ СЃР»РёС€РєРѕРј РіСЂРѕРјРєРѕ, С€СѓРј РїРѕРґРЅРёРјР°РµС‚СЃСЏ, -6в‚Ѕ РЅР° РѕС‚РјС‹С‡РєРё.", penaltyMoney: 6 }
                 ]
             },
             opened: {
-                subtitle: "Внутри стучит что-то металлическое",
+                subtitle: "Р’РЅСѓС‚СЂРё СЃС‚СѓС‡РёС‚ С‡С‚Рѕ-С‚Рѕ РјРµС‚Р°Р»Р»РёС‡РµСЃРєРѕРµ",
                 text: [
-                    "Крышка поддается, и из бархата выкатывается ледяной жетон. На обратной стороне выбит номер склада.",
-                    "Можно забрать находку себе или все-таки отнести ее хозяину и сыграть в долгую."
+                    "РљСЂС‹С€РєР° РїРѕРґРґР°РµС‚СЃСЏ, Рё РёР· Р±Р°СЂС…Р°С‚Р° РІС‹РєР°С‚С‹РІР°РµС‚СЃСЏ Р»РµРґСЏРЅРѕР№ Р¶РµС‚РѕРЅ. РќР° РѕР±СЂР°С‚РЅРѕР№ СЃС‚РѕСЂРѕРЅРµ РІС‹Р±РёС‚ РЅРѕРјРµСЂ СЃРєР»Р°РґР°.",
+                    "РњРѕР¶РЅРѕ Р·Р°Р±СЂР°С‚СЊ РЅР°С…РѕРґРєСѓ СЃРµР±Рµ РёР»Рё РІСЃРµ-С‚Р°РєРё РѕС‚РЅРµСЃС‚Рё РµРµ С…РѕР·СЏРёРЅСѓ Рё СЃС‹РіСЂР°С‚СЊ РІ РґРѕР»РіСѓСЋ."
                 ],
-                tags: ["удача", "жадность", "тихий скрип"],
+                tags: ["СѓРґР°С‡Р°", "Р¶Р°РґРЅРѕСЃС‚СЊ", "С‚РёС…РёР№ СЃРєСЂРёРї"],
                 choices: [
-                    { id: "keep-token", label: "Забрать жетон себе", note: "Получишь новый предмет и немного денег.", rewardMoney: 12, rewardItem: "iceToken", successText: "Находка. +12₽ и ледяной жетон уходит в карман.", complete: true },
-                    { id: "bring-token", label: "Отнести находку трактирщику", note: "Меньше риска, больше доверия.", rewardMoney: 26, successText: "Успех. Трактирщик выдает +26₽ и обещает помнить услугу.", complete: true }
+                    { id: "keep-token", label: "Р—Р°Р±СЂР°С‚СЊ Р¶РµС‚РѕРЅ СЃРµР±Рµ", note: "РџРѕР»СѓС‡РёС€СЊ РЅРѕРІС‹Р№ РїСЂРµРґРјРµС‚ Рё РЅРµРјРЅРѕРіРѕ РґРµРЅРµРі.", rewardMoney: 12, rewardItem: "iceToken", successText: "РќР°С…РѕРґРєР°. +12в‚Ѕ Рё Р»РµРґСЏРЅРѕР№ Р¶РµС‚РѕРЅ СѓС…РѕРґРёС‚ РІ РєР°СЂРјР°РЅ.", complete: true },
+                    { id: "bring-token", label: "РћС‚РЅРµСЃС‚Рё РЅР°С…РѕРґРєСѓ С‚СЂР°РєС‚РёСЂС‰РёРєСѓ", note: "РњРµРЅСЊС€Рµ СЂРёСЃРєР°, Р±РѕР»СЊС€Рµ РґРѕРІРµСЂРёСЏ.", rewardMoney: 26, successText: "РЈСЃРїРµС…. РўСЂР°РєС‚РёСЂС‰РёРє РІС‹РґР°РµС‚ +26в‚Ѕ Рё РѕР±РµС‰Р°РµС‚ РїРѕРјРЅРёС‚СЊ СѓСЃР»СѓРіСѓ.", complete: true }
                 ]
             }
         },
         brassDisease: {
             start: {
-                subtitle: "Механик просит принести шестерню",
+                subtitle: "РњРµС…Р°РЅРёРє РїСЂРѕСЃРёС‚ РїСЂРёРЅРµСЃС‚Рё С€РµСЃС‚РµСЂРЅСЋ",
                 text: [
-                    "Механик трет пальцами латунную пыль. Его автомат щелкает и глохнет.",
-                    "Принеси шестерню. Или найди, чем заменить. Тут важны предметы, риск и быстрые решения."
+                    "РњРµС…Р°РЅРёРє С‚СЂРµС‚ РїР°Р»СЊС†Р°РјРё Р»Р°С‚СѓРЅРЅСѓСЋ РїС‹Р»СЊ. Р•РіРѕ Р°РІС‚РѕРјР°С‚ С‰РµР»РєР°РµС‚ Рё РіР»РѕС…РЅРµС‚.",
+                    "РџСЂРёРЅРµСЃРё С€РµСЃС‚РµСЂРЅСЋ. РР»Рё РЅР°Р№РґРё, С‡РµРј Р·Р°РјРµРЅРёС‚СЊ. РўСѓС‚ РІР°Р¶РЅС‹ РїСЂРµРґРјРµС‚С‹, СЂРёСЃРє Рё Р±С‹СЃС‚СЂС‹Рµ СЂРµС€РµРЅРёСЏ."
                 ],
-                tags: ["риск", "шум", "латунь"],
+                tags: ["СЂРёСЃРє", "С€СѓРј", "Р»Р°С‚СѓРЅСЊ"],
                 choices: [
-                    { id: "give-gear", label: "Отдать шестерню", note: "Если есть латунная шестерня.", requiresItem: "brassGear", consumeItem: "brassGear", rewardMoney: 27, successText: "Успех. Автомат оживает, а мастерская платит +27₽.", complete: true },
-                    { id: "coin-fix", label: "Попробовать «колхоз» из монеты", note: "Шанс 50%.", chance: 0.5, successGoto: "jury-rigged", failText: "Провал. Искра режет пальцы, механизм плюется, -8₽ на бинты.", penaltyMoney: 8 }
+                    { id: "give-gear", label: "РћС‚РґР°С‚СЊ С€РµСЃС‚РµСЂРЅСЋ", note: "Р•СЃР»Рё РµСЃС‚СЊ Р»Р°С‚СѓРЅРЅР°СЏ С€РµСЃС‚РµСЂРЅСЏ.", requiresItem: "brassGear", consumeItem: "brassGear", rewardMoney: 27, successText: "РЈСЃРїРµС…. РђРІС‚РѕРјР°С‚ РѕР¶РёРІР°РµС‚, Р° РјР°СЃС‚РµСЂСЃРєР°СЏ РїР»Р°С‚РёС‚ +27в‚Ѕ.", complete: true },
+                    { id: "coin-fix", label: "РџРѕРїСЂРѕР±РѕРІР°С‚СЊ В«РєРѕР»С…РѕР·В» РёР· РјРѕРЅРµС‚С‹", note: "РЁР°РЅСЃ 50%.", chance: 0.5, successGoto: "jury-rigged", failText: "РџСЂРѕРІР°Р». РСЃРєСЂР° СЂРµР¶РµС‚ РїР°Р»СЊС†С‹, РјРµС…Р°РЅРёР·Рј РїР»СЋРµС‚СЃСЏ, -8в‚Ѕ РЅР° Р±РёРЅС‚С‹.", penaltyMoney: 8 }
                 ]
             },
             "jury-rigged": {
-                subtitle: "Монета держит зубцы на честном слове",
+                subtitle: "РњРѕРЅРµС‚Р° РґРµСЂР¶РёС‚ Р·СѓР±С†С‹ РЅР° С‡РµСЃС‚РЅРѕРј СЃР»РѕРІРµ",
                 text: [
-                    "Самодельная вставка неожиданно цепляет вал. Машина кашляет, но заводится.",
-                    "Механик может оставить тебя в долгу или отсыпать мелочи сразу."
+                    "РЎР°РјРѕРґРµР»СЊРЅР°СЏ РІСЃС‚Р°РІРєР° РЅРµРѕР¶РёРґР°РЅРЅРѕ С†РµРїР»СЏРµС‚ РІР°Р». РњР°С€РёРЅР° РєР°С€Р»СЏРµС‚, РЅРѕ Р·Р°РІРѕРґРёС‚СЃСЏ.",
+                    "РњРµС…Р°РЅРёРє РјРѕР¶РµС‚ РѕСЃС‚Р°РІРёС‚СЊ С‚РµР±СЏ РІ РґРѕР»РіСѓ РёР»Рё РѕС‚СЃС‹РїР°С‚СЊ РјРµР»РѕС‡Рё СЃСЂР°Р·Сѓ."
                 ],
-                tags: ["удача", "грязная работа", "теплый металл"],
+                tags: ["СѓРґР°С‡Р°", "РіСЂСЏР·РЅР°СЏ СЂР°Р±РѕС‚Р°", "С‚РµРїР»С‹Р№ РјРµС‚Р°Р»Р»"],
                 choices: [
-                    { id: "take-cash", label: "Взять оплату сразу", note: "Небольшая, но быстрая награда.", rewardMoney: 18, successText: "Находка в ладони: +18₽ за быстрый ремонт.", complete: true },
-                    { id: "ask-favor", label: "Попросить услугу позже", note: "Мастерская отдает карту льда.", rewardItem: "scrapMap", successText: "Успех. Вместо денег ты получаешь мятую карту льда.", complete: true }
+                    { id: "take-cash", label: "Р’Р·СЏС‚СЊ РѕРїР»Р°С‚Сѓ СЃСЂР°Р·Сѓ", note: "РќРµР±РѕР»СЊС€Р°СЏ, РЅРѕ Р±С‹СЃС‚СЂР°СЏ РЅР°РіСЂР°РґР°.", rewardMoney: 18, successText: "РќР°С…РѕРґРєР° РІ Р»Р°РґРѕРЅРё: +18в‚Ѕ Р·Р° Р±С‹СЃС‚СЂС‹Р№ СЂРµРјРѕРЅС‚.", complete: true },
+                    { id: "ask-favor", label: "РџРѕРїСЂРѕСЃРёС‚СЊ СѓСЃР»СѓРіСѓ РїРѕР·Р¶Рµ", note: "РњР°СЃС‚РµСЂСЃРєР°СЏ РѕС‚РґР°РµС‚ РєР°СЂС‚Сѓ Р»СЊРґР°.", rewardItem: "scrapMap", successText: "РЈСЃРїРµС…. Р’РјРµСЃС‚Рѕ РґРµРЅРµРі С‚С‹ РїРѕР»СѓС‡Р°РµС€СЊ РјСЏС‚СѓСЋ РєР°СЂС‚Сѓ Р»СЊРґР°.", complete: true }
                 ]
             }
         },
         signalE3: {
             start: {
-                subtitle: "На льду мигает старый маяк",
+                subtitle: "РќР° Р»СЊРґСѓ РјРёРіР°РµС‚ СЃС‚Р°СЂС‹Р№ РјР°СЏРє",
                 text: [
-                    "Сигнал E3 прорывается через ветер короткими рывками. Где-то впереди лежит контейнер или чья-то ловушка.",
-                    "Можно идти прямо на шум или приглушить шаг аптечкой и сделать вид, что все под контролем."
+                    "РЎРёРіРЅР°Р» E3 РїСЂРѕСЂС‹РІР°РµС‚СЃСЏ С‡РµСЂРµР· РІРµС‚РµСЂ РєРѕСЂРѕС‚РєРёРјРё СЂС‹РІРєР°РјРё. Р“РґРµ-С‚Рѕ РІРїРµСЂРµРґРё Р»РµР¶РёС‚ РєРѕРЅС‚РµР№РЅРµСЂ РёР»Рё С‡СЊСЏ-С‚Рѕ Р»РѕРІСѓС€РєР°.",
+                    "РњРѕР¶РЅРѕ РёРґС‚Рё РїСЂСЏРјРѕ РЅР° С€СѓРј РёР»Рё РїСЂРёРіР»СѓС€РёС‚СЊ С€Р°Рі Р°РїС‚РµС‡РєРѕР№ Рё СЃРґРµР»Р°С‚СЊ РІРёРґ, С‡С‚Рѕ РІСЃРµ РїРѕРґ РєРѕРЅС‚СЂРѕР»РµРј."
                 ],
-                tags: ["холод", "риск", "шанс"],
+                tags: ["С…РѕР»РѕРґ", "СЂРёСЃРє", "С€Р°РЅСЃ"],
                 choices: [
-                    { id: "go-straight", label: "Идти на слабый сигнал", note: "Шанс 65%.", chance: 0.65, successText: "Находка. Под снегом контейнер. Успех и +34₽.", failText: "Провал. Сигнал уводит в пустой карман льда, -5₽ на дорогу обратно.", rewardMoney: 34, penaltyMoney: 5, complete: true },
-                    { id: "dash-gap", label: "Рвануть через открытый лёд", note: "Нужна реакция 1.", requiresStat: "reaction", requiresStatValue: 1, rewardMoney: 16, successText: "Реакция спасает темп. Ты успеваешь к ящику и забираешь +16₽.", complete: true },
-                    { id: "quiet-steps", label: "Подавить шум аптечкой", note: "Если аптечка под рукой.", requiresItem: "medkit", consumeItem: "medkit", successGoto: "quiet-route" }
+                    { id: "go-straight", label: "РРґС‚Рё РЅР° СЃР»Р°Р±С‹Р№ СЃРёРіРЅР°Р»", note: "РЁР°РЅСЃ 65%.", chance: 0.65, successText: "РќР°С…РѕРґРєР°. РџРѕРґ СЃРЅРµРіРѕРј РєРѕРЅС‚РµР№РЅРµСЂ. РЈСЃРїРµС… Рё +34в‚Ѕ.", failText: "РџСЂРѕРІР°Р». РЎРёРіРЅР°Р» СѓРІРѕРґРёС‚ РІ РїСѓСЃС‚РѕР№ РєР°СЂРјР°РЅ Р»СЊРґР°, -5в‚Ѕ РЅР° РґРѕСЂРѕРіСѓ РѕР±СЂР°С‚РЅРѕ.", rewardMoney: 34, penaltyMoney: 5, complete: true },
+                    { id: "dash-gap", label: "Р РІР°РЅСѓС‚СЊ С‡РµСЂРµР· РѕС‚РєСЂС‹С‚С‹Р№ Р»С‘Рґ", note: "РќСѓР¶РЅР° СЂРµР°РєС†РёСЏ 1.", requiresStat: "reaction", requiresStatValue: 1, rewardMoney: 16, successText: "Р РµР°РєС†РёСЏ СЃРїР°СЃР°РµС‚ С‚РµРјРї. РўС‹ СѓСЃРїРµРІР°РµС€СЊ Рє СЏС‰РёРєСѓ Рё Р·Р°Р±РёСЂР°РµС€СЊ +16в‚Ѕ.", complete: true },
+                    { id: "quiet-steps", label: "РџРѕРґР°РІРёС‚СЊ С€СѓРј Р°РїС‚РµС‡РєРѕР№", note: "Р•СЃР»Рё Р°РїС‚РµС‡РєР° РїРѕРґ СЂСѓРєРѕР№.", requiresItem: "medkit", consumeItem: "medkit", successGoto: "quiet-route" }
                 ]
             },
             "quiet-route": {
-                subtitle: "Снег ведет к старому кабелю",
+                subtitle: "РЎРЅРµРі РІРµРґРµС‚ Рє СЃС‚Р°СЂРѕРјСѓ РєР°Р±РµР»СЋ",
                 text: [
-                    "Стим греет ребра, шаг становится ровнее. Под коркой льда виден кабель, уходящий к служебному люку.",
-                    "Люк можно вскрыть самому или просто снять показания и уйти без шума."
+                    "РЎС‚РёРј РіСЂРµРµС‚ СЂРµР±СЂР°, С€Р°Рі СЃС‚Р°РЅРѕРІРёС‚СЃСЏ СЂРѕРІРЅРµРµ. РџРѕРґ РєРѕСЂРєРѕР№ Р»СЊРґР° РІРёРґРµРЅ РєР°Р±РµР»СЊ, СѓС…РѕРґСЏС‰РёР№ Рє СЃР»СѓР¶РµР±РЅРѕРјСѓ Р»СЋРєСѓ.",
+                    "Р›СЋРє РјРѕР¶РЅРѕ РІСЃРєСЂС‹С‚СЊ СЃР°РјРѕРјСѓ РёР»Рё РїСЂРѕСЃС‚Рѕ СЃРЅСЏС‚СЊ РїРѕРєР°Р·Р°РЅРёСЏ Рё СѓР№С‚Рё Р±РµР· С€СѓРјР°."
                 ],
-                tags: ["удача", "тишина", "ледяной пар"],
+                tags: ["СѓРґР°С‡Р°", "С‚РёС€РёРЅР°", "Р»РµРґСЏРЅРѕР№ РїР°СЂ"],
                 choices: [
-                    { id: "open-hatch", label: "Вскрыть люк", note: "Получишь карту и деньги.", rewardMoney: 20, rewardItem: "scrapMap", successText: "Успех. Внутри карта льда и +20₽ за старые жетоны.", complete: true },
-                    { id: "leave-mark", label: "Снять показания и уйти", note: "Чуть меньше награды, меньше шума.", rewardMoney: 14, successText: "Спокойная находка. +14₽ и почти никакого шума.", complete: true }
+                    { id: "open-hatch", label: "Р’СЃРєСЂС‹С‚СЊ Р»СЋРє", note: "РџРѕР»СѓС‡РёС€СЊ РєР°СЂС‚Сѓ Рё РґРµРЅСЊРіРё.", rewardMoney: 20, rewardItem: "scrapMap", successText: "РЈСЃРїРµС…. Р’РЅСѓС‚СЂРё РєР°СЂС‚Р° Р»СЊРґР° Рё +20в‚Ѕ Р·Р° СЃС‚Р°СЂС‹Рµ Р¶РµС‚РѕРЅС‹.", complete: true },
+                    { id: "leave-mark", label: "РЎРЅСЏС‚СЊ РїРѕРєР°Р·Р°РЅРёСЏ Рё СѓР№С‚Рё", note: "Р§СѓС‚СЊ РјРµРЅСЊС€Рµ РЅР°РіСЂР°РґС‹, РјРµРЅСЊС€Рµ С€СѓРјР°.", rewardMoney: 14, successText: "РЎРїРѕРєРѕР№РЅР°СЏ РЅР°С…РѕРґРєР°. +14в‚Ѕ Рё РїРѕС‡С‚Рё РЅРёРєР°РєРѕРіРѕ С€СѓРјР°.", complete: true }
                 ]
             }
         },
         frostDebt: {
             start: {
-                subtitle: "На двери склада висит свежая метка",
+                subtitle: "РќР° РґРІРµСЂРё СЃРєР»Р°РґР° РІРёСЃРёС‚ СЃРІРµР¶Р°СЏ РјРµС‚РєР°",
                 text: [
-                    "Кто-то оставил на двери склада ржавый гвоздь с запиской: «Если слышишь скрип, ты уже опоздал».",
-                    "Можно сунуться внутрь сразу или переждать, пока ветер съест следы."
+                    "РљС‚Рѕ-С‚Рѕ РѕСЃС‚Р°РІРёР» РЅР° РґРІРµСЂРё СЃРєР»Р°РґР° СЂР¶Р°РІС‹Р№ РіРІРѕР·РґСЊ СЃ Р·Р°РїРёСЃРєРѕР№: В«Р•СЃР»Рё СЃР»С‹С€РёС€СЊ СЃРєСЂРёРї, С‚С‹ СѓР¶Рµ РѕРїРѕР·РґР°Р»В».",
+                    "РњРѕР¶РЅРѕ СЃСѓРЅСѓС‚СЊСЃСЏ РІРЅСѓС‚СЂСЊ СЃСЂР°Р·Сѓ РёР»Рё РїРµСЂРµР¶РґР°С‚СЊ, РїРѕРєР° РІРµС‚РµСЂ СЃСЉРµСЃС‚ СЃР»РµРґС‹."
                 ],
-                tags: ["слухи", "мороз", "неуверенность"],
+                tags: ["СЃР»СѓС…Рё", "РјРѕСЂРѕР·", "РЅРµСѓРІРµСЂРµРЅРЅРѕСЃС‚СЊ"],
                 choices: [
-                    { id: "rush-in", label: "Зайти сразу", note: "Шанс 45%.", chance: 0.45, rewardMoney: 29, failText: "Провал. Внутри пусто, а долг только растет. -7₽.", penaltyMoney: 7, successText: "Успех. В углу лежит чужой тайник. +29₽.", complete: true },
-                    { id: "break-door", label: "Выломать дверь силой", note: "Нужна сила 1.", requiresStat: "strength", requiresStatValue: 1, rewardMoney: 24, successText: "Сила решает вопрос быстро. Дверь сдаётся, а в тайнике лежат +24₽.", complete: true },
-                    { id: "find-key", label: "Осмотреть метку и найти ключ", note: "Нужен анализ 1.", requiresStat: "analysis", requiresStatValue: 1, rewardItem: "iceToken", successText: "Анализ цепляет мелочь на косяке. Спрятанный ключ ведет к жетону.", complete: true },
-                    { id: "wait-out", label: "Переждать ветер", note: "Безопаснее, но медленнее.", rewardMoney: 11, successText: "Спокойный ход. Ветер уносит шум, и ты забираешь +11₽.", complete: true }
+                    { id: "rush-in", label: "Р—Р°Р№С‚Рё СЃСЂР°Р·Сѓ", note: "РЁР°РЅСЃ 45%.", chance: 0.45, rewardMoney: 29, failText: "РџСЂРѕРІР°Р». Р’РЅСѓС‚СЂРё РїСѓСЃС‚Рѕ, Р° РґРѕР»Рі С‚РѕР»СЊРєРѕ СЂР°СЃС‚РµС‚. -7в‚Ѕ.", penaltyMoney: 7, successText: "РЈСЃРїРµС…. Р’ СѓРіР»Сѓ Р»РµР¶РёС‚ С‡СѓР¶РѕР№ С‚Р°Р№РЅРёРє. +29в‚Ѕ.", complete: true },
+                    { id: "break-door", label: "Р’С‹Р»РѕРјР°С‚СЊ РґРІРµСЂСЊ СЃРёР»РѕР№", note: "РќСѓР¶РЅР° СЃРёР»Р° 1.", requiresStat: "strength", requiresStatValue: 1, rewardMoney: 24, successText: "РЎРёР»Р° СЂРµС€Р°РµС‚ РІРѕРїСЂРѕСЃ Р±С‹СЃС‚СЂРѕ. Р”РІРµСЂСЊ СЃРґР°С‘С‚СЃСЏ, Р° РІ С‚Р°Р№РЅРёРєРµ Р»РµР¶Р°С‚ +24в‚Ѕ.", complete: true },
+                    { id: "find-key", label: "РћСЃРјРѕС‚СЂРµС‚СЊ РјРµС‚РєСѓ Рё РЅР°Р№С‚Рё РєР»СЋС‡", note: "РќСѓР¶РµРЅ Р°РЅР°Р»РёР· 1.", requiresStat: "analysis", requiresStatValue: 1, rewardItem: "iceToken", successText: "РђРЅР°Р»РёР· С†РµРїР»СЏРµС‚ РјРµР»РѕС‡СЊ РЅР° РєРѕСЃСЏРєРµ. РЎРїСЂСЏС‚Р°РЅРЅС‹Р№ РєР»СЋС‡ РІРµРґРµС‚ Рє Р¶РµС‚РѕРЅСѓ.", complete: true },
+                    { id: "wait-out", label: "РџРµСЂРµР¶РґР°С‚СЊ РІРµС‚РµСЂ", note: "Р‘РµР·РѕРїР°СЃРЅРµРµ, РЅРѕ РјРµРґР»РµРЅРЅРµРµ.", rewardMoney: 11, successText: "РЎРїРѕРєРѕР№РЅС‹Р№ С…РѕРґ. Р’РµС‚РµСЂ СѓРЅРѕСЃРёС‚ С€СѓРј, Рё С‚С‹ Р·Р°Р±РёСЂР°РµС€СЊ +11в‚Ѕ.", complete: true }
                 ]
             }
         }
     };
     const DUEL_WEAPONS = {
-        PISTOLS: { label: "Пистоль и щит", damage: 18, blockChance: 0.30 },
-        RIFLE: { label: "Винтовка", damage: 30, blockChance: 0 },
-        SHOTGUN: { label: "Дробовик", damage: 25, blockChance: 0 }
+        PISTOLS: { label: "РџРёСЃС‚РѕР»СЊ Рё С‰РёС‚", damage: 18, blockChance: 0.30 },
+        RIFLE: { label: "Р’РёРЅС‚РѕРІРєР°", damage: 30, blockChance: 0 },
+        SHOTGUN: { label: "Р”СЂРѕР±РѕРІРёРє", damage: 25, blockChance: 0 }
     };
     const AUGMENT_SLOTS = [
-        { id: "weapon", title: "Оружейная", hint: "Даёт бонус к точности или урону." },
-        { id: "defense", title: "Защитная", hint: "Снижает входящий урон и усиливает выживание." },
-        { id: "support", title: "Вспомогательная", hint: "Даёт уворот, реген или тактический бонус." }
+        { id: "weapon", title: "РћСЂСѓР¶РµР№РЅР°СЏ", hint: "Р”Р°С‘С‚ Р±РѕРЅСѓСЃ Рє С‚РѕС‡РЅРѕСЃС‚Рё РёР»Рё СѓСЂРѕРЅСѓ." },
+        { id: "defense", title: "Р—Р°С‰РёС‚РЅР°СЏ", hint: "РЎРЅРёР¶Р°РµС‚ РІС…РѕРґСЏС‰РёР№ СѓСЂРѕРЅ Рё СѓСЃРёР»РёРІР°РµС‚ РІС‹Р¶РёРІР°РЅРёРµ." },
+        { id: "support", title: "Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ", hint: "Р”Р°С‘С‚ СѓРІРѕСЂРѕС‚, СЂРµРіРµРЅ РёР»Рё С‚Р°РєС‚РёС‡РµСЃРєРёР№ Р±РѕРЅСѓСЃ." }
     ];
     const AUGMENT_LIBRARY = {
         weaponBrassSights: {
             id: "weaponBrassSights",
             slot: "weapon",
-            name: "Латунный прицел",
-            description: "Теплая мушка не гуляет на морозе и держит линию ровнее.",
-            effectLabel: "-8% к шансу блока щитом",
+            name: "Р›Р°С‚СѓРЅРЅС‹Р№ РїСЂРёС†РµР»",
+            description: "РўРµРїР»Р°СЏ РјСѓС€РєР° РЅРµ РіСѓР»СЏРµС‚ РЅР° РјРѕСЂРѕР·Рµ Рё РґРµСЂР¶РёС‚ Р»РёРЅРёСЋ СЂРѕРІРЅРµРµ.",
+            effectLabel: "-8% Рє С€Р°РЅСЃСѓ Р±Р»РѕРєР° С‰РёС‚РѕРј",
             hitChanceBonus: 0.08,
             weapons: ["PISTOLS", "RIFLE"]
         },
         weaponDoubleTap: {
             id: "weaponDoubleTap",
             slot: "weapon",
-            name: "Усиленный ударник",
-            description: "Плотный удар делает пистоль злее в прямой линии.",
-            effectLabel: "+4 урона для пистоля",
+            name: "РЈСЃРёР»РµРЅРЅС‹Р№ СѓРґР°СЂРЅРёРє",
+            description: "РџР»РѕС‚РЅС‹Р№ СѓРґР°СЂ РґРµР»Р°РµС‚ РїРёСЃС‚РѕР»СЊ Р·Р»РµРµ РІ РїСЂСЏРјРѕР№ Р»РёРЅРёРё.",
+            effectLabel: "+4 СѓСЂРѕРЅР° РґР»СЏ РїРёСЃС‚РѕР»СЏ",
             damageBonus: 4,
             weapons: ["PISTOLS"]
         },
         weaponPiercingCore: {
             id: "weaponPiercingCore",
             slot: "weapon",
-            name: "Бронебойный сердечник",
-            description: "Прошивает щитовой блок и давит линию напролом.",
-            effectLabel: "Игнорирует блокирование щитом",
+            name: "Р‘СЂРѕРЅРµР±РѕР№РЅС‹Р№ СЃРµСЂРґРµС‡РЅРёРє",
+            description: "РџСЂРѕС€РёРІР°РµС‚ С‰РёС‚РѕРІРѕР№ Р±Р»РѕРє Рё РґР°РІРёС‚ Р»РёРЅРёСЋ РЅР°РїСЂРѕР»РѕРј.",
+            effectLabel: "РРіРЅРѕСЂРёСЂСѓРµС‚ Р±Р»РѕРєРёСЂРѕРІР°РЅРёРµ С‰РёС‚РѕРј",
             ignoreBlocking: true,
             weapons: ["PISTOLS", "RIFLE", "SHOTGUN"]
         },
         weaponScatterNozzle: {
             id: "weaponScatterNozzle",
             slot: "weapon",
-            name: "Расширитель дроби",
-            description: "Дробовик цепляет по краю чаще, особенно на ближней линии.",
-            effectLabel: "+12% к шансу зацепа дробовика",
+            name: "Р Р°СЃС€РёСЂРёС‚РµР»СЊ РґСЂРѕР±Рё",
+            description: "Р”СЂРѕР±РѕРІРёРє С†РµРїР»СЏРµС‚ РїРѕ РєСЂР°СЋ С‡Р°С‰Рµ, РѕСЃРѕР±РµРЅРЅРѕ РЅР° Р±Р»РёР¶РЅРµР№ Р»РёРЅРёРё.",
+            effectLabel: "+12% Рє С€Р°РЅСЃСѓ Р·Р°С†РµРїР° РґСЂРѕР±РѕРІРёРєР°",
             grazeChanceBonus: 0.12,
             weapons: ["SHOTGUN"]
         },
         defensePlating: {
             id: "defensePlating",
             slot: "defense",
-            name: "Латунные пластины",
-            description: "Ставка на массу: броня гасит часть прямого попадания.",
-            effectLabel: "-4 входящего урона",
+            name: "Р›Р°С‚СѓРЅРЅС‹Рµ РїР»Р°СЃС‚РёРЅС‹",
+            description: "РЎС‚Р°РІРєР° РЅР° РјР°СЃСЃСѓ: Р±СЂРѕРЅСЏ РіР°СЃРёС‚ С‡Р°СЃС‚СЊ РїСЂСЏРјРѕРіРѕ РїРѕРїР°РґР°РЅРёСЏ.",
+            effectLabel: "-4 РІС…РѕРґСЏС‰РµРіРѕ СѓСЂРѕРЅР°",
             damageReduction: 4
         },
         defenseHeatSink: {
             id: "defenseHeatSink",
             slot: "defense",
-            name: "Теплоотвод",
-            description: "Переносит жар под куртку и даёт держать длинный бой.",
-            effectLabel: "+10 стартового HP",
+            name: "РўРµРїР»РѕРѕС‚РІРѕРґ",
+            description: "РџРµСЂРµРЅРѕСЃРёС‚ Р¶Р°СЂ РїРѕРґ РєСѓСЂС‚РєСѓ Рё РґР°С‘С‚ РґРµСЂР¶Р°С‚СЊ РґР»РёРЅРЅС‹Р№ Р±РѕР№.",
+            effectLabel: "+10 СЃС‚Р°СЂС‚РѕРІРѕРіРѕ HP",
             startHpBonus: 10
         },
         defenseColdMesh: {
             id: "defenseColdMesh",
             slot: "defense",
-            name: "Хладостойкая сетка",
-            description: "Упругая прослойка съедает скользящие попадания и мелкие осколки.",
-            effectLabel: "-2 урона даже от зацепа",
+            name: "РҐР»Р°РґРѕСЃС‚РѕР№РєР°СЏ СЃРµС‚РєР°",
+            description: "РЈРїСЂСѓРіР°СЏ РїСЂРѕСЃР»РѕР№РєР° СЃСЉРµРґР°РµС‚ СЃРєРѕР»СЊР·СЏС‰РёРµ РїРѕРїР°РґР°РЅРёСЏ Рё РјРµР»РєРёРµ РѕСЃРєРѕР»РєРё.",
+            effectLabel: "-2 СѓСЂРѕРЅР° РґР°Р¶Рµ РѕС‚ Р·Р°С†РµРїР°",
             damageReduction: 2,
             grazeReduction: 2
         },
         supportSidestep: {
             id: "supportSidestep",
             slot: "support",
-            name: "Сервопривод уворота",
-            description: "Пружина под коленом иногда срывает уже пойманную линию.",
-            effectLabel: "10% шанс сорвать прямое попадание",
+            name: "РЎРµСЂРІРѕРїСЂРёРІРѕРґ СѓРІРѕСЂРѕС‚Р°",
+            description: "РџСЂСѓР¶РёРЅР° РїРѕРґ РєРѕР»РµРЅРѕРј РёРЅРѕРіРґР° СЃСЂС‹РІР°РµС‚ СѓР¶Рµ РїРѕР№РјР°РЅРЅСѓСЋ Р»РёРЅРёСЋ.",
+            effectLabel: "10% С€Р°РЅСЃ СЃРѕСЂРІР°С‚СЊ РїСЂСЏРјРѕРµ РїРѕРїР°РґР°РЅРёРµ",
             evadeChance: 0.1
         },
         supportStimLoop: {
             id: "supportStimLoop",
             slot: "support",
-            name: "Стим-контур",
-            description: "Замкнутый впрыск возвращает дыхание после каждого раунда.",
-            effectLabel: "+4 HP после каждого раунда",
+            name: "РЎС‚РёРј-РєРѕРЅС‚СѓСЂ",
+            description: "Р—Р°РјРєРЅСѓС‚С‹Р№ РІРїСЂС‹СЃРє РІРѕР·РІСЂР°С‰Р°РµС‚ РґС‹С…Р°РЅРёРµ РїРѕСЃР»Рµ РєР°Р¶РґРѕРіРѕ СЂР°СѓРЅРґР°.",
+            effectLabel: "+4 HP РїРѕСЃР»Рµ РєР°Р¶РґРѕРіРѕ СЂР°СѓРЅРґР°",
             regenPerRound: 4
         },
         supportTargetLink: {
             id: "supportTargetLink",
             slot: "support",
-            name: "Связка меток",
-            description: "Центральная линия читается быстрее, если довериться датчикам.",
-            effectLabel: "-4% к блоку по центру",
+            name: "РЎРІСЏР·РєР° РјРµС‚РѕРє",
+            description: "Р¦РµРЅС‚СЂР°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ С‡РёС‚Р°РµС‚СЃСЏ Р±С‹СЃС‚СЂРµРµ, РµСЃР»Рё РґРѕРІРµСЂРёС‚СЊСЃСЏ РґР°С‚С‡РёРєР°Рј.",
+            effectLabel: "-4% Рє Р±Р»РѕРєСѓ РїРѕ С†РµРЅС‚СЂСѓ",
             centerHitBonus: 0.04
         }
     };
-    const POSITIVE_MARKERS = [/\+\d+\sмонет/gi, /\+\d+\sHP/gi];
-    const NEGATIVE_MARKERS = [/-\d+\sмонет/gi, /промах/gi, /провал/gi, /поражени[ея]/gi, /не хватает/gi, /ист[её]к/gi, /потер[яи]/gi, /зам[её]рз/gi, /ран[ае]н/gi, /шум/gi, /сорван/gi, /пусто/gi];
+    const POSITIVE_MARKERS = [/\+\d+\sРјРѕРЅРµС‚/gi, /\+\d+\sHP/gi];
+    const NEGATIVE_MARKERS = [/-\d+\sРјРѕРЅРµС‚/gi, /РїСЂРѕРјР°С…/gi, /РїСЂРѕРІР°Р»/gi, /РїРѕСЂР°Р¶РµРЅРё[РµСЏ]/gi, /РЅРµ С…РІР°С‚Р°РµС‚/gi, /РёСЃС‚[РµС‘]Рє/gi, /РїРѕС‚РµСЂ[СЏРё]/gi, /Р·Р°Рј[РµС‘]СЂР·/gi, /СЂР°РЅ[Р°Рµ]РЅ/gi, /С€СѓРј/gi, /СЃРѕСЂРІР°РЅ/gi, /РїСѓСЃС‚Рѕ/gi];
     const elements = {};
     let state = hydrateState(loadState());
     let toastTimer = null;
     let liveSyncPending = false;
     let friendSyncPending = false;
     const RUBLE_SIGN = "\u20BD";
-    const DUEL_DEFAULT_NOTE = "Правило: попадание проходит, если линия выстрела совпала с линией уворота соперника.";
+    const DUEL_DEFAULT_NOTE = "РџСЂР°РІРёР»Рѕ: РїРѕРїР°РґР°РЅРёРµ РїСЂРѕС…РѕРґРёС‚, РµСЃР»Рё Р»РёРЅРёСЏ РІС‹СЃС‚СЂРµР»Р° СЃРѕРІРїР°Р»Р° СЃ Р»РёРЅРёРµР№ СѓРІРѕСЂРѕС‚Р° СЃРѕРїРµСЂРЅРёРєР°.";
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
@@ -241,7 +242,7 @@
             console.error("Polus init failed", error);
             const toast = document.getElementById("toast");
             if (toast) {
-                toast.textContent = "Ошибка инициализации интерфейса. Обнови Mini App.";
+                toast.textContent = "РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РёРЅС‚РµСЂС„РµР№СЃР°. РћР±РЅРѕРІРё Mini App.";
                 toast.classList.remove("hidden");
             }
         }
@@ -305,6 +306,7 @@
         elements.duelOverlay = document.getElementById("duel-overlay");
         elements.duelTitle = document.getElementById("duel-title");
         elements.duelRoundPill = document.getElementById("duel-round-pill");
+        elements.duelRoundTimer = document.getElementById("duel-round-timer");
         elements.duelYouName = document.getElementById("duel-you-name");
         elements.duelYouMeta = document.getElementById("duel-you-meta");
         elements.duelYouAvatar = document.getElementById("duel-you-avatar");
@@ -331,6 +333,10 @@
         elements.duelShotSelect = document.getElementById("duel-shot-select");
         elements.duelDodgeSelect = document.getElementById("duel-dodge-select");
         elements.duelSubmitButton = document.getElementById("duel-submit-button");
+        elements.duelAutoToggle = document.getElementById("duel-auto-toggle");
+        elements.duelAutoNote = document.getElementById("duel-auto-note");
+        elements.duelAutoCover = document.getElementById("duel-auto-cover");
+        elements.duelControlStack = document.getElementById("duel-control-stack");
         elements.duelClearLogButton = document.getElementById("duel-clear-log-button");
         elements.duelWeaponButtons = Array.from(document.querySelectorAll('.weapon-option[data-duel-select="weapon"]'));
         elements.duelShotButtons = Array.from(document.querySelectorAll('.duel-toggle[data-duel-select="shot"]'));
@@ -369,8 +375,8 @@
                 if (friend) {
                     requestStartDuel({
                         mode: "friend",
-                        title: "Вызов на дуэль",
-                        copy: "Подтверди, что хочешь вызвать " + friend.name + " на бой. Пока это запускает общий поиск соперника.",
+                        title: "Р’С‹Р·РѕРІ РЅР° РґСѓСЌР»СЊ",
+                        copy: "РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ РІС‹Р·РІР°С‚СЊ " + friend.name + " РЅР° Р±РѕР№. РџРѕРєР° СЌС‚Рѕ Р·Р°РїСѓСЃРєР°РµС‚ РѕР±С‰РёР№ РїРѕРёСЃРє СЃРѕРїРµСЂРЅРёРєР°.",
                         execute: function () {
                             startQueueDuel(true);
                         }
@@ -389,7 +395,8 @@
             acceptFriendRequest: acceptFriendRequest,
             rejectFriendRequest: rejectFriendRequest,
             cancelStartDuel: cancelStartDuel,
-            confirmStartDuel: confirmStartDuel
+            confirmStartDuel: confirmStartDuel,
+            toggleAutoBattle: toggleAutoBattle
         };
     }
 
@@ -432,9 +439,9 @@
                     nickname: "",
                     registered: false,
                     demoMode: false,
-                    initError: error && error.message ? error.message : "Не удалось создать сессию"
+                    initError: error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ СЃРµСЃСЃРёСЋ"
                 });
-                state.player.name = "Новый игрок";
+                state.player.name = "РќРѕРІС‹Р№ РёРіСЂРѕРє";
                 state.player.money = 0;
                 saveState();
             } else {
@@ -453,7 +460,7 @@
         return {
             fallbackUser: {
                 guestId: getBrowserGuestId(),
-                firstName: "Гость",
+                firstName: "Р“РѕСЃС‚СЊ",
                 lastName: null,
                 username: null,
                 languageCode: navigator.language || "ru",
@@ -479,7 +486,7 @@
     function applySession(session) {
         const player = session && session.player ? session.player : null;
         if (!player) {
-            throw new Error("Пустой ответ сессии");
+            throw new Error("РџСѓСЃС‚РѕР№ РѕС‚РІРµС‚ СЃРµСЃСЃРёРё");
         }
         const previousPlayerId = state.auth && state.auth.playerId ? state.auth.playerId : null;
         const accountChanged = previousPlayerId !== player.id;
@@ -503,7 +510,7 @@
 
     function syncPlayerFromServer(player, resetEconomy) {
         state.player.id = player.id;
-        state.player.name = player.nickname || player.displayName || state.player.name || "Новый игрок";
+        state.player.name = player.nickname || player.displayName || state.player.name || "РќРѕРІС‹Р№ РёРіСЂРѕРє";
         state.player.level = typeof player.level === "number" ? player.level : state.player.level || 1;
         state.player.wins = typeof player.wins === "number" ? player.wins : state.player.wins;
         state.player.losses = typeof player.losses === "number" ? player.losses : state.player.losses;
@@ -594,9 +601,9 @@
             nickname: "",
             registered: false,
             demoMode: true,
-            initError: error && error.message ? error.message : "Не удалось создать сессию"
+            initError: error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ СЃРµСЃСЃРёСЋ"
         });
-        state.player.name = "Новый игрок";
+        state.player.name = "РќРѕРІС‹Р№ РёРіСЂРѕРє";
         state.player.money = 0;
         state.friends = [];
         state.friendRequests = [];
@@ -608,15 +615,15 @@
         elements.registrationError.textContent = "";
         elements.registrationError.classList.add("hidden");
         if (!nickname) {
-            showRegistrationError("Введи никнейм.");
+            showRegistrationError("Р’РІРµРґРё РЅРёРєРЅРµР№Рј.");
             return;
         }
         if (nickname.length < 3 || nickname.length > 20) {
-            showRegistrationError("Ник должен быть длиной от 3 до 20 символов.");
+            showRegistrationError("РќРёРє РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РґР»РёРЅРѕР№ РѕС‚ 3 РґРѕ 20 СЃРёРјРІРѕР»РѕРІ.");
             return;
         }
         if (!/^[\p{L}\p{N}_-]+$/u.test(nickname)) {
-            showRegistrationError("Ник может содержать только буквы, цифры, _ и -.");
+            showRegistrationError("РќРёРє РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ С‚РѕР»СЊРєРѕ Р±СѓРєРІС‹, С†РёС„СЂС‹, _ Рё -.");
             return;
         }
         elements.registrationSubmit.disabled = true;
@@ -626,14 +633,14 @@
                 state.auth.registered = true;
                 state.player.name = nickname;
                 state.player.money = 0;
-                addJournal("Ник \"" + nickname + "\" сохранен в локальном режиме.");
+                addJournal("РќРёРє \"" + nickname + "\" СЃРѕС…СЂР°РЅРµРЅ РІ Р»РѕРєР°Р»СЊРЅРѕРј СЂРµР¶РёРјРµ.");
                 saveState();
                 renderAll();
-                showToast("Ник сохранен.");
+                showToast("РќРёРє СЃРѕС…СЂР°РЅРµРЅ.");
                 return;
             }
             if (!state.auth || !state.auth.sessionToken) {
-                throw new Error("Открой Mini App через Telegram, чтобы закрепить ник.");
+                throw new Error("РћС‚РєСЂРѕР№ Mini App С‡РµСЂРµР· Telegram, С‡С‚РѕР±С‹ Р·Р°РєСЂРµРїРёС‚СЊ РЅРёРє.");
             }
             const response = await fetch("/api/player/register", {
                 method: "POST",
@@ -651,12 +658,12 @@
             state.auth.registered = Boolean(player.registered);
             syncPlayerFromServer(player, true);
             await loadFriendsOverview();
-            addJournal("Аккаунт зарегистрирован под ником \"" + (player.nickname || nickname) + "\".");
+            addJournal("РђРєРєР°СѓРЅС‚ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РїРѕРґ РЅРёРєРѕРј \"" + (player.nickname || nickname) + "\".");
             saveState();
             renderAll();
-            showToast("Аккаунт зарегистрирован.");
+            showToast("РђРєРєР°СѓРЅС‚ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ.");
         } catch (error) {
-            showRegistrationError(error && error.message ? error.message : "Не удалось зарегистрировать аккаунт.");
+            showRegistrationError(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ Р°РєРєР°СѓРЅС‚.");
         } finally {
             elements.registrationSubmit.disabled = false;
         }
@@ -670,9 +677,9 @@
     async function readApiError(response) {
         try {
             const payload = await response.json();
-            return payload && payload.message ? payload.message : "Ошибка запроса";
+            return payload && payload.message ? payload.message : "РћС€РёР±РєР° Р·Р°РїСЂРѕСЃР°";
         } catch (error) {
-            return "Ошибка запроса";
+            return "РћС€РёР±РєР° Р·Р°РїСЂРѕСЃР°";
         }
     }
 
@@ -756,10 +763,15 @@
         const payload = await duelResponse.json();
         const current = state.duel && state.duel.mode === "pvp-live" ? state.duel : null;
         const justFinished = Boolean(current && !current.finished && payload.status === "FINISHED");
+        const sameRound = Boolean(current && current.duelId === payload.duelId && current.round === payload.roundNumber && !current.finished);
+        const submittedAction = normalizeSubmittedAction(payload.yourSubmittedAction);
+        const preservedSelection = resolveLiveSelectionDraft(current, submittedAction, sameRound, Boolean(payload.autoBattleEnabled));
+        const roundStartedAt = payload.roundStartedAt ? new Date(payload.roundStartedAt).getTime() : (sameRound && current && current.roundStartedAt ? current.roundStartedAt : Date.now());
+        const roundDeadlineAt = payload.roundDeadlineAt ? new Date(payload.roundDeadlineAt).getTime() : (roundStartedAt + DUEL_ROUND_TIMEOUT_MS);
         state.duel = {
             mode: "pvp-live",
             duelId: payload.duelId,
-            title: "Найденный матч",
+            title: "РќР°Р№РґРµРЅРЅС‹Р№ РјР°С‚С‡",
             modeLabel: "PvP",
             playerName: payload.you.displayName,
             opponentName: payload.opponent.displayName,
@@ -770,17 +782,23 @@
             resultText: buildLiveResultText(payload),
             logs: payload.logs || [],
             chatMessages: payload.chatMessages || [],
-            selectedWeapon: current ? current.selectedWeapon : "PISTOLS",
-            selectedShot: current ? current.selectedShot : "CENTER",
-            selectedDodge: current ? current.selectedDodge : "STAY",
-            lastPlayerWeapon: current ? current.lastPlayerWeapon : "PISTOLS",
+            selectedWeapon: preservedSelection.weapon,
+            selectedShot: preservedSelection.shot,
+            selectedDodge: preservedSelection.dodge,
+            submittedAction: submittedAction,
+            lastPlayerWeapon: submittedAction && submittedAction.weapon ? submittedAction.weapon : (current ? current.lastPlayerWeapon : "PISTOLS"),
             lastOpponentWeapon: current ? current.lastOpponentWeapon : "RIFLE",
             activePanel: current && current.activePanel ? current.activePanel : "logs",
             chatError: current && current.chatError ? current.chatError : "",
             yourActionSubmitted: Boolean(payload.yourActionSubmitted),
             opponentActionSubmitted: Boolean(payload.opponentActionSubmitted),
             canSubmitAction: Boolean(payload.canSubmitAction),
-            resultLabel: payload.resultLabel || ""
+            resultLabel: payload.resultLabel || "",
+            roundStartedAt: roundStartedAt,
+            roundDeadlineAt: roundDeadlineAt,
+            autoBattleEnabled: Boolean(payload.autoBattleEnabled),
+            autoBattlePendingEnabled: typeof payload.autoBattlePendingEnabled === "boolean" ? payload.autoBattlePendingEnabled : null,
+            autoResolutionAt: null
         };
         if (justFinished) {
             await syncPlayerProfileFromApi();
@@ -800,20 +818,54 @@
     function buildLiveResultText(payload) {
         if (payload.status === "FINISHED") {
             if (payload.resultLabel === "VICTORY") {
-                return "Победа. Соперник сломал темп.";
+                return "РџРѕР±РµРґР°. РЎРѕРїРµСЂРЅРёРє СЃР»РѕРјР°Р» С‚РµРјРї.";
             }
             if (payload.resultLabel === "DEFEAT") {
-                return "Поражение. Придется собираться заново.";
+                return "РџРѕСЂР°Р¶РµРЅРёРµ. РџСЂРёРґРµС‚СЃСЏ СЃРѕР±РёСЂР°С‚СЊСЃСЏ Р·Р°РЅРѕРІРѕ.";
             }
-            return "Ничья. Обоих унесло в ледяную тишину.";
+            return "РќРёС‡СЊСЏ. РћР±РѕРёС… СѓРЅРµСЃР»Рѕ РІ Р»РµРґСЏРЅСѓСЋ С‚РёС€РёРЅСѓ.";
         }
         if (payload.yourActionSubmitted && !payload.opponentActionSubmitted) {
-            return "Ход зафиксирован. Ждем ответ соперника.";
+            return "РҐРѕРґ Р·Р°С„РёРєСЃРёСЂРѕРІР°РЅ. Р–РґРµРј РѕС‚РІРµС‚ СЃРѕРїРµСЂРЅРёРєР°.";
         }
         if (payload.yourActionSubmitted && payload.opponentActionSubmitted) {
-            return "Оба хода заперты. Раунд сейчас раскроется.";
+            return "РћР±Р° С…РѕРґР° Р·Р°РїРµСЂС‚С‹. Р Р°СѓРЅРґ СЃРµР№С‡Р°СЃ СЂР°СЃРєСЂРѕРµС‚СЃСЏ.";
         }
-        return "Выбери ход на раунд.";
+        return "Р’С‹Р±РµСЂРё С…РѕРґ РЅР° СЂР°СѓРЅРґ.";
+    }
+
+    function normalizeSubmittedAction(action) {
+        if (!action) {
+            return null;
+        }
+        return {
+            weapon: action.weapon || null,
+            shot: action.shot || action.shotDirection || null,
+            dodge: action.dodge || action.dodgeDirection || null,
+            source: action.source || "MANUAL",
+            submittedAt: action.submittedAt || null
+        };
+    }
+
+    function resolveLiveSelectionDraft(current, submittedAction, sameRound, autoBattleEnabled) {
+        if (autoBattleEnabled) {
+            return submittedAction || { weapon: null, shot: null, dodge: null };
+        }
+        if (!sameRound || !current) {
+            return submittedAction || { weapon: null, shot: null, dodge: null };
+        }
+        const currentDraft = {
+            weapon: current.selectedWeapon || null,
+            shot: current.selectedShot || null,
+            dodge: current.selectedDodge || null
+        };
+        if (!submittedAction) {
+            return currentDraft;
+        }
+        if (isCompleteAction(currentDraft) && !actionsMatch(currentDraft, submittedAction)) {
+            return currentDraft;
+        }
+        return submittedAction;
     }
 
     function liveDuelEndedByForfeit(payload) {
@@ -823,20 +875,20 @@
         const latest = payload.logs[payload.logs.length - 1];
         const lines = Array.isArray(latest.lines) ? latest.lines : [];
         return lines.some(function (line) {
-            return String(line).indexOf("покидает бой") >= 0 || String(line).indexOf("автопобеду") >= 0;
+            return String(line).indexOf("РїРѕРєРёРґР°РµС‚ Р±РѕР№") >= 0 || String(line).indexOf("Р°РІС‚РѕРїРѕР±РµРґСѓ") >= 0;
         });
     }
 
     function handleLiveForfeitOutcome(payload) {
         const resultLabel = payload && payload.resultLabel ? payload.resultLabel : "";
         if (resultLabel === "VICTORY") {
-            addJournal("Победа в PvP. +100 монет и +10 опыта.");
-            showToast("Победа. +100 монет и +10 опыта.");
+            addJournal("РџРѕР±РµРґР° РІ PvP. +100 РјРѕРЅРµС‚ Рё +10 РѕРїС‹С‚Р°.");
+            showToast("РџРѕР±РµРґР°. +100 РјРѕРЅРµС‚ Рё +10 РѕРїС‹С‚Р°.");
         } else if (resultLabel === "DEFEAT") {
-            addJournal("Автопоражение в PvP засчитано.");
-            showToast("Автопоражение засчитано.");
+            addJournal("РђРІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ РІ PvP Р·Р°СЃС‡РёС‚Р°РЅРѕ.");
+            showToast("РђРІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ Р·Р°СЃС‡РёС‚Р°РЅРѕ.");
         } else {
-            showToast("Матч завершен.");
+            showToast("РњР°С‚С‡ Р·Р°РІРµСЂС€РµРЅ.");
         }
         state.matchmaking.status = "COMPLETED";
         state.matchmaking.duelId = null;
@@ -862,6 +914,7 @@
         triggerScheduledJournalEvent();
         syncRemotePvp();
         syncFriendsIfNeeded();
+        syncLocalDuelState();
         expireQuestsIfNeeded();
         renderQueueStatus();
         renderQuestCounters();
@@ -873,6 +926,9 @@
         }
         if (state.ui.screen === "quest-detail") {
             renderQuestDetail();
+        }
+        if (state.duel && !elements.duelOverlay.classList.contains("hidden")) {
+            renderDuel();
         }
     }
 
@@ -979,8 +1035,8 @@
             if (friend) {
                 requestStartDuel({
                     mode: "friend",
-                    title: "Вызвать друга на дуэль?",
-                    copy: "Подтверди, что хочешь вызвать " + friend.name + ". Пока прямой вызов ведет в общий PvP-поиск.",
+                    title: "Р’С‹Р·РІР°С‚СЊ РґСЂСѓРіР° РЅР° РґСѓСЌР»СЊ?",
+                    copy: "РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ РІС‹Р·РІР°С‚СЊ " + friend.name + ". РџРѕРєР° РїСЂСЏРјРѕР№ РІС‹Р·РѕРІ РІРµРґРµС‚ РІ РѕР±С‰РёР№ PvP-РїРѕРёСЃРє.",
                     execute: function () {
                         startQueueDuel(true);
                     }
@@ -1036,8 +1092,12 @@
             submitLiveDuelAction();
             return;
         }
+        if (!isDuelSelectionComplete(state.duel)) {
+            showToast("Сначала выбери оружие, выстрел и уворот.");
+            return;
+        }
         resolveDuelRound(
-            { weapon: elements.duelWeaponSelect.value, shot: elements.duelShotSelect.value, dodge: elements.duelDodgeSelect.value },
+            getCurrentDuelAction(state.duel),
             buildOpponentAction()
         );
     }
@@ -1055,12 +1115,12 @@
     function openQuest(questId) {
         const quest = getQuest(questId);
         if (!quest || quest.status === "expired" || quest.status === "completed") {
-            showToast("Этот квест уже недоступен.");
+            showToast("Р­С‚РѕС‚ РєРІРµСЃС‚ СѓР¶Рµ РЅРµРґРѕСЃС‚СѓРїРµРЅ.");
             return;
         }
         if (quest.status === "new") {
             quest.status = "inProgress";
-            addJournal("Квест \"" + quest.title + "\" перешел в режим Продолжить.");
+            addJournal("РљРІРµСЃС‚ \"" + quest.title + "\" РїРµСЂРµС€РµР» РІ СЂРµР¶РёРј РџСЂРѕРґРѕР»Р¶РёС‚СЊ.");
         }
         state.ui.activeQuestId = questId;
         state.ui.screen = "quest-detail";
@@ -1074,8 +1134,8 @@
             return;
         }
         quest.expiresAt += 15 * 60 * 1000;
-        addJournal("Квест \"" + quest.title + "\" отложен. Таймер слегка отступил.");
-        showToast("Таймер квеста сдвинут на 15 минут.");
+        addJournal("РљРІРµСЃС‚ \"" + quest.title + "\" РѕС‚Р»РѕР¶РµРЅ. РўР°Р№РјРµСЂ СЃР»РµРіРєР° РѕС‚СЃС‚СѓРїРёР».");
+        showToast("РўР°Р№РјРµСЂ РєРІРµСЃС‚Р° СЃРґРІРёРЅСѓС‚ РЅР° 15 РјРёРЅСѓС‚.");
         saveState();
         renderAll();
     }
@@ -1089,14 +1149,14 @@
         }
         if (choice.requiresItem && !hasItem(choice.requiresItem)) {
             const missingName = ITEM_LIBRARY[choice.requiresItem].name;
-            const warning = "Не хватает предмета: " + missingName + ".";
+            const warning = "РќРµ С…РІР°С‚Р°РµС‚ РїСЂРµРґРјРµС‚Р°: " + missingName + ".";
             addJournal(warning);
             showToast(warning);
             renderAll();
             return;
         }
         if (choice.requiresStat && !meetsChoiceStat(choice)) {
-            const warning = "Не хватает характеристики: " + getStatLabel(choice.requiresStat) + " " + choice.requiresStatValue + ".";
+            const warning = "РќРµ С…РІР°С‚Р°РµС‚ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё: " + getStatLabel(choice.requiresStat) + " " + choice.requiresStatValue + ".";
             addJournal(warning);
             showToast(warning);
             renderAll();
@@ -1113,8 +1173,8 @@
             if (choice.penaltyMoney) {
                 state.player.money = Math.max(0, state.player.money - choice.penaltyMoney);
             }
-            addJournal(choice.failText || "Провал.");
-            showToast(choice.failText || "Провал.");
+            addJournal(choice.failText || "РџСЂРѕРІР°Р».");
+            showToast(choice.failText || "РџСЂРѕРІР°Р».");
             saveState();
             renderAll();
             return;
@@ -1125,8 +1185,8 @@
         if (choice.rewardItem) {
             addItem(choice.rewardItem, 1);
         }
-        addJournal(choice.successText || "Успех.");
-        showToast(choice.successText || "Успех.");
+        addJournal(choice.successText || "РЈСЃРїРµС….");
+        showToast(choice.successText || "РЈСЃРїРµС….");
         if (choice.successGoto) {
             quest.nodeId = choice.successGoto;
         } else if (choice.complete) {
@@ -1141,16 +1201,16 @@
 
     function useBackpackItem(itemId) {
         if (itemId !== "medkit") {
-            showToast("Этот предмет лучше поберечь для истории.");
+            showToast("Р­С‚РѕС‚ РїСЂРµРґРјРµС‚ Р»СѓС‡С€Рµ РїРѕР±РµСЂРµС‡СЊ РґР»СЏ РёСЃС‚РѕСЂРёРё.");
             return;
         }
         if (!hasItem("medkit")) {
-            showToast("Не хватает предмета: Аптечка.");
+            showToast("РќРµ С…РІР°С‚Р°РµС‚ РїСЂРµРґРјРµС‚Р°: РђРїС‚РµС‡РєР°.");
             return;
         }
         consumeItem("medkit", 1);
-        addJournal("Аптечка использована. Холод отступает, руки снова слушаются.");
-        showToast("Аптечка использована.");
+        addJournal("РђРїС‚РµС‡РєР° РёСЃРїРѕР»СЊР·РѕРІР°РЅР°. РҐРѕР»РѕРґ РѕС‚СЃС‚СѓРїР°РµС‚, СЂСѓРєРё СЃРЅРѕРІР° СЃР»СѓС€Р°СЋС‚СЃСЏ.");
+        showToast("РђРїС‚РµС‡РєР° РёСЃРїРѕР»СЊР·РѕРІР°РЅР°.");
         saveState();
         renderAll();
     }
@@ -1162,19 +1222,19 @@
         }
         if (item.section === "premium") {
             if (state.premium.owned.indexOf(item.id) >= 0) {
-                showToast("Этот премиальный лот уже открыт.");
+                showToast("Р­С‚РѕС‚ РїСЂРµРјРёР°Р»СЊРЅС‹Р№ Р»РѕС‚ СѓР¶Рµ РѕС‚РєСЂС‹С‚.");
                 return;
             }
             state.premium.owned.push(item.id);
-            addJournal('Премиальная витрина открыла "' + item.name + '".');
-            showToast("Открыто: " + item.name + ".");
+            addJournal('РџСЂРµРјРёР°Р»СЊРЅР°СЏ РІРёС‚СЂРёРЅР° РѕС‚РєСЂС‹Р»Р° "' + item.name + '".');
+            showToast("РћС‚РєСЂС‹С‚Рѕ: " + item.name + ".");
             saveState();
             renderAll();
             return;
         }
 
         if (state.player.money < item.price) {
-            const warning = "Не хватает монет: -" + item.price + " сейчас не потянуть.";
+            const warning = "РќРµ С…РІР°С‚Р°РµС‚ РјРѕРЅРµС‚: -" + item.price + " СЃРµР№С‡Р°СЃ РЅРµ РїРѕС‚СЏРЅСѓС‚СЊ.";
             addJournal(warning);
             showToast(warning);
             renderAll();
@@ -1182,19 +1242,19 @@
         }
 
         if (item.kind === "augment" && hasAugment(item.augmentId)) {
-            showToast("Эта аугментация уже в арсенале.");
+            showToast("Р­С‚Р° Р°СѓРіРјРµРЅС‚Р°С†РёСЏ СѓР¶Рµ РІ Р°СЂСЃРµРЅР°Р»Рµ.");
             return;
         }
 
         state.player.money -= item.price;
         if (item.kind === "augment") {
             unlockAugment(item.augmentId);
-            addJournal('Куплена аугментация "' + item.name + '". -' + item.price + " монет.");
+            addJournal('РљСѓРїР»РµРЅР° Р°СѓРіРјРµРЅС‚Р°С†РёСЏ "' + item.name + '". -' + item.price + " РјРѕРЅРµС‚.");
         } else {
             addItem(item.itemId, 1);
-            addJournal('Куплен предмет "' + item.name + '". -' + item.price + " монет.");
+            addJournal('РљСѓРїР»РµРЅ РїСЂРµРґРјРµС‚ "' + item.name + '". -' + item.price + " РјРѕРЅРµС‚.");
         }
-        showToast("Куплено: " + item.name + ".");
+        showToast("РљСѓРїР»РµРЅРѕ: " + item.name + ".");
         saveState();
         renderAll();
     }
@@ -1229,27 +1289,27 @@
         if (!skipConfirm) {
             requestStartDuel({
                 mode: "bot",
-                title: "Начать тренировочную дуэль?",
-                copy: "Подтверди, что хочешь сразу войти в бой с тренировочным соперником.",
+                title: "РќР°С‡Р°С‚СЊ С‚СЂРµРЅРёСЂРѕРІРѕС‡РЅСѓСЋ РґСѓСЌР»СЊ?",
+                copy: "РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ СЃСЂР°Р·Сѓ РІРѕР№С‚Рё РІ Р±РѕР№ СЃ С‚СЂРµРЅРёСЂРѕРІРѕС‡РЅС‹Рј СЃРѕРїРµСЂРЅРёРєРѕРј.",
                 execute: function () {
                     startBotDuel(true);
                 }
             });
             return;
         }
-        openDuel({ mode: "bot", title: "Тренировочная дуэль", modeLabel: "Бот", opponentName: "Тренировщик", opponentWeapon: "RIFLE" });
+        openDuel({ mode: "bot", title: "РўСЂРµРЅРёСЂРѕРІРѕС‡РЅР°СЏ РґСѓСЌР»СЊ", modeLabel: "Р‘РѕС‚", opponentName: "РўСЂРµРЅРёСЂРѕРІС‰РёРє", opponentWeapon: "RIFLE" });
     }
 
     async function startQueueDuel(skipConfirm) {
         if (!state.auth.registered) {
-            showToast("Сначала зарегистрируй аккаунт.");
+            showToast("РЎРЅР°С‡Р°Р»Р° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№ Р°РєРєР°СѓРЅС‚.");
             return;
         }
         if (!skipConfirm) {
             requestStartDuel({
                 mode: "queue",
-                title: "Начать поиск матча?",
-                copy: "Подтверди, что хочешь встать в очередь. Случайные нажатия тоже отправляют тебя в поиск.",
+                title: "РќР°С‡Р°С‚СЊ РїРѕРёСЃРє РјР°С‚С‡Р°?",
+                copy: "РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ РІСЃС‚Р°С‚СЊ РІ РѕС‡РµСЂРµРґСЊ. РЎР»СѓС‡Р°Р№РЅС‹Рµ РЅР°Р¶Р°С‚РёСЏ С‚РѕР¶Рµ РѕС‚РїСЂР°РІР»СЏСЋС‚ С‚РµР±СЏ РІ РїРѕРёСЃРє.",
                 execute: function () {
                     startQueueDuel(true);
                 }
@@ -1257,12 +1317,12 @@
             return;
         }
         if (state.matchmaking.status === "QUEUED") {
-            showToast("Очередь уже активна. Ищем соперника.");
+            showToast("РћС‡РµСЂРµРґСЊ СѓР¶Рµ Р°РєС‚РёРІРЅР°. РС‰РµРј СЃРѕРїРµСЂРЅРёРєР°.");
             return;
         }
         if (!state.auth.sessionToken || state.auth.demoMode) {
-            showToast("Вне Telegram доступна локальная дуэль.");
-            openDuel({ mode: "pvp", title: "Найденный матч", modeLabel: "PvP", opponentName: randomFrom(["Рейдер с перевала", "Контрабандист у проводов", "Молчаливый стрелок", "Часовой из белой пыли"]), opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"]) });
+            showToast("Р’РЅРµ Telegram РґРѕСЃС‚СѓРїРЅР° Р»РѕРєР°Р»СЊРЅР°СЏ РґСѓСЌР»СЊ.");
+            openDuel({ mode: "pvp", title: "РќР°Р№РґРµРЅРЅС‹Р№ РјР°С‚С‡", modeLabel: "PvP", opponentName: randomFrom(["Р РµР№РґРµСЂ СЃ РїРµСЂРµРІР°Р»Р°", "РљРѕРЅС‚СЂР°Р±Р°РЅРґРёСЃС‚ Сѓ РїСЂРѕРІРѕРґРѕРІ", "РњРѕР»С‡Р°Р»РёРІС‹Р№ СЃС‚СЂРµР»РѕРє", "Р§Р°СЃРѕРІРѕР№ РёР· Р±РµР»РѕР№ РїС‹Р»Рё"]), opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"]) });
             return;
         }
         try {
@@ -1271,12 +1331,12 @@
             applyMatchmakingStatus(payload);
             if (payload.status === "IN_DUEL" && payload.duelId) {
                 await refreshLiveDuel(payload.duelId);
-                showToast("Соперник найден.");
+                showToast("РЎРѕРїРµСЂРЅРёРє РЅР°Р№РґРµРЅ.");
             } else {
-                showToast(payload.message || "Ищем соперника.");
+                showToast(payload.message || "РС‰РµРј СЃРѕРїРµСЂРЅРёРєР°.");
             }
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось войти в очередь.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РІРѕР№С‚Рё РІ РѕС‡РµСЂРµРґСЊ.");
         }
     }
 
@@ -1291,7 +1351,7 @@
             state.matchmaking.queuedAt = null;
             saveState();
             renderAll();
-            showToast("Поиск дуэли отменён.");
+            showToast("РџРѕРёСЃРє РґСѓСЌР»Рё РѕС‚РјРµРЅС‘РЅ.");
             return;
         }
         if (elements.queueCancelButton) {
@@ -1301,9 +1361,9 @@
             const response = await apiFetch("/api/matchmaking/cancel", { method: "POST" });
             applyMatchmakingStatus(await response.json());
             renderAll();
-            showToast("Поиск дуэли отменён.");
+            showToast("РџРѕРёСЃРє РґСѓСЌР»Рё РѕС‚РјРµРЅС‘РЅ.");
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось отменить поиск.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РјРµРЅРёС‚СЊ РїРѕРёСЃРє.");
         } finally {
             if (elements.queueCancelButton) {
                 elements.queueCancelButton.disabled = false;
@@ -1313,11 +1373,11 @@
 
     async function allocateStat(stat) {
         if (!state.auth.registered) {
-            showToast("Сначала зарегистрируй аккаунт.");
+            showToast("РЎРЅР°С‡Р°Р»Р° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№ Р°РєРєР°СѓРЅС‚.");
             return;
         }
         if ((state.player.availableStatPoints || 0) <= 0) {
-            showToast("Свободных очков пока нет.");
+            showToast("РЎРІРѕР±РѕРґРЅС‹С… РѕС‡РєРѕРІ РїРѕРєР° РЅРµС‚.");
             return;
         }
         if (!state.auth.sessionToken || state.auth.demoMode) {
@@ -1325,7 +1385,7 @@
             state.player.availableStatPoints = Math.max(0, (state.player.availableStatPoints || 0) - 1);
             saveState();
             renderAll();
-            showToast("Характеристика усилена.");
+            showToast("РҐР°СЂР°РєС‚РµСЂРёСЃС‚РёРєР° СѓСЃРёР»РµРЅР°.");
             return;
         }
         try {
@@ -1339,24 +1399,24 @@
             syncPlayerFromServer(await response.json(), false);
             saveState();
             renderAll();
-            showToast("Характеристика усилена.");
+            showToast("РҐР°СЂР°РєС‚РµСЂРёСЃС‚РёРєР° СѓСЃРёР»РµРЅР°.");
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось распределить очко.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ СЂР°СЃРїСЂРµРґРµР»РёС‚СЊ РѕС‡РєРѕ.");
         }
     }
 
     async function submitFriendSearch() {
         if (!state.auth.registered) {
-            showToast("Сначала зарегистрируй аккаунт.");
+            showToast("РЎРЅР°С‡Р°Р»Р° Р·Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№ Р°РєРєР°СѓРЅС‚.");
             return;
         }
         const nickname = elements.friendSearchInput ? elements.friendSearchInput.value.trim() : "";
         if (!nickname) {
-            showToast("Введи ник игрока.");
+            showToast("Р’РІРµРґРё РЅРёРє РёРіСЂРѕРєР°.");
             return;
         }
         if (!state.auth.sessionToken || state.auth.demoMode) {
-            showToast("Добавление друзей доступно только в Telegram-аккаунте.");
+            showToast("Р”РѕР±Р°РІР»РµРЅРёРµ РґСЂСѓР·РµР№ РґРѕСЃС‚СѓРїРЅРѕ С‚РѕР»СЊРєРѕ РІ Telegram-Р°РєРєР°СѓРЅС‚Рµ.");
             return;
         }
         try {
@@ -1372,9 +1432,9 @@
                 elements.friendSearchInput.value = "";
             }
             renderFriends();
-            showToast("Запрос в друзья отправлен.");
+            showToast("Р—Р°РїСЂРѕСЃ РІ РґСЂСѓР·СЊСЏ РѕС‚РїСЂР°РІР»РµРЅ.");
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось отправить запрос.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ Р·Р°РїСЂРѕСЃ.");
         }
     }
 
@@ -1388,9 +1448,9 @@
             });
             applyFriendsOverview(await response.json());
             renderFriends();
-            showToast("Друг добавлен.");
+            showToast("Р”СЂСѓРі РґРѕР±Р°РІР»РµРЅ.");
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось принять запрос.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРёРЅСЏС‚СЊ Р·Р°РїСЂРѕСЃ.");
         }
     }
 
@@ -1404,9 +1464,9 @@
             });
             applyFriendsOverview(await response.json());
             renderFriends();
-            showToast("Запрос отклонен.");
+            showToast("Р—Р°РїСЂРѕСЃ РѕС‚РєР»РѕРЅРµРЅ.");
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось отклонить запрос.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєР»РѕРЅРёС‚СЊ Р·Р°РїСЂРѕСЃ.");
         }
     }
 
@@ -1425,20 +1485,31 @@
             opponentHp: 100,
             round: 1,
             finished: false,
-            resultText: "Собери ход на раунд и продави линию соперника.",
+            resultText: "Выбери ход на раунд.",
             logs: [],
             chatMessages: [],
             activePanel: "logs",
             chatError: "",
-            selectedWeapon: config.selectedWeapon || "PISTOLS",
-            selectedShot: config.selectedShot || "CENTER",
-            selectedDodge: config.selectedDodge || "STAY",
-            lastPlayerWeapon: config.selectedWeapon || "PISTOLS",
-            lastOpponentWeapon: config.opponentWeapon || (config.mode === "bot" ? "RIFLE" : randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"]))
+            selectedWeapon: null,
+            selectedShot: null,
+            selectedDodge: null,
+            submittedAction: null,
+            yourActionSubmitted: false,
+            opponentActionSubmitted: false,
+            canSubmitAction: true,
+            autoBattleEnabled: false,
+            autoBattlePendingEnabled: null,
+            autoResolutionAt: null,
+            lastPlayerWeapon: "PISTOLS",
+            lastOpponentWeapon: config.opponentWeapon || (config.mode === "bot" ? "RIFLE" : randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])),
+            roundStartedAt: Date.now(),
+            roundDeadlineAt: Date.now() + DUEL_ROUND_TIMEOUT_MS,
+            resultLabel: ""
         };
+        startLocalRound(state.duel, true);
         state.ui.duelExitConfirmOpen = false;
         saveState();
-        renderDuel();
+        renderAll();
         elements.duelOverlay.classList.remove("hidden");
         elements.duelOverlay.setAttribute("aria-hidden", "false");
         document.body.classList.add("duel-open");
@@ -1448,10 +1519,19 @@
         if (!state.duel || state.duel.mode !== "pvp-live" || !state.duel.duelId) {
             return;
         }
-        if (state.duel.yourActionSubmitted || !state.duel.canSubmitAction) {
-            showToast("Ход уже зафиксирован. Ждем соперника.");
+        if (state.duel.autoBattleEnabled) {
+            showToast("Этот раунд уже ведет автоматический бой.");
             return;
         }
+        if (!state.duel.canSubmitAction) {
+            showToast("Сейчас ход недоступен.");
+            return;
+        }
+        if (!isDuelSelectionComplete(state.duel)) {
+            showToast("Сначала выбери оружие, выстрел и уворот.");
+            return;
+        }
+        const actionPayload = getCurrentDuelAction(state.duel);
         elements.duelSubmitButton.disabled = true;
         try {
             const response = await apiFetch("/api/duel/" + encodeURIComponent(state.duel.duelId) + "/action", {
@@ -1460,15 +1540,15 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    weapon: elements.duelWeaponSelect.value,
-                    shotDirection: elements.duelShotSelect.value,
-                    dodgeDirection: elements.duelDodgeSelect.value
+                    weapon: actionPayload.weapon,
+                    shotDirection: actionPayload.shot,
+                    dodgeDirection: actionPayload.dodge
                 })
             });
             const payload = await response.json();
             state.matchmaking.status = payload.status === "FINISHED" ? "COMPLETED" : "IN_DUEL";
             await refreshLiveDuel(payload.duelId);
-            showToast(payload.canSubmitAction ? "Раунд обновлен." : "Ход зафиксирован.");
+            showToast(state.duel && state.duel.yourActionSubmitted ? "Ход сохранён." : "Раунд обновлён.");
         } catch (error) {
             showToast(error && error.message ? error.message : "Не удалось отправить ход.");
         } finally {
@@ -1476,12 +1556,142 @@
         }
     }
 
+    async function toggleAutoBattle() {
+        const duel = state.duel;
+        if (!duel || duel.finished) {
+            return;
+        }
+        const currentEnabled = Boolean(duel.autoBattleEnabled);
+        const pendingEnabled = typeof duel.autoBattlePendingEnabled === "boolean" ? duel.autoBattlePendingEnabled : null;
+        const desiredEnabled = pendingEnabled === null ? !currentEnabled : !pendingEnabled;
+        const nextPending = desiredEnabled === currentEnabled ? null : desiredEnabled;
+        if (duel.mode === "pvp-live" && duel.duelId) {
+            elements.duelAutoToggle.disabled = true;
+            try {
+                const response = await apiFetch("/api/duel/" + encodeURIComponent(duel.duelId) + "/automation", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ enabled: desiredEnabled })
+                });
+                const payload = await response.json();
+                await refreshLiveDuel(payload.duelId);
+                showToast(nextPending === null
+                    ? "Автоматический бой оставлен без изменений."
+                    : (nextPending ? "Автобой включится со следующего раунда." : "Автобой отключится со следующего раунда."));
+            } catch (error) {
+                showToast(error && error.message ? error.message : "Не удалось изменить автоматический бой.");
+            } finally {
+                elements.duelAutoToggle.disabled = false;
+            }
+            return;
+        }
+        duel.autoBattlePendingEnabled = nextPending;
+        saveState();
+        renderDuel();
+        showToast(nextPending === null
+            ? "Автоматический бой оставлен как есть."
+            : (nextPending ? "Автобой включится со следующего раунда." : "Автобой отключится со следующего раунда."));
+    }
+
     function buildOpponentAction() {
         return {
             weapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"]),
             shot: randomFrom(["LEFT", "CENTER", "RIGHT"]),
-            dodge: randomFrom(["LEFT", "STAY", "RIGHT"])
+            dodge: randomFrom(["LEFT", "STAY", "RIGHT"]),
+            source: "MANUAL"
         };
+    }
+
+    function buildAutoBattleAction() {
+        return {
+            weapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"]),
+            shot: randomFrom(["LEFT", "CENTER", "RIGHT"]),
+            dodge: randomFrom(["LEFT", "STAY", "RIGHT"]),
+            source: "AUTO_BATTLE"
+        };
+    }
+
+    function buildTimeoutDefaultAction() {
+        return {
+            weapon: "PISTOLS",
+            shot: "CENTER",
+            dodge: "STAY",
+            source: "TIMEOUT_DEFAULT"
+        };
+    }
+
+    function appendLocalSystemChat(text) {
+        if (!state.duel) {
+            return;
+        }
+        state.duel.chatMessages.push({
+            messageId: uid("chat"),
+            playerId: "system",
+            displayName: "Система",
+            text: text,
+            systemMessage: true,
+            createdAt: Date.now()
+        });
+        if (state.duel.chatMessages.length > 80) {
+            state.duel.chatMessages = state.duel.chatMessages.slice(-80);
+        }
+    }
+
+    function startLocalRound(duel, isInitial) {
+        if (!duel || duel.finished) {
+            return;
+        }
+        if (!isInitial && typeof duel.autoBattlePendingEnabled === "boolean") {
+            duel.autoBattleEnabled = duel.autoBattlePendingEnabled;
+            duel.autoBattlePendingEnabled = null;
+            appendLocalSystemChat(
+                duel.autoBattleEnabled
+                    ? "С этого раунда ходы игрока " + (duel.playerName || "Игрок") + " будут автоматическими."
+                    : "С этого раунда автоматические ходы игрока " + (duel.playerName || "Игрок") + " отключены."
+            );
+        }
+        duel.roundStartedAt = Date.now();
+        duel.roundDeadlineAt = duel.roundStartedAt + DUEL_ROUND_TIMEOUT_MS;
+        duel.selectedWeapon = null;
+        duel.selectedShot = null;
+        duel.selectedDodge = null;
+        duel.submittedAction = null;
+        duel.yourActionSubmitted = false;
+        duel.opponentActionSubmitted = false;
+        duel.autoResolutionAt = null;
+        duel.canSubmitAction = !duel.autoBattleEnabled;
+        duel.resultText = duel.autoBattleEnabled ? "Этот раунд будет сыгран автоматически." : "Выбери ход на раунд.";
+        if (duel.autoBattleEnabled) {
+            const autoAction = buildAutoBattleAction();
+            duel.submittedAction = autoAction;
+            duel.selectedWeapon = autoAction.weapon;
+            duel.selectedShot = autoAction.shot;
+            duel.selectedDodge = autoAction.dodge;
+            duel.yourActionSubmitted = true;
+            duel.autoResolutionAt = Date.now() + 1000;
+        }
+    }
+
+    function syncLocalDuelState() {
+        const duel = state.duel;
+        if (!duel || duel.finished || duel.mode === "pvp-live") {
+            return false;
+        }
+        if (!duel.roundStartedAt || !duel.roundDeadlineAt) {
+            startLocalRound(duel, true);
+            return true;
+        }
+        if (duel.autoBattleEnabled && duel.yourActionSubmitted && duel.autoResolutionAt && Date.now() >= duel.autoResolutionAt) {
+            resolveDuelRound(duel.submittedAction || buildAutoBattleAction(), buildOpponentAction());
+            return true;
+        }
+        if (Date.now() >= duel.roundDeadlineAt) {
+            resolveDuelRound(duel.submittedAction || buildTimeoutDefaultAction(), buildOpponentAction());
+            return true;
+        }
+        return false;
     }
 
     function resolveDuelRound(playerAction, opponentAction) {
@@ -1494,6 +1704,8 @@
         duel.selectedWeapon = playerAction.weapon;
         duel.selectedShot = playerAction.shot;
         duel.selectedDodge = playerAction.dodge;
+        duel.submittedAction = playerAction;
+        duel.yourActionSubmitted = true;
         duel.lastPlayerWeapon = playerAction.weapon;
         duel.lastOpponentWeapon = opponentAction.weapon;
         const lines = [
@@ -1512,53 +1724,52 @@
             duel.finished = true;
             duel.resultText = "Ничья. Оба дуэлянта падают в снег.";
             state.player.money = Math.max(0, state.player.money - 4);
-            addJournal("Ничья в дуэли. -4₽ на перевязку и горячий чай.");
+            addJournal("Ничья в дуэли. -4 монеты на перевязку и горячий чай.");
         } else if (duel.opponentHp === 0) {
             duel.finished = true;
             duel.resultText = "Победа. Соперник оседает в снег.";
             state.player.wins += 1;
             state.player.money += duel.mode === "bot" ? 10 : 24;
-            addJournal("Победа в дуэли. +" + (duel.mode === "bot" ? 10 : 24) + "₽ и немного уважения.");
+            addJournal("Победа в дуэли. +" + (duel.mode === "bot" ? 10 : 24) + " монет и немного уважения.");
         } else if (duel.playerHp === 0) {
             duel.finished = true;
             duel.resultText = "Поражение. Приходится отползать к теплу.";
             state.player.losses += 1;
             state.player.money = Math.max(0, state.player.money - (duel.mode === "bot" ? 4 : 12));
-            addJournal("Поражение в дуэли. -" + (duel.mode === "bot" ? 4 : 12) + "₽ на патроны и лед.");
+            addJournal("Поражение в дуэли. -" + (duel.mode === "bot" ? 4 : 12) + " монет на патроны и лед.");
         } else {
             duel.round += 1;
-            duel.resultText = "Раунд прожит. Выбери следующий ход.";
+            startLocalRound(duel, false);
         }
         saveState();
         renderAll();
-        renderDuel();
     }
 
     function resolveAttack(attackerName, defenderName, attackerAction, defenderAction, attackerSide) {
         const lines = [];
         const lineMatched = attackerAction.shot === defenderAction.dodge;
         if (!lineMatched && attackerAction.weapon !== "SHOTGUN") {
-            lines.push(attackerName + " уводит выстрел мимо линии.");
+            lines.push(attackerName + " СѓРІРѕРґРёС‚ РІС‹СЃС‚СЂРµР» РјРёРјРѕ Р»РёРЅРёРё.");
             return { damage: 0, lines: lines };
         }
         if (lineMatched && shouldSupportEvade(attackerSide === "player" ? "opponent" : "player")) {
-            lines.push(defenderName + " уходит от урона.");
+            lines.push(defenderName + " СѓС…РѕРґРёС‚ РѕС‚ СѓСЂРѕРЅР°.");
             return { damage: 0, lines: lines };
         }
         if (attackerAction.weapon === "PISTOLS") {
             if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon, attackerAction.shot)) {
-                lines.push(defenderName + " закрывается щитом и блокирует пулю.");
+                lines.push(defenderName + " Р·Р°РєСЂС‹РІР°РµС‚СЃСЏ С‰РёС‚РѕРј Рё Р±Р»РѕРєРёСЂСѓРµС‚ РїСѓР»СЋ.");
                 return { damage: 0, lines: lines };
             }
             let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
-            damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, attackerSide === "player" ? "соперник" : "ты");
-            lines.push(attackerName + " попадает из пистоля и наносит " + damage + " урона.");
+            damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, attackerSide === "player" ? "СЃРѕРїРµСЂРЅРёРє" : "С‚С‹");
+            lines.push(attackerName + " РїРѕРїР°РґР°РµС‚ РёР· РїРёСЃС‚РѕР»СЏ Рё РЅР°РЅРѕСЃРёС‚ " + damage + " СѓСЂРѕРЅР°.");
             return { damage: damage, lines: lines };
         }
         if (attackerAction.weapon === "RIFLE") {
             let damage = 30 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
-            damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, attackerSide === "player" ? "соперник" : "ты");
-            lines.push(attackerName + " попадает из винтовки и срезает щитовой блок.");
+            damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, attackerSide === "player" ? "СЃРѕРїРµСЂРЅРёРє" : "С‚С‹");
+            lines.push(attackerName + " РїРѕРїР°РґР°РµС‚ РёР· РІРёРЅС‚РѕРІРєРё Рё СЃСЂРµР·Р°РµС‚ С‰РёС‚РѕРІРѕР№ Р±Р»РѕРє.");
             return { damage: damage, lines: lines };
         }
         let pelletsHit = 0;
@@ -1566,11 +1777,11 @@
         if (!lineMatched) {
             if (Math.random() < SHOTGUN_EDGE_GRAZE_CHANCE + getWeaponGrazeBonus(attackerSide, attackerAction.weapon)) {
                 let edgeDamage = SHOTGUN_EDGE_DAMAGE + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
-                edgeDamage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", edgeDamage, true, lines, attackerSide === "player" ? "соперник" : "ты");
-                lines.push(attackerName + " цепляет краем и наносит " + edgeDamage + " урона.");
+                edgeDamage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", edgeDamage, true, lines, attackerSide === "player" ? "СЃРѕРїРµСЂРЅРёРє" : "С‚С‹");
+                lines.push(attackerName + " С†РµРїР»СЏРµС‚ РєСЂР°РµРј Рё РЅР°РЅРѕСЃРёС‚ " + edgeDamage + " СѓСЂРѕРЅР°.");
                 return { damage: edgeDamage, lines: lines };
             }
-            lines.push(attackerName + " не цепляет цель дробью.");
+            lines.push(attackerName + " РЅРµ С†РµРїР»СЏРµС‚ С†РµР»СЊ РґСЂРѕР±СЊСЋ.");
             return { damage: 0, lines: lines };
         }
         for (let pellet = 0; pellet < 5; pellet++) {
@@ -1581,14 +1792,14 @@
             }
         }
         if (!pelletsHit) {
-            lines.push(defenderName + " полностью перекрывает дробь щитом.");
+            lines.push(defenderName + " РїРѕР»РЅРѕСЃС‚СЊСЋ РїРµСЂРµРєСЂС‹РІР°РµС‚ РґСЂРѕР±СЊ С‰РёС‚РѕРј.");
             return { damage: 0, lines: lines };
         }
         let damage = pelletsHit * 5 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
-        damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, pelletsHit < 3, lines, attackerSide === "player" ? "соперник" : "ты");
-        let summary = attackerName + " попадает " + pelletsHit + " дробинами и наносит " + damage + " урона.";
+        damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, pelletsHit < 3, lines, attackerSide === "player" ? "СЃРѕРїРµСЂРЅРёРє" : "С‚С‹");
+        let summary = attackerName + " РїРѕРїР°РґР°РµС‚ " + pelletsHit + " РґСЂРѕР±РёРЅР°РјРё Рё РЅР°РЅРѕСЃРёС‚ " + damage + " СѓСЂРѕРЅР°.";
         if (pelletsBlocked) {
-            summary += " Щит снимает " + pelletsBlocked + " дробин.";
+            summary += " Р©РёС‚ СЃРЅРёРјР°РµС‚ " + pelletsBlocked + " РґСЂРѕР±РёРЅ.";
         }
         lines.push(summary);
         return { damage: damage, lines: lines };
@@ -1605,7 +1816,7 @@
             return;
         }
         duel.playerHp += restored;
-        lines.push(support.name + ": +" + restored + " HP после размена.");
+        lines.push(support.name + ": +" + restored + " HP РїРѕСЃР»Рµ СЂР°Р·РјРµРЅР°.");
     }
 
     function shouldSupportEvade(side) {
@@ -1686,7 +1897,7 @@
         }
         const reduced = Math.max(0, damage - reduction);
         if (reduced !== damage) {
-            lines.push(defenderName + ": " + defenseAugment.name + " гасит " + (damage - reduced) + " урона.");
+            lines.push(defenderName + ": " + defenseAugment.name + " РіР°СЃРёС‚ " + (damage - reduced) + " СѓСЂРѕРЅР°.");
         }
         return reduced;
     }
@@ -1699,28 +1910,28 @@
     function triggerRandomJournalEvent(isAutomatic) {
         if (hasActiveBattle()) {
             if (!isAutomatic) {
-                showToast("Во время боя дневник молчит.");
+                showToast("Р’Рѕ РІСЂРµРјСЏ Р±РѕСЏ РґРЅРµРІРЅРёРє РјРѕР»С‡РёС‚.");
             }
             return;
         }
         const events = [
-            { text: "На проводах висит новый слух. Успех для внимательных: +6₽ за подсказку.", money: 6 },
-            { text: "Слишком сильный ветер. Провал для спешащих: -4₽ на топливо.", money: -4 },
-            { text: "В проулке найден тайник. Находка приносит +1 аптечку.", itemId: "medkit" },
-            { text: "Лавочник ворчит, но уступает коробку патронов. Получена находка.", itemId: "cartridges38" },
-            { text: "Старый технарь возвращает долг. +9₽ падают в ладонь.", money: 9 },
-            { text: "На морозе лопается ремень, -3₽ уходят на починку.", money: -3 },
-            { text: "Под снегом находится ледяной жетон. Находка уходит в карман.", itemId: "iceToken" },
-            { text: "Сигнальный ящик открыт. Внутри мятая карта льда.", itemId: "scrapMap" },
-            { text: "Схрон у проводов приносит +1 латунную шестерню.", itemId: "brassGear" },
-            { text: "Тихий обмен у лавки добавляет +5₽ без лишних вопросов.", money: 5 },
-            { text: "Ночной холод добирается до запасов, -2₽ уходят на керосин.", money: -2 },
-            { text: "Новый слух ведет к истории «Снеговой долг».", addQuest: "frostDebt" },
-            { text: "Северный коридор снова мигает. Получен квест «Сигнал E3».", addQuest: "signalE3" },
-            { text: "Мастерская зовет обратно. Получен квест «Латунная болезнь».", addQuest: "brassDisease" },
-            { text: "Трактирщик оставляет записку. Получен квест «Семейная реликвия».", addQuest: "familyRelic" },
-            { text: "Под слоем инея находится +1 аптечка и короткая передышка.", itemId: "medkit" },
-            { text: "Короткий рейд приносит +7₽ и пачку новостей.", money: 7 }
+            { text: "РќР° РїСЂРѕРІРѕРґР°С… РІРёСЃРёС‚ РЅРѕРІС‹Р№ СЃР»СѓС…. РЈСЃРїРµС… РґР»СЏ РІРЅРёРјР°С‚РµР»СЊРЅС‹С…: +6в‚Ѕ Р·Р° РїРѕРґСЃРєР°Р·РєСѓ.", money: 6 },
+            { text: "РЎР»РёС€РєРѕРј СЃРёР»СЊРЅС‹Р№ РІРµС‚РµСЂ. РџСЂРѕРІР°Р» РґР»СЏ СЃРїРµС€Р°С‰РёС…: -4в‚Ѕ РЅР° С‚РѕРїР»РёРІРѕ.", money: -4 },
+            { text: "Р’ РїСЂРѕСѓР»РєРµ РЅР°Р№РґРµРЅ С‚Р°Р№РЅРёРє. РќР°С…РѕРґРєР° РїСЂРёРЅРѕСЃРёС‚ +1 Р°РїС‚РµС‡РєСѓ.", itemId: "medkit" },
+            { text: "Р›Р°РІРѕС‡РЅРёРє РІРѕСЂС‡РёС‚, РЅРѕ СѓСЃС‚СѓРїР°РµС‚ РєРѕСЂРѕР±РєСѓ РїР°С‚СЂРѕРЅРѕРІ. РџРѕР»СѓС‡РµРЅР° РЅР°С…РѕРґРєР°.", itemId: "cartridges38" },
+            { text: "РЎС‚Р°СЂС‹Р№ С‚РµС…РЅР°СЂСЊ РІРѕР·РІСЂР°С‰Р°РµС‚ РґРѕР»Рі. +9в‚Ѕ РїР°РґР°СЋС‚ РІ Р»Р°РґРѕРЅСЊ.", money: 9 },
+            { text: "РќР° РјРѕСЂРѕР·Рµ Р»РѕРїР°РµС‚СЃСЏ СЂРµРјРµРЅСЊ, -3в‚Ѕ СѓС…РѕРґСЏС‚ РЅР° РїРѕС‡РёРЅРєСѓ.", money: -3 },
+            { text: "РџРѕРґ СЃРЅРµРіРѕРј РЅР°С…РѕРґРёС‚СЃСЏ Р»РµРґСЏРЅРѕР№ Р¶РµС‚РѕРЅ. РќР°С…РѕРґРєР° СѓС…РѕРґРёС‚ РІ РєР°СЂРјР°РЅ.", itemId: "iceToken" },
+            { text: "РЎРёРіРЅР°Р»СЊРЅС‹Р№ СЏС‰РёРє РѕС‚РєСЂС‹С‚. Р’РЅСѓС‚СЂРё РјСЏС‚Р°СЏ РєР°СЂС‚Р° Р»СЊРґР°.", itemId: "scrapMap" },
+            { text: "РЎС…СЂРѕРЅ Сѓ РїСЂРѕРІРѕРґРѕРІ РїСЂРёРЅРѕСЃРёС‚ +1 Р»Р°С‚СѓРЅРЅСѓСЋ С€РµСЃС‚РµСЂРЅСЋ.", itemId: "brassGear" },
+            { text: "РўРёС…РёР№ РѕР±РјРµРЅ Сѓ Р»Р°РІРєРё РґРѕР±Р°РІР»СЏРµС‚ +5в‚Ѕ Р±РµР· Р»РёС€РЅРёС… РІРѕРїСЂРѕСЃРѕРІ.", money: 5 },
+            { text: "РќРѕС‡РЅРѕР№ С…РѕР»РѕРґ РґРѕР±РёСЂР°РµС‚СЃСЏ РґРѕ Р·Р°РїР°СЃРѕРІ, -2в‚Ѕ СѓС…РѕРґСЏС‚ РЅР° РєРµСЂРѕСЃРёРЅ.", money: -2 },
+            { text: "РќРѕРІС‹Р№ СЃР»СѓС… РІРµРґРµС‚ Рє РёСЃС‚РѕСЂРёРё В«РЎРЅРµРіРѕРІРѕР№ РґРѕР»РіВ».", addQuest: "frostDebt" },
+            { text: "РЎРµРІРµСЂРЅС‹Р№ РєРѕСЂРёРґРѕСЂ СЃРЅРѕРІР° РјРёРіР°РµС‚. РџРѕР»СѓС‡РµРЅ РєРІРµСЃС‚ В«РЎРёРіРЅР°Р» E3В».", addQuest: "signalE3" },
+            { text: "РњР°СЃС‚РµСЂСЃРєР°СЏ Р·РѕРІРµС‚ РѕР±СЂР°С‚РЅРѕ. РџРѕР»СѓС‡РµРЅ РєРІРµСЃС‚ В«Р›Р°С‚СѓРЅРЅР°СЏ Р±РѕР»РµР·РЅСЊВ».", addQuest: "brassDisease" },
+            { text: "РўСЂР°РєС‚РёСЂС‰РёРє РѕСЃС‚Р°РІР»СЏРµС‚ Р·Р°РїРёСЃРєСѓ. РџРѕР»СѓС‡РµРЅ РєРІРµСЃС‚ В«РЎРµРјРµР№РЅР°СЏ СЂРµР»РёРєРІРёСЏВ».", addQuest: "familyRelic" },
+            { text: "РџРѕРґ СЃР»РѕРµРј РёРЅРµСЏ РЅР°С…РѕРґРёС‚СЃСЏ +1 Р°РїС‚РµС‡РєР° Рё РєРѕСЂРѕС‚РєР°СЏ РїРµСЂРµРґС‹С€РєР°.", itemId: "medkit" },
+            { text: "РљРѕСЂРѕС‚РєРёР№ СЂРµР№Рґ РїСЂРёРЅРѕСЃРёС‚ +7в‚Ѕ Рё РїР°С‡РєСѓ РЅРѕРІРѕСЃС‚РµР№.", money: 7 }
         ];
         const questPool = ["familyRelic", "brassDisease", "signalE3", "frostDebt"];
         const eligibleEvents = events.filter(function (event) {
@@ -1752,7 +1963,7 @@
         state.world.lastJournalEventAt = Date.now();
         addJournal(event.text);
         if (!isAutomatic) {
-            showToast("Дневник обновлен.");
+            showToast("Р”РЅРµРІРЅРёРє РѕР±РЅРѕРІР»РµРЅ.");
         }
         saveState();
         renderAll();
@@ -1763,7 +1974,7 @@
         state.quests.forEach(function (quest) {
             if ((quest.status === "new" || quest.status === "inProgress") && quest.expiresAt <= Date.now()) {
                 quest.status = "expired";
-                addJournal("Квест \"" + quest.title + "\" истек. Мороз оказался быстрее.");
+                addJournal("РљРІРµСЃС‚ \"" + quest.title + "\" РёСЃС‚РµРє. РњРѕСЂРѕР· РѕРєР°Р·Р°Р»СЃСЏ Р±С‹СЃС‚СЂРµРµ.");
                 if (state.ui.activeQuestId === quest.id) {
                     state.ui.activeQuestId = null;
                     state.ui.screen = "quests";
@@ -1811,7 +2022,7 @@
         elements.profileName.textContent = state.player.name;
         elements.profileLevel.textContent = String(state.player.level);
         elements.profileMoney.textContent = formatMoney(state.player.money);
-        elements.shopMoney.textContent = state.player.money + " монет";
+        elements.shopMoney.textContent = state.player.money + " РјРѕРЅРµС‚";
         elements.profileAvatar.textContent = state.player.name.slice(0, 1).toUpperCase();
         const progressTarget = Math.max(1, state.player.levelProgressTarget || 100);
         const progressCurrent = Math.max(0, Math.min(progressTarget, state.player.levelProgressCurrent || 0));
@@ -1828,15 +2039,15 @@
         const queuedAt = state.matchmaking.queuedAt || Date.now();
         const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
         elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-        elements.queueStatusNote.textContent = state.matchmaking.message || "Ждём соперника в очереди.";
+        elements.queueStatusNote.textContent = state.matchmaking.message || "Р–РґС‘Рј СЃРѕРїРµСЂРЅРёРєР° РІ РѕС‡РµСЂРµРґРё.";
         elements.queueCancelButton.disabled = false;
     }
 
     function renderHeroStats() {
         const stats = [
-            { id: "strength", label: "Сила", value: state.player.strength || 0, hint: "Ломает преграды и продавливает сцены." },
-            { id: "reaction", label: "Реакция", value: state.player.reaction || 0, hint: "Помогает быстро читать угрозу и темп." },
-            { id: "analysis", label: "Анализ", value: state.player.analysis || 0, hint: "Открывает внимательные и хитрые решения." }
+            { id: "strength", label: "РЎРёР»Р°", value: state.player.strength || 0, hint: "Р›РѕРјР°РµС‚ РїСЂРµРіСЂР°РґС‹ Рё РїСЂРѕРґР°РІР»РёРІР°РµС‚ СЃС†РµРЅС‹." },
+            { id: "reaction", label: "Р РµР°РєС†РёСЏ", value: state.player.reaction || 0, hint: "РџРѕРјРѕРіР°РµС‚ Р±С‹СЃС‚СЂРѕ С‡РёС‚Р°С‚СЊ СѓРіСЂРѕР·Сѓ Рё С‚РµРјРї." },
+            { id: "analysis", label: "РђРЅР°Р»РёР·", value: state.player.analysis || 0, hint: "РћС‚РєСЂС‹РІР°РµС‚ РІРЅРёРјР°С‚РµР»СЊРЅС‹Рµ Рё С…РёС‚СЂС‹Рµ СЂРµС€РµРЅРёСЏ." }
         ];
         const available = Math.max(0, state.player.availableStatPoints || 0);
         elements.statPointsBadge.textContent = String(available);
@@ -1866,8 +2077,8 @@
         }
         const isDemo = Boolean(auth.demoMode);
         elements.registrationCopy.textContent = isDemo
-            ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
-            : "Введи никнейм. Аккаунт будет закреплен за твоим Telegram ID.";
+            ? "Р’РІРµРґРё РЅРёРєРЅРµР№Рј. Р’РЅРµ Telegram РѕРЅ СЃРѕС…СЂР°РЅРёС‚СЃСЏ С‚РѕР»СЊРєРѕ РІ СЌС‚РѕРј Р±СЂР°СѓР·РµСЂРµ."
+            : "Р’РІРµРґРё РЅРёРєРЅРµР№Рј. РђРєРєР°СѓРЅС‚ Р±СѓРґРµС‚ Р·Р°РєСЂРµРїР»РµРЅ Р·Р° С‚РІРѕРёРј Telegram ID.";
         if (!elements.registrationNickname.value) {
             elements.registrationNickname.value = auth.nickname || "";
         }
@@ -1898,7 +2109,7 @@
     function renderQuestList() {
         const quests = getActiveQuests();
         if (!quests.length) {
-            elements.questList.innerHTML = '<article class="quest-card"><p>Активных квестов нет. Дневник скоро подбросит новую наводку.</p></article>';
+            elements.questList.innerHTML = '<article class="quest-card"><p>РђРєС‚РёРІРЅС‹С… РєРІРµСЃС‚РѕРІ РЅРµС‚. Р”РЅРµРІРЅРёРє СЃРєРѕСЂРѕ РїРѕРґР±СЂРѕСЃРёС‚ РЅРѕРІСѓСЋ РЅР°РІРѕРґРєСѓ.</p></article>';
             return;
         }
         elements.questList.innerHTML = quests.map(function (quest) {
@@ -1907,7 +2118,7 @@
                 "<h3>" + escapeHtml(quest.title) + "</h3>",
                 "<p>" + escapeHtml(quest.description) + "</p>",
                 '<div class="quest-chip-row"><span class="chip">' + escapeHtml(quest.location) + '</span><span class="timer-chip">' + escapeHtml(formatDuration(quest.expiresAt - Date.now())) + "</span></div>",
-                '<div class="quest-actions"><button class="primary-button" data-action="open" data-quest-id="' + escapeHtml(quest.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.openQuest(\'' + escapeJs(quest.id) + '\')">' + (quest.status === "inProgress" ? "Продолжить" : "Выполнить") + '</button><button class="secondary-button" data-action="delay" data-quest-id="' + escapeHtml(quest.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.delayQuest(\'' + escapeJs(quest.id) + '\')">Отложить</button></div>',
+                '<div class="quest-actions"><button class="primary-button" data-action="open" data-quest-id="' + escapeHtml(quest.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.openQuest(\'' + escapeJs(quest.id) + '\')">' + (quest.status === "inProgress" ? "РџСЂРѕРґРѕР»Р¶РёС‚СЊ" : "Р’С‹РїРѕР»РЅРёС‚СЊ") + '</button><button class="secondary-button" data-action="delay" data-quest-id="' + escapeHtml(quest.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.delayQuest(\'' + escapeJs(quest.id) + '\')">РћС‚Р»РѕР¶РёС‚СЊ</button></div>',
                 "</article>"
             ].join("");
         }).join("");
@@ -1916,9 +2127,9 @@
     function renderQuestDetail() {
         const quest = getQuest(state.ui.activeQuestId);
         if (!quest) {
-            elements.questDetailTitle.textContent = "Текстовый квест";
-            elements.questDetailSubtitle.textContent = "Выбери историю из списка";
-            elements.questStoryText.innerHTML = "<p>Открой квест, чтобы увидеть сцену, выборы и карманный инвентарь.</p>";
+            elements.questDetailTitle.textContent = "РўРµРєСЃС‚РѕРІС‹Р№ РєРІРµСЃС‚";
+            elements.questDetailSubtitle.textContent = "Р’С‹Р±РµСЂРё РёСЃС‚РѕСЂРёСЋ РёР· СЃРїРёСЃРєР°";
+            elements.questStoryText.innerHTML = "<p>РћС‚РєСЂРѕР№ РєРІРµСЃС‚, С‡С‚РѕР±С‹ СѓРІРёРґРµС‚СЊ СЃС†РµРЅСѓ, РІС‹Р±РѕСЂС‹ Рё РєР°СЂРјР°РЅРЅС‹Р№ РёРЅРІРµРЅС‚Р°СЂСЊ.</p>";
             elements.questChoiceList.innerHTML = "";
             elements.questStateTags.innerHTML = "";
             elements.questStateCount.textContent = "0";
@@ -1937,9 +2148,9 @@
             const missingStat = choice.requiresStat && !meetsChoiceStat(choice);
             const disabled = missingItem || missingStat;
             const missingNote = missingItem
-                ? '<span class="text-negative">Не хватает предмета.</span>'
+                ? '<span class="text-negative">РќРµ С…РІР°С‚Р°РµС‚ РїСЂРµРґРјРµС‚Р°.</span>'
                 : missingStat
-                    ? '<span class="text-negative">Нужно: ' + escapeHtml(getStatLabel(choice.requiresStat)) + " " + escapeHtml(String(choice.requiresStatValue)) + ".</span>"
+                    ? '<span class="text-negative">РќСѓР¶РЅРѕ: ' + escapeHtml(getStatLabel(choice.requiresStat)) + " " + escapeHtml(String(choice.requiresStatValue)) + ".</span>"
                     : "";
             return [
                 '<button class="choice-button" type="button" data-quest-id="' + escapeHtml(quest.id) + '" data-choice-id="' + escapeHtml(choice.id) + '" onclick="window.PolusApp && window.PolusApp.chooseQuestAction(\'' + escapeJs(quest.id) + '\', \'' + escapeJs(choice.id) + '\')"' + (disabled ? " disabled" : "") + ">",
@@ -1970,7 +2181,7 @@
                 "<h3>" + escapeHtml(augment.name) + "</h3>",
                 '<p class="augment-copy">' + escapeHtml(augment.effectLabel || augment.description || "") + "</p>",
                 "</div>",
-                '<button class="utility-button" data-augment-slot="' + escapeHtml(slotConfig.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.changeAugment(\'' + escapeJs(slotConfig.id) + '\')">Изменить</button>',
+                '<button class="utility-button" data-augment-slot="' + escapeHtml(slotConfig.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.changeAugment(\'' + escapeJs(slotConfig.id) + '\')">РР·РјРµРЅРёС‚СЊ</button>',
                 "</div>",
                 "</article>"
             ].join("");
@@ -1984,13 +2195,13 @@
                 '<span class="augment-type">' + escapeHtml(slotConfig.title) + "</span>",
                 "<h3>" + escapeHtml(augment.name) + "</h3>",
                 '<p class="augment-copy">' + escapeHtml(augment.effectLabel || augment.description || "") + "</p>",
-                '<span class="augment-status' + (isActive ? " is-active" : "") + '">' + (isActive ? "Установлена" : "В хранилище") + "</span>",
+                '<span class="augment-status' + (isActive ? " is-active" : "") + '">' + (isActive ? "РЈСЃС‚Р°РЅРѕРІР»РµРЅР°" : "Р’ С…СЂР°РЅРёР»РёС‰Рµ") + "</span>",
                 "</article>"
             ].join("");
         }).join("");
         elements.backpackList.innerHTML = state.inventory.backpack.map(function (item) {
             const definition = ITEM_LIBRARY[item.id];
-            return '<article class="inventory-card"><h3>' + escapeHtml(definition.name) + " x" + escapeHtml(String(item.quantity)) + "</h3><p>" + escapeHtml(definition.description) + "</p>" + (definition.usable ? '<div class="inventory-actions"><button class="utility-button is-positive" data-item-action="use" data-item-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.useItem(\'' + escapeJs(item.id) + '\')">Использовать</button></div>' : "") + "</article>";
+            return '<article class="inventory-card"><h3>' + escapeHtml(definition.name) + " x" + escapeHtml(String(item.quantity)) + "</h3><p>" + escapeHtml(definition.description) + "</p>" + (definition.usable ? '<div class="inventory-actions"><button class="utility-button is-positive" data-item-action="use" data-item-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.useItem(\'' + escapeJs(item.id) + '\')">РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ</button></div>' : "") + "</article>";
         }).join("");
     }
 
@@ -1999,16 +2210,16 @@
         elements.friendRequestBadge.textContent = String(Math.min(9, requests.length));
         elements.friendRequestPanel.innerHTML = requests.length ? [
             '<section class="friend-request-stack">',
-            '<div class="panel-header friend-subheader"><h3 class="panel-title panel-title-small">Приглашения</h3></div>',
+            '<div class="panel-header friend-subheader"><h3 class="panel-title panel-title-small">РџСЂРёРіР»Р°С€РµРЅРёСЏ</h3></div>',
             requests.map(function (request) {
                 const online = request.status === "online";
                 return [
                     '<article class="friend-card friend-request-card">',
                     "<h3>" + escapeHtml(request.name) + "</h3>",
-                    '<div class="friend-status-row"><span class="status-chip ' + (online ? "is-online" : "is-offline") + '">' + (online ? "Онлайн" : "Оффлайн") + '</span><span class="timer-chip">Уровень ' + escapeHtml(String(request.level)) + "</span></div>",
+                    '<div class="friend-status-row"><span class="status-chip ' + (online ? "is-online" : "is-offline") + '">' + (online ? "РћРЅР»Р°Р№РЅ" : "РћС„С„Р»Р°Р№РЅ") + '</span><span class="timer-chip">РЈСЂРѕРІРµРЅСЊ ' + escapeHtml(String(request.level)) + "</span></div>",
                     '<div class="friend-actions">',
-                    '<button class="primary-button full-width" type="button" data-request-accept-id="' + escapeHtml(request.id) + '">Принять</button>',
-                    '<button class="secondary-button full-width" type="button" data-request-reject-id="' + escapeHtml(request.id) + '">Отклонить</button>',
+                    '<button class="primary-button full-width" type="button" data-request-accept-id="' + escapeHtml(request.id) + '">РџСЂРёРЅСЏС‚СЊ</button>',
+                    '<button class="secondary-button full-width" type="button" data-request-reject-id="' + escapeHtml(request.id) + '">РћС‚РєР»РѕРЅРёС‚СЊ</button>',
                     "</div>",
                     "</article>"
                 ].join("");
@@ -2020,14 +2231,14 @@
             return [
                 '<article class="friend-card">',
                 "<h3>" + escapeHtml(friend.name) + "</h3>",
-                '<div class="friend-status-row"><span class="status-chip ' + (online ? "is-online" : "is-offline") + '">' + (online ? "Онлайн" : "Оффлайн") + '</span><span class="timer-chip">Уровень ' + escapeHtml(String(friend.level)) + "</span></div>",
+                '<div class="friend-status-row"><span class="status-chip ' + (online ? "is-online" : "is-offline") + '">' + (online ? "РћРЅР»Р°Р№РЅ" : "РћС„С„Р»Р°Р№РЅ") + '</span><span class="timer-chip">РЈСЂРѕРІРµРЅСЊ ' + escapeHtml(String(friend.level)) + "</span></div>",
                 '<div class="friend-actions">',
-                '<button class="primary-button full-width" data-friend-id="' + escapeHtml(friend.id) + '" type="button"' + (online ? "" : " disabled") + '>Вызвать на дуэль</button>',
-                '<button class="secondary-button full-width" data-friend-profile-id="' + escapeHtml(friend.id) + '" type="button">Посмотреть профиль</button>',
+                '<button class="primary-button full-width" data-friend-id="' + escapeHtml(friend.id) + '" type="button"' + (online ? "" : " disabled") + '>Р’С‹Р·РІР°С‚СЊ РЅР° РґСѓСЌР»СЊ</button>',
+                '<button class="secondary-button full-width" data-friend-profile-id="' + escapeHtml(friend.id) + '" type="button">РџРѕСЃРјРѕС‚СЂРµС‚СЊ РїСЂРѕС„РёР»СЊ</button>',
                 "</div>",
                 "</article>"
             ].join("");
-        }).join("") : '<article class="friend-card"><p>Пока никого нет в друзьях. Найди игрока по никнейму и отправь запрос.</p></article>';
+        }).join("") : '<article class="friend-card"><p>РџРѕРєР° РЅРёРєРѕРіРѕ РЅРµС‚ РІ РґСЂСѓР·СЊСЏС…. РќР°Р№РґРё РёРіСЂРѕРєР° РїРѕ РЅРёРєРЅРµР№РјСѓ Рё РѕС‚РїСЂР°РІСЊ Р·Р°РїСЂРѕСЃ.</p></article>';
     }
 
     function renderShop() {
@@ -2047,8 +2258,8 @@
                 const ownedPremium = item.section === "premium" && state.premium.owned.indexOf(item.id) >= 0;
                 const ownedAugment = item.kind === "augment" && hasAugment(item.augmentId);
                 const alreadyOwned = ownedPremium || ownedAugment;
-                const priceLabel = item.section === "premium" ? item.price + " " + RUBLE_SIGN : item.price + " монет";
-                const buttonLabel = item.section === "premium" ? (ownedPremium ? "В коллекции" : "Купить за " + item.price + " " + RUBLE_SIGN) : (ownedAugment ? "В арсенале" : "Купить");
+                const priceLabel = item.section === "premium" ? item.price + " " + RUBLE_SIGN : item.price + " РјРѕРЅРµС‚";
+                const buttonLabel = item.section === "premium" ? (ownedPremium ? "Р’ РєРѕР»Р»РµРєС†РёРё" : "РљСѓРїРёС‚СЊ Р·Р° " + item.price + " " + RUBLE_SIGN) : (ownedAugment ? "Р’ Р°СЂСЃРµРЅР°Р»Рµ" : "РљСѓРїРёС‚СЊ");
                 return '<article class="shop-card' + (item.section === "premium" ? " shop-card-premium" : "") + '">' + renderShopPreview(item) + '<h3>' + escapeHtml(item.name) + '</h3><div class="shop-price-row"><strong>' + escapeHtml(priceLabel) + '</strong></div><div class="shop-actions"><button class="' + (item.section === "premium" ? "secondary-button" : "primary-button") + '" data-shop-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.buy(\'' + escapeJs(item.id) + '\')"' + (alreadyOwned ? " disabled" : "") + '>' + escapeHtml(buttonLabel) + "</button></div></article>";
             }).join(""),
             "</section>"
@@ -2060,7 +2271,7 @@
             return "";
         }
         if (item.previewType === "skin") {
-            return '<div class="shop-preview shop-preview-skin shop-preview-' + escapeHtml(item.previewTone || "crimson") + '"><div class="shop-preview-avatar">И</div></div>';
+            return '<div class="shop-preview shop-preview-skin shop-preview-' + escapeHtml(item.previewTone || "crimson") + '"><div class="shop-preview-avatar">Р</div></div>';
         }
         return '<div class="shop-preview shop-preview-backdrop shop-preview-' + escapeHtml(item.previewTone || "polar") + '"></div>';
     }
@@ -2068,7 +2279,7 @@
     function openAugmentPicker(slot) {
         const owned = getOwnedAugments(slot);
         if (!owned.length) {
-            showToast("Сначала купи еще модули для этой линии.");
+            showToast("РЎРЅР°С‡Р°Р»Р° РєСѓРїРё РµС‰Рµ РјРѕРґСѓР»Рё РґР»СЏ СЌС‚РѕР№ Р»РёРЅРёРё.");
             return;
         }
         state.ui.augmentPickerSlot = slot;
@@ -2085,7 +2296,7 @@
     function selectAugment(augmentId) {
         const augment = AUGMENT_LIBRARY[augmentId];
         if (!augment || !hasAugment(augmentId)) {
-            showToast("Этот модуль еще не разблокирован.");
+            showToast("Р­С‚РѕС‚ РјРѕРґСѓР»СЊ РµС‰Рµ РЅРµ СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅ.");
             return;
         }
         state.inventory.augmentSlots[augment.slot] = augment.id;
@@ -2110,7 +2321,7 @@
         if (!friend) {
             return;
         }
-        showToast(friend.name + " · уровень " + friend.level + " · " + (friend.status === "online" ? "онлайн" : "оффлайн") + ".");
+        showToast(friend.name + " В· СѓСЂРѕРІРµРЅСЊ " + friend.level + " В· " + (friend.status === "online" ? "РѕРЅР»Р°Р№РЅ" : "РѕС„С„Р»Р°Р№РЅ") + ".");
     }
 
     function getOwnedAugments(slot) {
@@ -2155,7 +2366,7 @@
                 '<button class="inventory-card augment-card augment-option' + (isActive ? " is-active" : "") + '" type="button" data-augment-id="' + escapeHtml(augment.id) + '" onclick="window.PolusApp && window.PolusApp.selectAugment(\'' + escapeJs(augment.id) + '\')">',
                 "<h3>" + escapeHtml(augment.name) + "</h3>",
                 '<p class="augment-copy">' + escapeHtml(augment.effectLabel || augment.description || "") + "</p>",
-                '<span class="augment-status' + (isActive ? " is-active" : "") + '">' + (isActive ? "Установлена" : "Выбрать") + "</span>",
+                '<span class="augment-status' + (isActive ? " is-active" : "") + '">' + (isActive ? "РЈСЃС‚Р°РЅРѕРІР»РµРЅР°" : "Р’С‹Р±СЂР°С‚СЊ") + "</span>",
                 "</button>"
             ].join("");
         }).join("");
@@ -2187,10 +2398,11 @@
         duel.chatError = duel.chatError || "";
         syncDuelInputs(duel);
         elements.duelTitle.textContent = duel.title;
-        elements.duelRoundPill.textContent = "Раунд " + duel.round;
-        elements.duelYouName.textContent = duel.playerName || "Игрок";
+        elements.duelRoundPill.textContent = "Р Р°СѓРЅРґ " + duel.round;
+        elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
+        elements.duelYouName.textContent = duel.playerName || "РРіСЂРѕРє";
         elements.duelYouMeta.textContent = buildDuelMeta();
-        elements.duelYouAvatar.textContent = (duel.playerName || "Ты").slice(0, 1).toUpperCase();
+        elements.duelYouAvatar.textContent = (duel.playerName || "РўС‹").slice(0, 1).toUpperCase();
         elements.duelOpponentName.textContent = duel.opponentName;
         elements.duelOpponentMeta.textContent = buildDuelMeta();
         elements.duelOpponentAvatar.textContent = duel.opponentName.slice(0, 1).toUpperCase();
@@ -2199,15 +2411,27 @@
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
         elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, duel.opponentHp)) + "%";
         elements.duelRoundStatus.innerHTML = decorateText(buildDuelStatusText(duel));
-        elements.duelSubmitButton.disabled = duel.finished || (duel.mode === "pvp-live" && (!duel.canSubmitAction || duel.yourActionSubmitted));
+        const duelSelectionComplete = isDuelSelectionComplete(duel);
+        const duelHasPendingChanges = hasPendingDuelChanges(duel);
+        const submitButtonLabel = duel.finished
+            ? "Раунд завершен"
+            : duel.yourActionSubmitted
+                ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
+                : "Сделать ход";
+        elements.duelSubmitButton.textContent = submitButtonLabel;
+        elements.duelSubmitButton.disabled = duel.finished
+            || duel.autoBattleEnabled
+            || !duel.canSubmitAction
+            || !duelSelectionComplete
+            || (duel.yourActionSubmitted && !duelHasPendingChanges);
         renderDuelControls();
         if (!duel.logs.length) {
-            elements.duelLogList.innerHTML = '<div class="duel-log-round"><p class="duel-log-round-title">Лёд молчит. Первый размен еще не произошел.</p></div>';
+            elements.duelLogList.innerHTML = '<div class="duel-log-round"><p class="duel-log-round-title">Р›С‘Рґ РјРѕР»С‡РёС‚. РџРµСЂРІС‹Р№ СЂР°Р·РјРµРЅ РµС‰Рµ РЅРµ РїСЂРѕРёР·РѕС€РµР».</p></div>';
         } else {
             elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(function (entry) {
                 const roundNumber = typeof entry.round === "number" ? entry.round : entry.roundNumber;
                 const lines = Array.isArray(entry.lines) ? entry.lines : [];
-                const title = lines.length ? lines[0] : "Раунд " + roundNumber;
+                const title = lines.length ? lines[0] : "Р Р°СѓРЅРґ " + roundNumber;
                 const detailLines = lines.slice(1);
                 return '<div class="duel-log-round"><p class="duel-log-round-title">' + decorateText(title) + '</p>' + detailLines.map(function (line) {
                     return '<p class="duel-log-line">' + decorateText(line) + "</p>";
@@ -2232,6 +2456,9 @@
         if (!duel || duel.finished) {
             return;
         }
+        if (duel.autoBattleEnabled) {
+            return;
+        }
         if (kind === "weapon") {
             duel.selectedWeapon = value;
         }
@@ -2252,28 +2479,51 @@
         }
         state.duel.logs = [];
         if (!state.duel.finished) {
-            state.duel.resultText = "Собери ход на раунд и продави линию соперника.";
+            state.duel.resultText = "РЎРѕР±РµСЂРё С…РѕРґ РЅР° СЂР°СѓРЅРґ Рё РїСЂРѕРґР°РІРё Р»РёРЅРёСЋ СЃРѕРїРµСЂРЅРёРєР°.";
         }
         saveState();
         renderDuel();
     }
 
     function syncDuelInputs(duel) {
-        duel.selectedWeapon = duel.selectedWeapon || duel.lastPlayerWeapon || "PISTOLS";
-        duel.selectedShot = duel.selectedShot || "CENTER";
-        duel.selectedDodge = duel.selectedDodge || "STAY";
-        duel.lastPlayerWeapon = duel.lastPlayerWeapon || duel.selectedWeapon;
+        duel.lastPlayerWeapon = duel.lastPlayerWeapon || "PISTOLS";
         duel.lastOpponentWeapon = duel.lastOpponentWeapon || "RIFLE";
-        elements.duelWeaponSelect.value = duel.selectedWeapon;
-        elements.duelShotSelect.value = duel.selectedShot;
-        elements.duelDodgeSelect.value = duel.selectedDodge;
+        elements.duelWeaponSelect.value = duel.selectedWeapon || "";
+        elements.duelShotSelect.value = duel.selectedShot || "";
+        elements.duelDodgeSelect.value = duel.selectedDodge || "";
     }
 
     function renderDuelControls() {
-        toggleDuelButtonGroup(elements.duelWeaponButtons, elements.duelWeaponSelect.value);
-        toggleDuelButtonGroup(elements.duelShotButtons, elements.duelShotSelect.value);
-        toggleDuelButtonGroup(elements.duelDodgeButtons, elements.duelDodgeSelect.value);
-        elements.duelClearLogButton.disabled = !state.duel || !state.duel.logs.length || state.duel.mode === "pvp-live";
+        const duel = state.duel;
+        const controlsDisabled = !duel || duel.finished || duel.autoBattleEnabled;
+        toggleDuelButtonGroup(elements.duelWeaponButtons, duel ? duel.selectedWeapon : "");
+        toggleDuelButtonGroup(elements.duelShotButtons, duel ? duel.selectedShot : "");
+        toggleDuelButtonGroup(elements.duelDodgeButtons, duel ? duel.selectedDodge : "");
+        [].concat(elements.duelWeaponButtons, elements.duelShotButtons, elements.duelDodgeButtons).forEach(function (button) {
+            button.disabled = controlsDisabled;
+        });
+        elements.duelClearLogButton.disabled = !duel || !duel.logs.length || duel.mode === "pvp-live";
+        if (!duel) {
+            elements.duelAutoToggle.classList.remove("is-active", "is-pending");
+            elements.duelAutoToggle.disabled = true;
+            elements.duelAutoToggle.textContent = "Включить автоматический бой";
+            elements.duelAutoNote.textContent = "";
+            elements.duelAutoNote.classList.add("hidden");
+            elements.duelAutoCover.classList.add("hidden");
+            return;
+        }
+        const currentEnabled = Boolean(duel.autoBattleEnabled);
+        const pendingEnabled = typeof duel.autoBattlePendingEnabled === "boolean" ? duel.autoBattlePendingEnabled : null;
+        elements.duelAutoToggle.disabled = duel.finished;
+        elements.duelAutoToggle.classList.toggle("is-active", currentEnabled);
+        elements.duelAutoToggle.classList.toggle("is-pending", pendingEnabled !== null && pendingEnabled !== currentEnabled);
+        elements.duelAutoToggle.textContent = currentEnabled ? "Автобой включен" : "Включить автоматический бой";
+        const note = currentEnabled
+            ? (pendingEnabled === false ? "Со следующего раунда автоматика отключится." : "Текущий раунд играет автоматика.")
+            : (pendingEnabled === true ? "Со следующего раунда ходы станут автоматическими." : "");
+        elements.duelAutoNote.textContent = note;
+        elements.duelAutoNote.classList.toggle("hidden", !note);
+        elements.duelAutoCover.classList.toggle("hidden", !currentEnabled || duel.finished);
     }
 
     function renderDuelChat(duel) {
@@ -2281,16 +2531,19 @@
         const canWrite = isLiveChat && !duel.finished;
         const messages = duel.chatMessages || [];
         if (!messages.length) {
-            elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока молчит. Первый ход или первое слово — за вами." : "Чат доступен только в PvP-матче между двумя игроками.") + "</p></div>";
+            elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Р§Р°С‚ РїРѕРєР° РјРѕР»С‡РёС‚. РџРµСЂРІС‹Р№ С…РѕРґ РёР»Рё РїРµСЂРІРѕРµ СЃР»РѕРІРѕ вЂ” Р·Р° РІР°РјРё." : "Р§Р°С‚ РґРѕСЃС‚СѓРїРµРЅ С‚РѕР»СЊРєРѕ РІ PvP-РјР°С‚С‡Рµ РјРµР¶РґСѓ РґРІСѓРјСЏ РёРіСЂРѕРєР°РјРё.") + "</p></div>";
         } else {
             elements.duelChatList.innerHTML = messages.map(function (message) {
                 const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
-                return '<div class="duel-chat-entry' + (own ? " duel-chat-entry-own" : "") + '"><p class="duel-chat-meta">' + escapeHtml(message.displayName || "Игрок") + " · " + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</p><p class="duel-chat-text">' + escapeHtml(message.text || "") + "</p></div>";
+                const systemMessage = Boolean(message.systemMessage);
+                const infoMessage = systemMessage && /отключены/i.test(String(message.text || ""));
+                const extraClass = systemMessage ? (infoMessage ? " duel-chat-entry-info" : " duel-chat-entry-system") : (own ? " duel-chat-entry-own" : "");
+                return '<div class="duel-chat-entry' + extraClass + '"><p class="duel-chat-meta">' + escapeHtml(message.displayName || "РРіСЂРѕРє") + " В· " + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</p><p class="duel-chat-text">' + escapeHtml(message.text || "") + "</p></div>";
             }).join("");
         }
         elements.duelChatInput.disabled = !canWrite;
         elements.duelChatSendButton.disabled = !canWrite;
-        elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+        elements.duelChatInput.placeholder = canWrite ? "РќР°РїРёС€Рё СЃРѕРѕР±С‰РµРЅРёРµ СЃРѕРїРµСЂРЅРёРєСѓ" : "Р§Р°С‚ РЅРµРґРѕСЃС‚СѓРїРµРЅ";
         elements.duelChatError.textContent = duel.chatError || "";
         elements.duelChatError.classList.toggle("hidden", !duel.chatError);
         elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -2314,12 +2567,12 @@
             return;
         }
         if (hasForbiddenLink(rawMessage)) {
-            state.duel.chatError = "Ссылка запрещена в боевом чате.";
+            state.duel.chatError = "РЎСЃС‹Р»РєР° Р·Р°РїСЂРµС‰РµРЅР° РІ Р±РѕРµРІРѕРј С‡Р°С‚Рµ.";
             renderDuel();
             return;
         }
         if (state.duel.mode !== "pvp-live" || !state.duel.duelId) {
-            state.duel.chatError = "Чат доступен только в PvP-матче.";
+            state.duel.chatError = "Р§Р°С‚ РґРѕСЃС‚СѓРїРµРЅ С‚РѕР»СЊРєРѕ РІ PvP-РјР°С‚С‡Рµ.";
             renderDuel();
             return;
         }
@@ -2337,7 +2590,7 @@
             elements.duelChatInput.value = "";
             await refreshLiveDuel(payload.duelId);
         } catch (error) {
-            state.duel.chatError = error && error.message ? error.message : "Не удалось отправить сообщение.";
+            state.duel.chatError = error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ.";
             renderDuel();
         } finally {
             elements.duelChatSendButton.disabled = false;
@@ -2360,10 +2613,25 @@
         if (duel.finished) {
             return duel.resultText;
         }
+        if (duel.autoBattleEnabled) {
+            return "Этот раунд идет автоматически.";
+        }
+        if (duel.mode === "pvp-live") {
+            if (duel.yourActionSubmitted) {
+                return hasPendingDuelChanges(duel)
+                    ? "Выбор изменен. Нажми «Изменить ход», чтобы отправить новый вариант."
+                    : "Ход зафиксирован. Ждем соперника.";
+            }
+            if (typeof duel.autoBattlePendingEnabled === "boolean") {
+                return duel.autoBattlePendingEnabled
+                    ? "Автобой включится со следующего раунда."
+                    : "Автобой отключится со следующего раунда.";
+            }
+        }
         if (duel.logs.length) {
             return duel.resultText + " " + DUEL_DEFAULT_NOTE;
         }
-        return DUEL_DEFAULT_NOTE;
+        return duel.resultText || DUEL_DEFAULT_NOTE;
     }
 
     function closeDuelSilently() {
@@ -2393,8 +2661,8 @@
         if (!shouldOpen) {
             return;
         }
-        elements.startDuelTitle.textContent = config.title || "Начать бой?";
-        elements.startDuelCopy.textContent = config.copy || "Подтверди, что хочешь начать бой.";
+        elements.startDuelTitle.textContent = config.title || "РќР°С‡Р°С‚СЊ Р±РѕР№?";
+        elements.startDuelCopy.textContent = config.copy || "РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ РЅР°С‡Р°С‚СЊ Р±РѕР№.";
     }
 
     function renderDuelExitModal() {
@@ -2443,11 +2711,11 @@
         try {
             if (state.duel.mode === "pvp-live" && !state.duel.finished && state.duel.duelId) {
                 await apiFetch("/api/duel/" + encodeURIComponent(state.duel.duelId) + "/forfeit", { method: "POST" });
-                addJournal("Ты покинул бой. Засчитано автопоражение.");
+                addJournal("РўС‹ РїРѕРєРёРЅСѓР» Р±РѕР№. Р—Р°СЃС‡РёС‚Р°РЅРѕ Р°РІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ.");
                 state.matchmaking.status = "COMPLETED";
                 state.matchmaking.duelId = null;
                 closeCurrentDuelToMenu();
-                showToast("Засчитано автопоражение.");
+                showToast("Р—Р°СЃС‡РёС‚Р°РЅРѕ Р°РІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ.");
                 return;
             }
 
@@ -2455,11 +2723,11 @@
             const penalty = duel.mode === "bot" ? 4 : 12;
             state.player.losses += 1;
             state.player.money = Math.max(0, state.player.money - penalty);
-            addJournal("Автопоражение в дуэли. -" + penalty + "₽ на патроны и лед.");
+            addJournal("РђРІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ РІ РґСѓСЌР»Рё. -" + penalty + "в‚Ѕ РЅР° РїР°С‚СЂРѕРЅС‹ Рё Р»РµРґ.");
             closeCurrentDuelToMenu();
-            showToast("Засчитано автопоражение.");
+            showToast("Р—Р°СЃС‡РёС‚Р°РЅРѕ Р°РІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ.");
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось покинуть бой.");
+            showToast(error && error.message ? error.message : "РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕРєРёРЅСѓС‚СЊ Р±РѕР№.");
         } finally {
             if (elements.duelExitCancelButton) {
                 elements.duelExitCancelButton.disabled = false;
@@ -2535,33 +2803,33 @@
 
     function buildQuest(storyId, durationMs) {
         const template = {
-            familyRelic: { title: "Семейная реликвия", description: "Трактирщик просит вернуть запертую шкатулку из кладовой. Внутри что-то важное.", location: "Трактир «Северный Ветер»" },
-            brassDisease: { title: "Латунная болезнь", description: "Механик просит принести шестерню. Его автомат заедает, а мастерская стынет.", location: "Мастерская на льду" },
-            signalE3: { title: "Сигнал E3", description: "Слабый аварийный маяк мигает за линией проводов. Там или контейнер, или ловушка.", location: "Ледяной коридор" },
-            frostDebt: { title: "Снеговой долг", description: "Свежая метка на двери склада обещает тайник и неприятности.", location: "Склад у торосов" }
+            familyRelic: { title: "РЎРµРјРµР№РЅР°СЏ СЂРµР»РёРєРІРёСЏ", description: "РўСЂР°РєС‚РёСЂС‰РёРє РїСЂРѕСЃРёС‚ РІРµСЂРЅСѓС‚СЊ Р·Р°РїРµСЂС‚СѓСЋ С€РєР°С‚СѓР»РєСѓ РёР· РєР»Р°РґРѕРІРѕР№. Р’РЅСѓС‚СЂРё С‡С‚Рѕ-С‚Рѕ РІР°Р¶РЅРѕРµ.", location: "РўСЂР°РєС‚РёСЂ В«РЎРµРІРµСЂРЅС‹Р№ Р’РµС‚РµСЂВ»" },
+            brassDisease: { title: "Р›Р°С‚СѓРЅРЅР°СЏ Р±РѕР»РµР·РЅСЊ", description: "РњРµС…Р°РЅРёРє РїСЂРѕСЃРёС‚ РїСЂРёРЅРµСЃС‚Рё С€РµСЃС‚РµСЂРЅСЋ. Р•РіРѕ Р°РІС‚РѕРјР°С‚ Р·Р°РµРґР°РµС‚, Р° РјР°СЃС‚РµСЂСЃРєР°СЏ СЃС‚С‹РЅРµС‚.", location: "РњР°СЃС‚РµСЂСЃРєР°СЏ РЅР° Р»СЊРґСѓ" },
+            signalE3: { title: "РЎРёРіРЅР°Р» E3", description: "РЎР»Р°Р±С‹Р№ Р°РІР°СЂРёР№РЅС‹Р№ РјР°СЏРє РјРёРіР°РµС‚ Р·Р° Р»РёРЅРёРµР№ РїСЂРѕРІРѕРґРѕРІ. РўР°Рј РёР»Рё РєРѕРЅС‚РµР№РЅРµСЂ, РёР»Рё Р»РѕРІСѓС€РєР°.", location: "Р›РµРґСЏРЅРѕР№ РєРѕСЂРёРґРѕСЂ" },
+            frostDebt: { title: "РЎРЅРµРіРѕРІРѕР№ РґРѕР»Рі", description: "РЎРІРµР¶Р°СЏ РјРµС‚РєР° РЅР° РґРІРµСЂРё СЃРєР»Р°РґР° РѕР±РµС‰Р°РµС‚ С‚Р°Р№РЅРёРє Рё РЅРµРїСЂРёСЏС‚РЅРѕСЃС‚Рё.", location: "РЎРєР»Р°Рґ Сѓ С‚РѕСЂРѕСЃРѕРІ" }
         }[storyId];
         return { id: uid("quest"), storyId: storyId, nodeId: "start", title: template.title, description: template.description, location: template.location, status: "new", expiresAt: Date.now() + durationMs };
     }
 
     function buildShopCatalog() {
         return [
-            { id: "shop-medkit", section: "standard", kind: "item", itemId: "medkit", name: "Аптечка", description: "Бинты, стим и запас прочности на один грязный бой.", price: 20 },
-            { id: "shop-gear", section: "standard", kind: "item", itemId: "brassGear", name: "Латунная шестерня", description: "Редкая деталь для квестов, ремонта и тех, кто вечно что-то чинит.", price: 18 },
-            { id: "shop-ammo", section: "standard", kind: "item", itemId: "cartridges38", name: "Патроны .38", description: "Сухие, чистые и пока еще теплые.", price: 9 },
-            { id: "shop-weapon-sights", section: "standard", kind: "augment", augmentId: "weaponBrassSights", name: "Латунный прицел", description: "Оружейная аугментация: выпрямляет мушку и даёт стабильную линию.", price: 34 },
-            { id: "shop-weapon-piercing", section: "standard", kind: "augment", augmentId: "weaponPiercingCore", name: "Бронебойный сердечник", description: "Оружейная аугментация: давит сквозь щитовой блок.", price: 39 },
-            { id: "shop-weapon-scatter", section: "standard", kind: "augment", augmentId: "weaponScatterNozzle", name: "Расширитель дроби", description: "Оружейная аугментация: делает дробовик липким на краю линии.", price: 31 },
-            { id: "shop-defense-mesh", section: "standard", kind: "augment", augmentId: "defenseColdMesh", name: "Хладостойкая сетка", description: "Защитная аугментация: режет даже скользящий урон.", price: 28 },
-            { id: "shop-support-link", section: "standard", kind: "augment", augmentId: "supportTargetLink", name: "Связка меток", description: "Вспомогательная аугментация: помогает держать центр.", price: 26 },
-            { id: "premium-skin-crimson", section: "premium", kind: "premium", name: "Скин «Багряный кобальт»", description: "Премиальный скин карточки дуэлянта с рубиновым свечением.", price: 149, previewType: "skin", previewTone: "crimson" },
-            { id: "premium-backdrop-polar", section: "premium", kind: "premium", name: "Фон «Полярная латунь»", description: "Премиальный фон хаба с холодной латунью и мягким снеговым свечением.", price: 199, previewType: "backdrop", previewTone: "polar" }
+            { id: "shop-medkit", section: "standard", kind: "item", itemId: "medkit", name: "РђРїС‚РµС‡РєР°", description: "Р‘РёРЅС‚С‹, СЃС‚РёРј Рё Р·Р°РїР°СЃ РїСЂРѕС‡РЅРѕСЃС‚Рё РЅР° РѕРґРёРЅ РіСЂСЏР·РЅС‹Р№ Р±РѕР№.", price: 20 },
+            { id: "shop-gear", section: "standard", kind: "item", itemId: "brassGear", name: "Р›Р°С‚СѓРЅРЅР°СЏ С€РµСЃС‚РµСЂРЅСЏ", description: "Р РµРґРєР°СЏ РґРµС‚Р°Р»СЊ РґР»СЏ РєРІРµСЃС‚РѕРІ, СЂРµРјРѕРЅС‚Р° Рё С‚РµС…, РєС‚Рѕ РІРµС‡РЅРѕ С‡С‚Рѕ-С‚Рѕ С‡РёРЅРёС‚.", price: 18 },
+            { id: "shop-ammo", section: "standard", kind: "item", itemId: "cartridges38", name: "РџР°С‚СЂРѕРЅС‹ .38", description: "РЎСѓС…РёРµ, С‡РёСЃС‚С‹Рµ Рё РїРѕРєР° РµС‰Рµ С‚РµРїР»С‹Рµ.", price: 9 },
+            { id: "shop-weapon-sights", section: "standard", kind: "augment", augmentId: "weaponBrassSights", name: "Р›Р°С‚СѓРЅРЅС‹Р№ РїСЂРёС†РµР»", description: "РћСЂСѓР¶РµР№РЅР°СЏ Р°СѓРіРјРµРЅС‚Р°С†РёСЏ: РІС‹РїСЂСЏРјР»СЏРµС‚ РјСѓС€РєСѓ Рё РґР°С‘С‚ СЃС‚Р°Р±РёР»СЊРЅСѓСЋ Р»РёРЅРёСЋ.", price: 34 },
+            { id: "shop-weapon-piercing", section: "standard", kind: "augment", augmentId: "weaponPiercingCore", name: "Р‘СЂРѕРЅРµР±РѕР№РЅС‹Р№ СЃРµСЂРґРµС‡РЅРёРє", description: "РћСЂСѓР¶РµР№РЅР°СЏ Р°СѓРіРјРµРЅС‚Р°С†РёСЏ: РґР°РІРёС‚ СЃРєРІРѕР·СЊ С‰РёС‚РѕРІРѕР№ Р±Р»РѕРє.", price: 39 },
+            { id: "shop-weapon-scatter", section: "standard", kind: "augment", augmentId: "weaponScatterNozzle", name: "Р Р°СЃС€РёСЂРёС‚РµР»СЊ РґСЂРѕР±Рё", description: "РћСЂСѓР¶РµР№РЅР°СЏ Р°СѓРіРјРµРЅС‚Р°С†РёСЏ: РґРµР»Р°РµС‚ РґСЂРѕР±РѕРІРёРє Р»РёРїРєРёРј РЅР° РєСЂР°СЋ Р»РёРЅРёРё.", price: 31 },
+            { id: "shop-defense-mesh", section: "standard", kind: "augment", augmentId: "defenseColdMesh", name: "РҐР»Р°РґРѕСЃС‚РѕР№РєР°СЏ СЃРµС‚РєР°", description: "Р—Р°С‰РёС‚РЅР°СЏ Р°СѓРіРјРµРЅС‚Р°С†РёСЏ: СЂРµР¶РµС‚ РґР°Р¶Рµ СЃРєРѕР»СЊР·СЏС‰РёР№ СѓСЂРѕРЅ.", price: 28 },
+            { id: "shop-support-link", section: "standard", kind: "augment", augmentId: "supportTargetLink", name: "РЎРІСЏР·РєР° РјРµС‚РѕРє", description: "Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ Р°СѓРіРјРµРЅС‚Р°С†РёСЏ: РїРѕРјРѕРіР°РµС‚ РґРµСЂР¶Р°С‚СЊ С†РµРЅС‚СЂ.", price: 26 },
+            { id: "premium-skin-crimson", section: "premium", kind: "premium", name: "РЎРєРёРЅ В«Р‘Р°РіСЂСЏРЅС‹Р№ РєРѕР±Р°Р»СЊС‚В»", description: "РџСЂРµРјРёР°Р»СЊРЅС‹Р№ СЃРєРёРЅ РєР°СЂС‚РѕС‡РєРё РґСѓСЌР»СЏРЅС‚Р° СЃ СЂСѓР±РёРЅРѕРІС‹Рј СЃРІРµС‡РµРЅРёРµРј.", price: 149, previewType: "skin", previewTone: "crimson" },
+            { id: "premium-backdrop-polar", section: "premium", kind: "premium", name: "Р¤РѕРЅ В«РџРѕР»СЏСЂРЅР°СЏ Р»Р°С‚СѓРЅСЊВ»", description: "РџСЂРµРјРёР°Р»СЊРЅС‹Р№ С„РѕРЅ С…Р°Р±Р° СЃ С…РѕР»РѕРґРЅРѕР№ Р»Р°С‚СѓРЅСЊСЋ Рё РјСЏРіРєРёРј СЃРЅРµРіРѕРІС‹Рј СЃРІРµС‡РµРЅРёРµРј.", price: 199, previewType: "backdrop", previewTone: "polar" }
         ];
     }
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 9;
-        next.player = Object.assign({ name: "Новый игрок", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 }, next.player || {});
+        next.version = 10;
+        next.player = Object.assign({ name: "РќРѕРІС‹Р№ РёРіСЂРѕРє", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 }, next.player || {});
         const progressSnapshot = getLevelProgressSnapshot(typeof next.player.experience === "number" ? next.player.experience : 0);
         next.player.level = progressSnapshot.level;
         next.player.levelProgressCurrent = progressSnapshot.current;
@@ -2613,7 +2881,7 @@
 
     function buildInitialState() {
         return {
-            version: 9,
+            version: 10,
             auth: {
                 sessionToken: null,
                 playerId: null,
@@ -2629,7 +2897,7 @@
                 message: "",
                 queuedAt: null
             },
-            player: { name: "Новый игрок", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 },
+            player: { name: "РќРѕРІС‹Р№ РёРіСЂРѕРє", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 },
             world: {
                 lastJournalEventAt: Date.now(),
                 lastFriendSyncAt: 0
@@ -2638,9 +2906,9 @@
             journal: [],
             inventory: {
                 equipped: [
-                    { slot: "Кобура", name: "Пистоль и щит", description: "Короткий ствол и щит для ближней линии." },
-                    { slot: "Спина", name: "Винтовка «Север-3»", description: "Тяжелая, но надежная на длинной линии." },
-                    { slot: "Шея", name: "Плотный шарф", description: "Спасает горло, но не спасает от долгов." }
+                    { slot: "РљРѕР±СѓСЂР°", name: "РџРёСЃС‚РѕР»СЊ Рё С‰РёС‚", description: "РљРѕСЂРѕС‚РєРёР№ СЃС‚РІРѕР» Рё С‰РёС‚ РґР»СЏ Р±Р»РёР¶РЅРµР№ Р»РёРЅРёРё." },
+                    { slot: "РЎРїРёРЅР°", name: "Р’РёРЅС‚РѕРІРєР° В«РЎРµРІРµСЂ-3В»", description: "РўСЏР¶РµР»Р°СЏ, РЅРѕ РЅР°РґРµР¶РЅР°СЏ РЅР° РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё." },
+                    { slot: "РЁРµСЏ", name: "РџР»РѕС‚РЅС‹Р№ С€Р°СЂС„", description: "РЎРїР°СЃР°РµС‚ РіРѕСЂР»Рѕ, РЅРѕ РЅРµ СЃРїР°СЃР°РµС‚ РѕС‚ РґРѕР»РіРѕРІ." }
                 ],
                 augmentSlots: {
                     weapon: "weaponBrassSights",
@@ -2682,7 +2950,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && (parsed.version === 4 || parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8 || parsed.version === 9) ? parsed : buildInitialState();
+            return parsed && (parsed.version === 4 || parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8 || parsed.version === 9 || parsed.version === 10) ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -2703,34 +2971,77 @@
 
     function weaponInstrumentLabel(code) {
         return {
-            PISTOLS: "из пистоля",
-            RIFLE: "из винтовки",
-            SHOTGUN: "из дробовика"
+            PISTOLS: "РёР· РїРёСЃС‚РѕР»СЏ Рё С‰РёС‚Р°",
+            RIFLE: "РёР· РІРёРЅС‚РѕРІРєРё",
+            SHOTGUN: "РёР· РґСЂРѕР±РѕРІРёРєР°"
         }[code] || "";
     }
 
     function directionLabel(code) {
-        return { LEFT: "влево", CENTER: "по центру", RIGHT: "вправо" }[code] || code;
+        return { LEFT: "РІР»РµРІРѕ", CENTER: "РїРѕ С†РµРЅС‚СЂСѓ", RIGHT: "РІРїСЂР°РІРѕ" }[code] || code;
     }
 
     function dodgeLabel(code) {
-        return { LEFT: "смещается влево", STAY: "остается по центру", RIGHT: "смещается вправо" }[code] || code;
+        return { LEFT: "СЃРјРµС‰Р°РµС‚СЃСЏ РІР»РµРІРѕ", STAY: "РѕСЃС‚Р°РµС‚СЃСЏ РїРѕ С†РµРЅС‚СЂСѓ", RIGHT: "СЃРјРµС‰Р°РµС‚СЃСЏ РІРїСЂР°РІРѕ" }[code] || code;
     }
 
     function buildDuelIntentLine(name, action) {
-        return name + " стреляет " + directionLabel(action.shot) + " " + weaponInstrumentLabel(action.weapon) + " и " + dodgeLabel(action.dodge) + ".";
+        return name + " СЃС‚СЂРµР»СЏРµС‚ " + directionLabel(action.shot) + " " + weaponInstrumentLabel(action.weapon) + " Рё " + dodgeLabel(action.dodge) + ".";
+    }
+
+    function isCompleteAction(action) {
+        return Boolean(action && action.weapon && action.shot && action.dodge);
+    }
+
+    function actionsMatch(left, right) {
+        if (!left && !right) {
+            return true;
+        }
+        if (!left || !right) {
+            return false;
+        }
+        return left.weapon === right.weapon && left.shot === right.shot && left.dodge === right.dodge;
+    }
+
+    function isDuelSelectionComplete(duel) {
+        return isCompleteAction(getCurrentDuelAction(duel));
+    }
+
+    function getCurrentDuelAction(duel) {
+        if (!duel) {
+            return { weapon: null, shot: null, dodge: null };
+        }
+        return {
+            weapon: duel.selectedWeapon || null,
+            shot: duel.selectedShot || null,
+            dodge: duel.selectedDodge || null
+        };
+    }
+
+    function hasPendingDuelChanges(duel) {
+        if (!duel || !duel.yourActionSubmitted || !duel.submittedAction) {
+            return false;
+        }
+        return isCompleteAction(getCurrentDuelAction(duel)) && !actionsMatch(getCurrentDuelAction(duel), duel.submittedAction);
+    }
+
+    function getRoundTimeRemainingMs(duel) {
+        if (!duel || duel.finished || !duel.roundDeadlineAt) {
+            return 0;
+        }
+        return Math.max(0, duel.roundDeadlineAt - Date.now());
     }
 
     function pluralizeHits(count) {
         const remainderTen = count % 10;
         const remainderHundred = count % 100;
         if (remainderTen === 1 && remainderHundred !== 11) {
-            return count + " раз";
+            return count + " СЂР°Р·";
         }
         if (remainderTen >= 2 && remainderTen <= 4 && (remainderHundred < 12 || remainderHundred > 14)) {
-            return count + " раза";
+            return count + " СЂР°Р·Р°";
         }
-        return count + " раз";
+        return count + " СЂР°Р·";
     }
 
     function getLevelProgressSnapshot(experience) {
@@ -2769,11 +3080,11 @@
 
     function formatQueueElapsed(totalSeconds) {
         if (totalSeconds < 60) {
-            return totalSeconds + " сек";
+            return totalSeconds + " СЃРµРє";
         }
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        return minutes + " мин " + pad(seconds) + " сек";
+        return minutes + " РјРёРЅ " + pad(seconds) + " СЃРµРє";
     }
 
     function formatTimestamp(timestamp) {
@@ -2786,9 +3097,9 @@
 
     function getStatLabel(stat) {
         return {
-            strength: "Сила",
-            reaction: "Реакция",
-            analysis: "Анализ"
+            strength: "РЎРёР»Р°",
+            reaction: "Р РµР°РєС†РёСЏ",
+            analysis: "РђРЅР°Р»РёР·"
         }[stat] || stat;
     }
 
@@ -2819,8 +3130,8 @@
 
     function normalizeResourceText(text) {
         return String(text)
-            .replace(new RegExp("([+-]?\\d+)\\s*" + escapeRegExp(RUBLE_SIGN), "g"), "$1 монет")
-            .replace(/([+-]?\d+)\s*в‚Ѕ/g, "$1 монет");
+            .replace(new RegExp("([+-]?\\d+)\\s*" + escapeRegExp(RUBLE_SIGN), "g"), "$1 РјРѕРЅРµС‚")
+            .replace(/([+-]?\d+)\s*РІвЂљР…/g, "$1 РјРѕРЅРµС‚");
     }
 
     function getRewardTerms() {
