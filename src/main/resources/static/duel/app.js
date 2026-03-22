@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v16";
+    const STORAGE_KEY = "polus_frontend_prototype_v17";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -3117,7 +3117,7 @@
 
     function buildInitialState() {
         return {
-            version: 16,
+            version: 17,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { name: "Новый игрок", level: 1, experience: 0, levelProgressCurrent: 0, levelProgressTarget: 100, money: 0, wins: 0, losses: 0, strength: 0, reaction: 0, analysis: 0, availableStatPoints: 0 },
@@ -3138,7 +3138,7 @@
     function hydrateState(source) {
         const base = buildInitialState();
         const next = source && typeof source === "object" ? Object.assign({}, base, source) : base;
-        next.version = 16;
+        next.version = 17;
         next.ui = Object.assign({}, base.ui, next.ui || {});
         next.inventory = { equipped: [], augmentSlots: {}, unlockedAugments: [], backpack: [] };
         next.premium = next.premium || { owned: [] };
@@ -3161,7 +3161,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 16 ? parsed : buildInitialState();
+            return parsed && parsed.version === 17 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -3859,5 +3859,207 @@
 
     function pad(value) {
         return String(value).padStart(2, "0");
+    }
+
+    function startBotDuel(skipConfirm) {
+        if (!skipConfirm) {
+            requestStartDuel({
+                mode: "bot",
+                title: "Начать бой с ботом?",
+                copy: "Подтверди, что хочешь сразу войти в бой с тренировочным соперником.",
+                execute: function () {
+                    startBotDuel(true);
+                }
+            });
+            return;
+        }
+        openDuel({
+            mode: "bot",
+            title: "Дуэль",
+            modeLabel: "Бот",
+            opponentName: "Тренировщик",
+            opponentWeapon: "RIFLE"
+        });
+    }
+
+    async function startQueueDuel(skipConfirm) {
+        if (!state.auth.registered) {
+            showToast("Сначала зарегистрируй аккаунт.");
+            return;
+        }
+        if (!skipConfirm) {
+            requestStartDuel({
+                mode: "queue",
+                title: "Начать поиск матча?",
+                copy: "Подтверди, что хочешь встать в очередь на PvP-матч.",
+                execute: function () {
+                    startQueueDuel(true);
+                }
+            });
+            return;
+        }
+        if (state.matchmaking.status === "QUEUED") {
+            showToast("Очередь уже активна. Ищем соперника.");
+            return;
+        }
+        if (!state.auth.sessionToken || state.auth.demoMode) {
+            showToast("Вне Telegram доступен локальный бой.");
+            openDuel({
+                mode: "pvp",
+                title: "Дуэль",
+                modeLabel: "PvP",
+                opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
+                opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
+            });
+            return;
+        }
+        try {
+            const response = await apiFetch("/api/matchmaking/join", { method: "POST" });
+            const payload = await response.json();
+            applyMatchmakingStatus(payload);
+            if (payload.status === "IN_DUEL" && payload.duelId) {
+                await refreshLiveDuel(payload.duelId);
+                showToast("Соперник найден.");
+            } else {
+                showToast(payload.message || "Ищем соперника.");
+            }
+        } catch (error) {
+            showToast(error && error.message ? error.message : "Не удалось войти в очередь.");
+        }
+    }
+
+    async function cancelQueue() {
+        if (state.matchmaking.status !== "QUEUED") {
+            return;
+        }
+        if (!state.auth.sessionToken || state.auth.demoMode) {
+            state.matchmaking.status = "IDLE";
+            state.matchmaking.duelId = null;
+            state.matchmaking.message = "";
+            state.matchmaking.queuedAt = null;
+            saveState();
+            renderAll();
+            showToast("Поиск дуэли отменен.");
+            return;
+        }
+        if (elements.queueCancelButton) {
+            elements.queueCancelButton.disabled = true;
+        }
+        try {
+            const response = await apiFetch("/api/matchmaking/cancel", { method: "POST" });
+            applyMatchmakingStatus(await response.json());
+            renderAll();
+            showToast("Поиск дуэли отменен.");
+        } catch (error) {
+            showToast(error && error.message ? error.message : "Не удалось отменить поиск.");
+        } finally {
+            if (elements.queueCancelButton) {
+                elements.queueCancelButton.disabled = false;
+            }
+        }
+    }
+
+    function buildLiveResultText(payload) {
+        if (payload.status === "FINISHED") {
+            if (payload.resultLabel === "VICTORY") {
+                return "Победа. Ты удержал темп до конца.";
+            }
+            if (payload.resultLabel === "DEFEAT") {
+                return "Поражение. Этот бой остался за соперником.";
+            }
+            return "Ничья. Оба бойца удержали линию.";
+        }
+        if (payload.yourActionSubmitted && !payload.opponentActionSubmitted) {
+            return "Ход зафиксирован. Ждём ответ соперника.";
+        }
+        if (payload.yourActionSubmitted && payload.opponentActionSubmitted) {
+            return "Оба хода зафиксированы. Раунд сейчас раскроется.";
+        }
+        return "";
+    }
+
+    function openLiveDuelResult(payload) {
+        const isVictory = payload.resultLabel === "VICTORY";
+        const isDefeat = payload.resultLabel === "DEFEAT";
+        const winnerName = isVictory
+            ? (payload.you && payload.you.displayName ? payload.you.displayName : state.player.name)
+            : (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "Соперник");
+        const rewardMoney = isVictory ? BATTLE_VICTORY_COINS : 0;
+        const rewardExperience = BATTLE_REWARD_EXPERIENCE;
+
+        openDuelResultModal({
+            title: isVictory ? "Ты победил" : (isDefeat ? "Ты проиграл" : "Ничья"),
+            copy: isVictory
+                ? "Побежден " + (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "соперник") + "."
+                : (isDefeat ? "Победил " + winnerName + "." : "Оба бойца удержали линию до конца."),
+            experience: rewardExperience,
+            money: rewardMoney
+        });
+    }
+
+    function renderDuel() {
+        const duel = state.duel;
+        if (!duel) {
+            closeDuelSilently();
+            return;
+        }
+        duel.activePanel = duel.activePanel || "logs";
+        duel.chatMessages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
+        duel.chatError = duel.chatError || "";
+        syncDuelInputs(duel);
+        elements.duelTitle.textContent = "Дуэль";
+        elements.duelRoundPill.textContent = "Раунд " + duel.round;
+        elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
+        elements.duelYouName.textContent = duel.playerName || "Игрок";
+        elements.duelYouMeta.textContent = "";
+        elements.duelYouAvatar.textContent = (duel.playerName || "И").slice(0, 1).toUpperCase();
+        elements.duelOpponentName.textContent = duel.opponentName || "Соперник";
+        elements.duelOpponentMeta.textContent = "";
+        elements.duelOpponentAvatar.textContent = (duel.opponentName || "С").slice(0, 1).toUpperCase();
+        elements.duelYouHp.textContent = duel.playerHp + " HP";
+        elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+        elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
+        elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
+        const duelStatus = buildDuelStatusText(duel);
+        elements.duelRoundStatus.innerHTML = duelStatus ? decorateText(duelStatus) : "";
+        elements.duelRoundStatus.classList.toggle("hidden", !duelStatus);
+        const duelSelectionComplete = isDuelSelectionComplete(duel);
+        const duelHasPendingChanges = hasPendingDuelChanges(duel);
+        const submitButtonLabel = duel.finished
+            ? "Бой завершен"
+            : duel.yourActionSubmitted
+                ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
+                : "Сделать ход";
+        elements.duelSubmitButton.textContent = submitButtonLabel;
+        elements.duelSubmitButton.disabled = duel.finished
+            || duel.autoBattleEnabled
+            || !duel.canSubmitAction
+            || !duelSelectionComplete
+            || (duel.yourActionSubmitted && !duelHasPendingChanges);
+        renderDuelControls();
+        if (!duel.logs.length) {
+            elements.duelLogList.innerHTML = '<div class="duel-log-round"><p class="duel-log-round-title">Логов пока нет. Первый обмен ходами появится здесь.</p></div>';
+        } else {
+            elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(function (entry) {
+                const roundNumber = typeof entry.round === "number" ? entry.round : entry.roundNumber;
+                const lines = Array.isArray(entry.lines) ? entry.lines : [];
+                const title = lines.length ? lines[0] : "Раунд " + roundNumber;
+                const detailLines = lines.slice(1);
+                return '<div class="duel-log-round"><p class="duel-log-round-title">' + decorateText(title) + '</p>' + detailLines.map(function (line) {
+                    return '<p class="duel-log-line">' + decorateText(line) + "</p>";
+                }).join("") + "</div>";
+            }).join("");
+        }
+        renderDuelChat(duel);
+        elements.duelTabLogs.classList.toggle("is-active", duel.activePanel === "logs");
+        elements.duelTabLogs.setAttribute("aria-selected", duel.activePanel === "logs" ? "true" : "false");
+        elements.duelTabChat.classList.toggle("is-active", duel.activePanel === "chat");
+        elements.duelTabChat.setAttribute("aria-selected", duel.activePanel === "chat" ? "true" : "false");
+        elements.duelLogsPane.classList.toggle("hidden", duel.activePanel !== "logs");
+        elements.duelChatPane.classList.toggle("hidden", duel.activePanel !== "chat");
+        elements.duelClearLogButton.classList.toggle("hidden", duel.activePanel !== "logs");
+        elements.duelOverlay.classList.remove("hidden");
+        elements.duelOverlay.setAttribute("aria-hidden", "false");
+        document.body.classList.add("duel-open");
     }
 })();
