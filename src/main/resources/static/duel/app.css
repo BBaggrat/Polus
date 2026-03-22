@@ -417,9 +417,10 @@ button {
 
 .hero-stat-line {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
 }
 
 .hero-stat-name {
@@ -443,16 +444,24 @@ button {
 }
 
 .hero-stat-button {
-    min-width: auto;
-    min-height: auto;
-    padding: 0;
-    border: 0;
-    background: none;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(216, 176, 123, 0.34);
+    background: rgba(216, 176, 123, 0.08);
     box-shadow: none;
     color: var(--brass);
     font-family: var(--font-head);
     font-size: 0.96rem;
     font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
 }
 
 .hero-stat-button:hover,
@@ -787,7 +796,7 @@ button {
 
 .friend-actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
 }
 
 .friend-actions > * {
@@ -1123,32 +1132,43 @@ body.duel-open .bottom-nav {
 }
 
 .duel-topbar {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: flex-end;
     gap: 12px;
     margin-bottom: 14px;
 }
 
-.duel-topbar-actions {
-    margin-left: auto;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    gap: 8px;
-    flex-wrap: wrap;
+.duel-timer-box {
+    display: grid;
+    justify-items: center;
+    justify-self: center;
+    gap: 2px;
+    text-align: center;
+}
+
+.duel-timer-label {
+    color: var(--muted);
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .duel-round-timer {
     margin: 0;
     color: var(--icy);
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 700;
+}
+
+.duel-round-pill {
+    justify-self: start;
 }
 
 .duel-topbar-close {
     min-height: 40px;
     padding: 8px 14px;
+    justify-self: end;
 }
 
 .duel-section-label {
@@ -1249,19 +1269,24 @@ body.duel-open .bottom-nav {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+    align-items: start;
 }
 
 .duel-hp-column {
     display: grid;
     gap: 6px;
     justify-items: start;
+    width: 100%;
 }
 
 .hp-track {
+    width: 100%;
     height: 12px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.06);
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .hp-fill {
@@ -1277,6 +1302,7 @@ body.duel-open .bottom-nav {
 
 .hp-copy {
     font-size: 0.95rem;
+    text-align: left;
 }
 
 .duel-form-card {
@@ -1512,20 +1538,15 @@ body.duel-open .bottom-nav {
 
 .social-chat-panel {
     position: fixed;
-    right: 16px;
-    bottom: 156px;
-    z-index: 8;
-    width: min(380px, calc(100vw - 32px));
-    max-height: 70vh;
-    padding: 14px;
-    border-radius: 24px;
+    inset: 0;
+    z-index: 20;
+    width: auto;
+    max-height: none;
+    padding: 20px 16px 24px;
+    border-radius: 0;
     border: 1px solid var(--line);
-    background:
-        linear-gradient(180deg, rgba(58, 81, 121, 0.14), transparent 28%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
-        rgba(13, 20, 35, 0.96);
+    background: linear-gradient(180deg, #11192b 0%, #0c111d 100%);
     box-shadow: var(--shadow);
-    backdrop-filter: blur(18px);
 }
 
 .social-chat-panel-header {
@@ -1540,7 +1561,7 @@ body.duel-open .bottom-nav {
     display: grid;
     grid-template-columns: 148px minmax(0, 1fr);
     gap: 12px;
-    min-height: 340px;
+    min-height: 100%;
 }
 
 .social-chat-thread-list {
@@ -1548,6 +1569,9 @@ body.duel-open .bottom-nav {
     gap: 8px;
     align-content: start;
     overflow: auto;
+    padding: 6px;
+    border-radius: 18px;
+    background: rgba(10, 16, 28, 1);
 }
 
 .social-chat-thread-card {
@@ -1580,6 +1604,9 @@ body.duel-open .bottom-nav {
     grid-template-rows: auto 1fr auto;
     gap: 10px;
     min-height: 0;
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(10, 16, 28, 1);
 }
 
 .social-chat-thread-head {
@@ -1600,7 +1627,7 @@ body.duel-open .bottom-nav {
     overflow: auto;
     display: grid;
     gap: 10px;
-    padding-right: 4px;
+    padding: 6px 4px 6px 0;
 }
 
 .social-chat-message {
@@ -1616,12 +1643,12 @@ body.duel-open .bottom-nav {
     padding: 10px 12px;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(22, 30, 48, 1);
 }
 
 .social-chat-message-own .social-chat-message-bubble {
     border-color: rgba(216, 176, 123, 0.32);
-    background: rgba(216, 176, 123, 0.08);
+    background: rgba(76, 42, 26, 1);
 }
 
 .social-chat-message-bubble strong,
@@ -2033,11 +2060,9 @@ body.duel-open .social-chat-panel {
     }
 
     .duel-topbar {
-        align-items: flex-start;
-    }
-
-    .duel-topbar-actions {
-        width: auto;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 8px;
     }
 
     .friend-actions {
@@ -2049,11 +2074,10 @@ body.duel-open .social-chat-panel {
     }
 
     .social-chat-panel {
-        left: 12px;
-        right: 12px;
+        inset: 0;
         width: auto;
-        bottom: 92px;
-        max-height: 62vh;
+        max-height: none;
+        padding: 16px 12px 18px;
     }
 
     .social-chat-layout {

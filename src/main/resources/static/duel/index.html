@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260321-5">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260322-2">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -50,7 +50,7 @@
                 <div class="queue-status-copy">
                     <p class="queue-status-label">Поиск дуэли</p>
                     <strong class="queue-status-time" id="queue-status-time">0 сек</strong>
-                    <p class="queue-status-note" id="queue-status-note">Ждём соперника в очереди.</p>
+                    <p class="queue-status-note" id="queue-status-note">Ждем соперника в очереди.</p>
                 </div>
                 <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
             </section>
@@ -62,89 +62,20 @@
                 </div>
                 <div class="hero-stats" id="hero-stats"></div>
             </section>
+
+            <div id="quest-badge" class="hidden"></div>
+            <div id="quest-counter" class="hidden"></div>
+            <div id="journal-list" class="hidden"></div>
+            <div id="quest-list" class="hidden"></div>
+            <div id="quest-detail-title" class="hidden"></div>
+            <div id="quest-detail-subtitle" class="hidden"></div>
+            <div id="quest-story-text" class="hidden"></div>
+            <div id="quest-choice-list" class="hidden"></div>
+            <div id="quest-state-tags" class="hidden"></div>
+            <div id="quest-state-count" class="hidden"></div>
+            <div id="quest-pocket-list" class="hidden"></div>
+            <div id="quest-pocket-count" class="hidden"></div>
         </article>
-
-        <button class="panel quest-teaser" id="quest-teaser" type="button" onclick="window.PolusApp && window.PolusApp.navigate('quests')">
-            <div>
-                <p class="panel-title panel-title-small quest-teaser-title">Текстовые квесты</p>
-            </div>
-            <span class="badge" id="quest-badge">0</span>
-        </button>
-
-        <section class="panel journal-panel">
-            <div class="panel-header">
-                <div>
-                    <h2 class="panel-title panel-title-small">Дневник</h2>
-                </div>
-                <button class="ghost-button" id="journal-event-button" type="button" onclick="window.PolusApp && window.PolusApp.triggerJournalEvent()">Случайное событие</button>
-            </div>
-
-            <div class="journal-list" id="journal-list"></div>
-        </section>
-    </section>
-
-    <section class="screen" id="screen-quests" data-screen="quests">
-        <section class="panel">
-            <div class="panel-header">
-                <div>
-                    <h2 class="panel-title">Текстовые квесты</h2>
-                    <p class="panel-copy">Успей выполнить до истечения таймера</p>
-                </div>
-                <div class="header-actions">
-                    <span class="badge" id="quest-counter">0</span>
-                    <button class="ghost-button" data-nav-target="home" type="button" onclick="window.PolusApp && window.PolusApp.navigate('home')">Назад</button>
-                </div>
-            </div>
-
-            <div class="quest-list" id="quest-list"></div>
-        </section>
-    </section>
-
-    <section class="screen" id="screen-quest-detail" data-screen="quest-detail">
-        <section class="panel quest-detail-panel">
-            <div class="panel-header">
-                <div>
-                    <h2 class="panel-title" id="quest-detail-title">Текстовый квест</h2>
-                    <p class="panel-copy" id="quest-detail-subtitle">Мини-история в мире Полюса</p>
-                </div>
-                <button class="ghost-button" id="quest-back-button" type="button" onclick="window.PolusApp && window.PolusApp.navigate('quests')">К списку</button>
-            </div>
-
-            <div class="scene-art">
-                <div class="scene-art-grid">
-                    <div class="scene-glyph scene-glyph-left"></div>
-                    <div class="scene-glyph scene-glyph-center"></div>
-                    <div class="scene-glyph scene-glyph-right"></div>
-                </div>
-            </div>
-
-            <div class="quest-detail-layout">
-                <div class="quest-main">
-                    <div class="story-card">
-                        <div class="story-text" id="quest-story-text"></div>
-                    </div>
-                    <div class="choice-list" id="quest-choice-list"></div>
-                </div>
-
-                <aside class="quest-side">
-                    <section class="side-card">
-                        <div class="side-header">
-                            <h3>Состояние</h3>
-                            <span class="badge badge-muted" id="quest-state-count">0</span>
-                        </div>
-                        <div class="tag-list" id="quest-state-tags"></div>
-                    </section>
-
-                    <section class="side-card">
-                        <div class="side-header">
-                            <h3>Карманный инвентарь</h3>
-                            <span class="badge badge-muted" id="quest-pocket-count">0</span>
-                        </div>
-                        <div class="pocket-list" id="quest-pocket-list"></div>
-                    </section>
-                </aside>
-            </div>
-        </section>
     </section>
 
     <section class="screen" id="screen-inventory" data-screen="inventory">
@@ -157,7 +88,7 @@
 
             <div class="empty-state-card" id="inventory-placeholder">
                 <h3>Раздел в переработке</h3>
-                <p>Инвентарь и аугментации временно убраны до следующей версии.</p>
+                <p>Инвентарь и аугментации временно скрыты до следующей версии.</p>
             </div>
         </section>
     </section>
@@ -292,11 +223,12 @@
         <section class="duel-stage">
             <div class="duel-topbar">
                 <h2 class="sr-only" id="duel-title">Дуэль</h2>
-                <div class="duel-topbar-actions">
-                    <div class="duel-round-pill" id="duel-round-pill">Раунд 1</div>
+                <div class="duel-round-pill" id="duel-round-pill">Раунд 1</div>
+                <div class="duel-timer-box">
+                    <span class="duel-timer-label">Таймер</span>
                     <p class="duel-round-timer" id="duel-round-timer">02:00</p>
-                    <button class="ghost-button duel-topbar-close" id="duel-close-button" type="button" onclick="window.PolusApp && window.PolusApp.closeDuel()">Выйти</button>
                 </div>
+                <button class="ghost-button duel-topbar-close" id="duel-close-button" type="button" onclick="window.PolusApp && window.PolusApp.closeDuel()">Выйти</button>
             </div>
 
             <div class="duel-roster">
@@ -312,9 +244,9 @@
 
                 <article class="duelist-card duel-roster-card duel-roster-card-opponent">
                     <div class="duelist-head">
-                        <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">Т</div>
+                        <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">С</div>
                         <div>
-                            <h3 id="duel-opponent-name">Тренировщик</h3>
+                            <h3 id="duel-opponent-name">Соперник</h3>
                             <p class="duelist-meta" id="duel-opponent-meta"></p>
                         </div>
                     </div>
@@ -353,17 +285,17 @@
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
                         <strong>Пистоль и щит</strong>
                         <span class="weapon-stat">18 урона</span>
-                        <span class="weapon-trait">1 пуля · блок 30%</span>
+                        <span class="weapon-trait">Шанс блокировать выстрел 30%</span>
                     </button>
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="RIFLE" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'RIFLE')">
                         <strong>Винтовка</strong>
                         <span class="weapon-stat">30 урона</span>
-                        <span class="weapon-trait">1 пуля · срезает блок</span>
+                        <span class="weapon-trait">Игнорирует блокирование</span>
                     </button>
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="SHOTGUN" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'SHOTGUN')">
                         <strong>Дробовик</strong>
                         <span class="weapon-stat">5-25 урона</span>
-                        <span class="weapon-trait">5 дробин · зацеп краем</span>
+                        <span class="weapon-trait">Вероятность зацепа 35%</span>
                     </button>
                 </div>
 
@@ -427,7 +359,7 @@
     <div class="modal-sheet modal-sheet-compact duel-result-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="duel-result-title">Бой завершён</h3>
+                <h3 class="panel-title panel-title-small" id="duel-result-title">Бой завершен</h3>
                 <p class="panel-copy duel-exit-copy" id="duel-result-copy">Победа за тобой.</p>
             </div>
         </div>
@@ -445,10 +377,19 @@
     </div>
 </section>
 
+<section class="modal-overlay modal-overlay-centered hidden" id="augment-modal" aria-hidden="true">
+    <div class="modal-sheet modal-sheet-compact">
+        <div class="modal-header modal-header-stack">
+            <div>
+                <h3 class="panel-title panel-title-small" id="augment-modal-title">Модуль</h3>
+            </div>
+        </div>
+        <div id="augment-modal-list"></div>
+    </div>
+</section>
+
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/app.js?v=polus-20260321-5"></script>
+<script src="/duel/app.js?v=polus-20260322-2"></script>
 </body>
 </html>
-
-
