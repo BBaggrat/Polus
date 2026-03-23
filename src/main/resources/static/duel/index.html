@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260323-1">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260323-3">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -26,17 +26,13 @@
                     <h1 class="panel-title" id="profile-name">Новый игрок</h1>
                 </div>
                 <div class="profile-side">
-                    <div class="stat-chip">
-                        <div class="level-progress-mini" aria-hidden="true">
-                            <div class="level-progress-mini-fill" id="profile-level-progress-fill"></div>
-                        </div>
-                        <small class="level-progress-mini-text" id="profile-level-progress-text">0 / 100</small>
-                        <span>Уровень</span>
-                        <strong id="profile-level">1</strong>
-                    </div>
                     <div class="stat-chip stat-chip-accent">
                         <span>Монеты</span>
                         <strong id="profile-money">0</strong>
+                    </div>
+                    <div class="stat-chip">
+                        <span>Рейтинг</span>
+                        <strong id="profile-rating">0</strong>
                     </div>
                 </div>
             </div>
@@ -55,13 +51,8 @@
                 <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
             </section>
 
-            <section class="stats-panel">
-                <div class="stats-panel-header">
-                    <h2 class="panel-title panel-title-small">Характеристики</h2>
-                    <span class="badge badge-muted" id="stat-points-badge">0</span>
-                </div>
-                <div class="hero-stats" id="hero-stats"></div>
-            </section>
+            <div class="hidden" id="stat-points-badge">0</div>
+            <div class="hidden" id="hero-stats"></div>
 
             <div id="quest-badge" class="hidden"></div>
             <div id="quest-counter" class="hidden"></div>
@@ -365,7 +356,7 @@
         </div>
         <div class="duel-result-rewards">
             <div class="duel-result-chip">
-                <span>Опыт</span>
+                <span>Рейтинг</span>
                 <strong id="duel-result-exp">+0</strong>
             </div>
             <div class="duel-result-chip">
@@ -390,6 +381,6 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/app.js?v=polus-20260323-1"></script>
+<script src="/duel/app.js?v=polus-20260323-3"></script>
 </body>
 </html>

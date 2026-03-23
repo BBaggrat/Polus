@@ -129,7 +129,7 @@ public class FriendService {
         return new FriendSummaryResponse(
                 profile.getId(),
                 profile.displayName(),
-                profile.getLevel(),
+                profile.getRating(),
                 isOnline(profile)
         );
     }
@@ -141,7 +141,7 @@ public class FriendService {
                 request.id(),
                 profile.getId(),
                 profile.displayName(),
-                profile.getLevel(),
+                profile.getRating(),
                 isOnline(profile)
         );
     }

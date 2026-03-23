@@ -41,9 +41,6 @@ public class PlayerService {
                         authenticatedUser.languageCode(),
                         0,
                         0,
-                        0,
-                        0,
-                        0,
                         now,
                         now
                 ));
@@ -87,25 +84,6 @@ public class PlayerService {
         return playerProfile;
     }
 
-    public synchronized PlayerProfile allocateStat(String playerId, PlayerStat stat) {
-        PlayerProfile playerProfile = findRequiredById(playerId);
-        if (playerProfile.getAvailableStatPoints() <= 0) {
-            throw new ConflictException("Нет свободных очков характеристик");
-        }
-        playerProfile.incrementStat(stat);
-        playerProfile.setUpdatedAt(clock.instant());
-        playerRepository.save(playerProfile);
-        appEventLogger.info(
-                AppEventType.PLAYER_UPDATED,
-                "Player stat allocated",
-                Map.of(
-                        "playerId", playerProfile.getId(),
-                        "stat", stat.name()
-                )
-        );
-        return playerProfile;
-    }
-
     public synchronized PlayerProfile touch(String playerId) {
         PlayerProfile playerProfile = findRequiredById(playerId);
         playerProfile.setUpdatedAt(clock.instant());
@@ -143,26 +121,26 @@ public class PlayerService {
         playerRepository.save(playerProfile);
     }
 
-    public synchronized void rewardVictory(String playerId, int coins, int experience) {
+    public synchronized void rewardVictory(String playerId, int coins, int ratingDelta) {
         PlayerProfile playerProfile = findRequiredById(playerId);
         playerProfile.incrementWins();
         playerProfile.setCoins(playerProfile.getCoins() + Math.max(0, coins));
-        playerProfile.addExperience(Math.max(0, experience));
+        playerProfile.addRating(ratingDelta);
         playerProfile.setUpdatedAt(clock.instant());
         playerRepository.save(playerProfile);
     }
 
-    public synchronized void rewardDefeat(String playerId, int experience) {
+    public synchronized void rewardDefeat(String playerId, int coins, int ratingDelta) {
         PlayerProfile playerProfile = findRequiredById(playerId);
         playerProfile.incrementLosses();
-        playerProfile.addExperience(Math.max(0, experience));
+        playerProfile.setCoins(playerProfile.getCoins() + Math.max(0, coins));
+        playerProfile.addRating(ratingDelta);
         playerProfile.setUpdatedAt(clock.instant());
         playerRepository.save(playerProfile);
     }
 
-    public synchronized void rewardDraw(String playerId, int experience) {
+    public synchronized void rewardDraw(String playerId) {
         PlayerProfile playerProfile = findRequiredById(playerId);
-        playerProfile.addExperience(Math.max(0, experience));
         playerProfile.setUpdatedAt(clock.instant());
         playerRepository.save(playerProfile);
     }

@@ -37,14 +37,4 @@ public class PlayerController {
     public PlayerResponse me(@RequestHeader("X-Session-Token") String sessionToken) {
         return PlayerResponse.from(sessionService.requirePlayer(sessionToken));
     }
-
-    @PostMapping("/stats")
-    public PlayerResponse allocateStat(@RequestHeader("X-Session-Token") String sessionToken,
-                                       @RequestBody AllocateStatRequest request) {
-        PlayerProfile playerProfile = sessionService.requirePlayer(sessionToken);
-        return PlayerResponse.from(playerService.allocateStat(
-                playerProfile.getId(),
-                PlayerStat.fromValue(request != null ? request.stat() : null)
-        ));
-    }
 }

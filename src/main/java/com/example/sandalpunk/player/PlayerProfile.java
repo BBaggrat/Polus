@@ -13,10 +13,7 @@ public class PlayerProfile {
     private String lastName;
     private String languageCode;
     private int coins;
-    private int experience;
-    private int strength;
-    private int reaction;
-    private int analysis;
+    private int rating;
     private int wins;
     private int losses;
     private String activeDuelId;
@@ -33,10 +30,7 @@ public class PlayerProfile {
             String lastName,
             String languageCode,
             int coins,
-            int experience,
-            int strength,
-            int reaction,
-            int analysis,
+            int rating,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -49,10 +43,7 @@ public class PlayerProfile {
         this.lastName = lastName;
         this.languageCode = languageCode;
         this.coins = coins;
-        this.experience = experience;
-        this.strength = strength;
-        this.reaction = reaction;
-        this.analysis = analysis;
+        this.rating = rating;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -121,28 +112,20 @@ public class PlayerProfile {
         this.coins = coins;
     }
 
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public void addRating(int ratingDelta) {
+        this.rating = Math.max(0, this.rating + ratingDelta);
+    }
+
     public int getWins() {
         return wins;
-    }
-
-    public int getStrength() {
-        return strength;
-    }
-
-    public int getReaction() {
-        return reaction;
-    }
-
-    public int getAnalysis() {
-        return analysis;
-    }
-
-    public int getExperience() {
-        return experience;
-    }
-
-    public void addExperience(int experienceDelta) {
-        this.experience = Math.max(0, this.experience + experienceDelta);
     }
 
     public void incrementWins() {
@@ -192,66 +175,5 @@ public class PlayerProfile {
 
     public boolean isRegistered() {
         return nickname != null && !nickname.isBlank();
-    }
-
-    public void incrementStat(PlayerStat stat) {
-        switch (stat) {
-            case STRENGTH -> strength++;
-            case REACTION -> reaction++;
-            case ANALYSIS -> analysis++;
-        }
-    }
-
-    public int getAllocatedStatPoints() {
-        return strength + reaction + analysis;
-    }
-
-    public int getAvailableStatPoints() {
-        return Math.max(0, getLevel() - 1 - getAllocatedStatPoints());
-    }
-
-    public int getLevel() {
-        if (experience >= 500) {
-            return 5;
-        }
-        if (experience >= 350) {
-            return 4;
-        }
-        if (experience >= 200) {
-            return 3;
-        }
-        if (experience >= 100) {
-            return 2;
-        }
-        return 1;
-    }
-
-    public int getCurrentLevelExperience() {
-        int level = getLevel();
-        return experience - levelFloor(level);
-    }
-
-    public int getNextLevelExperience() {
-        int level = getLevel();
-        return level >= 5 ? 150 : levelCap(level) - levelFloor(level);
-    }
-
-    private int levelFloor(int level) {
-        return switch (level) {
-            case 5 -> 350;
-            case 4 -> 200;
-            case 3 -> 100;
-            default -> 0;
-        };
-    }
-
-    private int levelCap(int level) {
-        return switch (level) {
-            case 1 -> 100;
-            case 2 -> 200;
-            case 3 -> 350;
-            case 4 -> 500;
-            default -> 500;
-        };
     }
 }

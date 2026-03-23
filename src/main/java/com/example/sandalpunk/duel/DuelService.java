@@ -21,8 +21,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class DuelService {
 
-    private static final int BATTLE_EXPERIENCE = 10;
     private static final int VICTORY_COINS = 100;
+    private static final int DEFEAT_COINS = 25;
+    private static final int RATING_DELTA = 10;
     private static final int MAX_CHAT_MESSAGES = 80;
     private static final int ROUND_TIMEOUT_SECONDS = 120;
     private static final Pattern LINK_PATTERN = Pattern.compile(
@@ -219,8 +220,8 @@ public class DuelService {
                     now
             ));
 
-            playerService.rewardVictory(winnerPlayerId, VICTORY_COINS, BATTLE_EXPERIENCE);
-            playerService.rewardDefeat(actorId, BATTLE_EXPERIENCE);
+            playerService.rewardVictory(winnerPlayerId, VICTORY_COINS, RATING_DELTA);
+            playerService.rewardDefeat(actorId, DEFEAT_COINS, -RATING_DELTA);
 
             appEventLogger.info(
                     AppEventType.MATCH_FINISH,
@@ -351,11 +352,11 @@ public class DuelService {
             duel.setFinishedAt(clock.instant());
             if (resolution.winnerPlayerId() != null) {
                 String loserPlayerId = duel.opponentId(resolution.winnerPlayerId());
-                playerService.rewardVictory(resolution.winnerPlayerId(), VICTORY_COINS, BATTLE_EXPERIENCE);
-                playerService.rewardDefeat(loserPlayerId, BATTLE_EXPERIENCE);
+                playerService.rewardVictory(resolution.winnerPlayerId(), VICTORY_COINS, RATING_DELTA);
+                playerService.rewardDefeat(loserPlayerId, DEFEAT_COINS, -RATING_DELTA);
             } else {
-                playerService.rewardDraw(duel.getPlayerOneId(), BATTLE_EXPERIENCE);
-                playerService.rewardDraw(duel.getPlayerTwoId(), BATTLE_EXPERIENCE);
+                playerService.rewardDraw(duel.getPlayerOneId());
+                playerService.rewardDraw(duel.getPlayerTwoId());
             }
             appEventLogger.info(
                     AppEventType.MATCH_FINISH,
@@ -426,15 +427,13 @@ public class DuelService {
                 viewer.getId(),
                 viewer.displayName(),
                 viewerIsPlayerOne ? duel.getPlayerOneHp() : duel.getPlayerTwoHp(),
-                viewer.getWins(),
-                viewer.getLosses()
+                viewer.getRating()
         );
         DuelParticipantView opponentView = new DuelParticipantView(
                 opponent.getId(),
                 opponent.displayName(),
                 viewerIsPlayerOne ? duel.getPlayerTwoHp() : duel.getPlayerOneHp(),
-                opponent.getWins(),
-                opponent.getLosses()
+                opponent.getRating()
         );
 
         String resultLabel = null;

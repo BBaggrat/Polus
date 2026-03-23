@@ -4,7 +4,7 @@ public record FriendRequestResponse(
         String requestId,
         String playerId,
         String displayName,
-        int level,
+        int rating,
         boolean online
 ) {
 }
