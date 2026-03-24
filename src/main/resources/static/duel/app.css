@@ -523,6 +523,12 @@ button {
     color: var(--brass);
 }
 
+#screen-home {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+}
+
 .journal-panel {
     min-height: 260px;
 }
@@ -1547,15 +1553,20 @@ body.duel-open .bottom-nav {
 
 .social-chat-panel {
     position: fixed;
-    inset: 0;
+    top: max(72px, env(safe-area-inset-top) + 12px);
+    right: 16px;
+    bottom: max(92px, env(safe-area-inset-bottom) + 16px);
+    left: 16px;
     z-index: 20;
-    width: auto;
+    width: min(920px, calc(100vw - 32px));
+    margin: 0 auto;
     max-height: none;
-    padding: 20px 16px 24px;
-    border-radius: 0;
+    padding: 18px 14px 16px;
+    border-radius: 28px;
     border: 1px solid var(--line);
-    background: linear-gradient(180deg, #11192b 0%, #0c111d 100%);
+    background: linear-gradient(180deg, rgba(17, 25, 43, 0.99) 0%, rgba(12, 17, 29, 0.99) 100%);
     box-shadow: var(--shadow);
+    overflow: hidden;
 }
 
 .social-chat-panel-header {
@@ -1571,6 +1582,7 @@ body.duel-open .bottom-nav {
     grid-template-columns: 148px minmax(0, 1fr);
     gap: 12px;
     min-height: 100%;
+    height: calc(100% - 58px);
 }
 
 .social-chat-thread-list {
@@ -1684,10 +1696,17 @@ body.duel-open .bottom-nav {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
+    align-items: stretch;
+}
+
+.social-chat-input {
+    min-width: 0;
 }
 
 .social-chat-send {
     min-width: 120px;
+    width: 100%;
+    padding-inline: 12px;
 }
 
 .social-chat-empty {
@@ -2096,14 +2115,38 @@ body.duel-open .social-chat-panel {
     }
 
     .social-chat-panel {
-        inset: 0;
+        top: max(72px, env(safe-area-inset-top) + 10px);
+        right: 10px;
+        bottom: max(88px, env(safe-area-inset-bottom) + 14px);
+        left: 10px;
         width: auto;
         max-height: none;
-        padding: 16px 12px 18px;
+        padding: 14px 12px 14px;
+        border-radius: 24px;
     }
 
     .social-chat-layout {
         grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 10px;
+        height: calc(100% - 48px);
+    }
+
+    .social-chat-thread-list {
+        max-height: 136px;
+    }
+
+    .social-chat-thread-view {
+        padding: 10px 8px;
+    }
+
+    .social-chat-form {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .social-chat-send {
+        min-width: 0;
     }
 
     .social-chat-fab {

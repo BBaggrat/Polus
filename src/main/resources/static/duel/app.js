@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v20";
+    const STORAGE_KEY = "polus_frontend_prototype_v21";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -5455,5 +5455,130 @@
         elements.duelOverlay.classList.remove("hidden");
         elements.duelOverlay.setAttribute("aria-hidden", "false");
         document.body.classList.add("duel-open");
+    }
+
+    async function toggleAutoBattle() {
+        const duel = state.duel;
+        if (!duel || duel.finished) {
+            return;
+        }
+        const currentEnabled = Boolean(duel.autoBattleEnabled);
+        const pendingEnabled = typeof duel.autoBattlePendingEnabled === "boolean" ? duel.autoBattlePendingEnabled : null;
+        const desiredEnabled = pendingEnabled === null ? !currentEnabled : !pendingEnabled;
+        const nextPending = desiredEnabled === currentEnabled ? null : desiredEnabled;
+        if (duel.mode === "pvp-live" && duel.duelId) {
+            elements.duelAutoToggle.disabled = true;
+            try {
+                const response = await apiFetch("/api/duel/" + encodeURIComponent(duel.duelId) + "/automation", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ enabled: desiredEnabled })
+                });
+                const payload = await response.json();
+                await refreshLiveDuel(payload.duelId);
+            } catch (error) {
+                showToast(error && error.message ? error.message : "Не удалось переключить автоматический бой.");
+            } finally {
+                if (elements.duelAutoToggle) {
+                    elements.duelAutoToggle.disabled = false;
+                }
+            }
+            return;
+        }
+        duel.autoBattlePendingEnabled = nextPending;
+        saveState();
+        renderDuel();
+    }
+
+    function renderDuelControls() {
+        const duel = state.duel;
+        const controlsDisabled = !duel || duel.finished || duel.autoBattleEnabled;
+        toggleDuelButtonGroup(elements.duelWeaponButtons, duel ? duel.selectedWeapon : "");
+        toggleDuelButtonGroup(elements.duelShotButtons, duel ? duel.selectedShot : "");
+        toggleDuelButtonGroup(elements.duelDodgeButtons, duel ? duel.selectedDodge : "");
+        [].concat(elements.duelWeaponButtons, elements.duelShotButtons, elements.duelDodgeButtons).forEach(function (button) {
+            button.disabled = controlsDisabled;
+        });
+        elements.duelClearLogButton.disabled = !duel || !duel.logs.length || duel.mode === "pvp-live";
+        if (!duel) {
+            elements.duelAutoToggle.classList.remove("is-active", "is-pending");
+            elements.duelAutoToggle.disabled = true;
+            elements.duelAutoToggle.textContent = "Включить автоматический бой";
+            elements.duelAutoNote.textContent = "";
+            elements.duelAutoNote.classList.add("hidden");
+            elements.duelAutoCover.classList.add("hidden");
+            return;
+        }
+        const currentEnabled = Boolean(duel.autoBattleEnabled);
+        const pendingEnabled = typeof duel.autoBattlePendingEnabled === "boolean" ? duel.autoBattlePendingEnabled : null;
+        elements.duelAutoToggle.disabled = duel.finished;
+        elements.duelAutoToggle.classList.toggle("is-active", currentEnabled);
+        elements.duelAutoToggle.classList.toggle("is-pending", pendingEnabled !== null && pendingEnabled !== currentEnabled);
+        elements.duelAutoToggle.textContent = currentEnabled ? "Выключить автоматический бой" : "Включить автоматический бой";
+        elements.duelAutoNote.textContent = "";
+        elements.duelAutoNote.classList.add("hidden");
+        elements.duelAutoCover.classList.toggle("hidden", !currentEnabled || duel.finished);
+    }
+
+    function startLocalRound(duel, isInitial) {
+        if (!duel || duel.finished) {
+            return;
+        }
+        if (!isInitial && typeof duel.autoBattlePendingEnabled === "boolean") {
+            duel.autoBattleEnabled = duel.autoBattlePendingEnabled;
+            duel.autoBattlePendingEnabled = null;
+            appendLocalSystemLog(
+                duel.autoBattleEnabled
+                    ? "С этого раунда ходы игрока " + (duel.playerName || "Игрок") + " будут автоматическими."
+                    : "С этого раунда автоматические ходы игрока " + (duel.playerName || "Игрок") + " отключены."
+            );
+        }
+        duel.roundStartedAt = Date.now();
+        duel.roundDeadlineAt = duel.roundStartedAt + DUEL_ROUND_TIMEOUT_MS;
+        duel.selectedWeapon = null;
+        duel.selectedShot = null;
+        duel.selectedDodge = null;
+        duel.submittedAction = null;
+        duel.yourActionSubmitted = false;
+        duel.opponentActionSubmitted = false;
+        duel.autoResolutionAt = null;
+        duel.canSubmitAction = !duel.autoBattleEnabled;
+        duel.resultText = duel.autoBattleEnabled ? "С этого раунда ход идет автоматически." : "";
+        if (duel.autoBattleEnabled) {
+            const autoAction = buildAutoBattleAction();
+            duel.submittedAction = autoAction;
+            duel.selectedWeapon = autoAction.weapon;
+            duel.selectedShot = autoAction.shot;
+            duel.selectedDodge = autoAction.dodge;
+            duel.yourActionSubmitted = true;
+            duel.autoResolutionAt = Date.now() + 1000;
+        }
+    }
+
+    function buyShopItem(shopId) {
+        const item = state.shop.find(function (entry) { return entry.id === shopId; });
+        if (!item) {
+            return;
+        }
+        if (item.section === "premium") {
+            showToast("Премиальный раздел временно в работе.");
+            return;
+        }
+        if (state.player.money < item.price) {
+            const warning = "Не хватает монет: " + item.price + ".";
+            addJournal(warning);
+            showToast(warning);
+            renderAll();
+            return;
+        }
+
+        state.player.money -= item.price;
+        addItem(item.itemId, 1);
+        addJournal("Куплен предмет «" + item.name + "». -" + item.price + " монет.");
+        showToast("Куплено: " + item.name + ".");
+        saveState();
+        renderAll();
     }
 })();
