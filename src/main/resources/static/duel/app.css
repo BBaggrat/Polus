@@ -524,9 +524,13 @@ button {
 }
 
 #screen-home {
-    display: grid;
+    display: none;
     gap: 16px;
     align-content: start;
+}
+
+#screen-home.is-active {
+    display: grid;
 }
 
 .journal-panel {
@@ -1567,6 +1571,8 @@ body.duel-open .bottom-nav {
     background: linear-gradient(180deg, rgba(17, 25, 43, 0.99) 0%, rgba(12, 17, 29, 0.99) 100%);
     box-shadow: var(--shadow);
     overflow: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
 }
 
 .social-chat-panel-header {
@@ -1593,6 +1599,9 @@ body.duel-open .bottom-nav {
     padding: 6px;
     border-radius: 18px;
     background: rgba(10, 16, 28, 1);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
 }
 
 .social-chat-thread-card {
@@ -1650,6 +1659,9 @@ body.duel-open .bottom-nav {
     display: grid;
     gap: 10px;
     padding: 6px 4px 6px 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
 }
 
 .social-chat-message {
@@ -1719,6 +1731,15 @@ body.duel-open .bottom-nav {
 
 body.duel-open .social-chat-fab,
 body.duel-open .social-chat-panel {
+    display: none !important;
+}
+
+body.social-open {
+    overflow: hidden;
+}
+
+body.social-open .bottom-nav,
+body.social-open .social-chat-fab {
     display: none !important;
 }
 
@@ -2117,7 +2138,7 @@ body.duel-open .social-chat-panel {
     .social-chat-panel {
         top: max(72px, env(safe-area-inset-top) + 10px);
         right: 10px;
-        bottom: max(88px, env(safe-area-inset-bottom) + 14px);
+        bottom: max(108px, env(safe-area-inset-bottom) + 22px);
         left: 10px;
         width: auto;
         max-height: none;

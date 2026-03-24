@@ -389,6 +389,7 @@
             openSocialInbox: openSocialInbox,
             closeSocialInbox: closeSocialInbox,
             selectDuelOption: updateDuelSelection,
+            submitDuelTurn: submitCurrentDuelTurn,
             setDuelPanel: setDuelPanel,
             duelFriend: function (friendId) {
                 const friend = getFriendById(friendId);
@@ -2183,6 +2184,7 @@
         elements.socialChatFabBadge.classList.toggle('hidden', threads.length === 0);
         elements.socialChatPanel.classList.toggle('hidden', !state.social.isOpen);
         elements.socialChatPanel.setAttribute('aria-hidden', state.social.isOpen ? 'false' : 'true');
+        document.body.classList.toggle('social-open', Boolean(state.social.isOpen));
 
         if (!threads.length) {
             elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Чаты появятся здесь после первого диалога с другом.</article>';
@@ -2635,6 +2637,24 @@
         };
         saveState();
         renderDuelResultModal();
+    }
+
+    function submitCurrentDuelTurn() {
+        if (!state.duel || state.duel.finished) {
+            return;
+        }
+        if (state.duel.mode === "pvp-live") {
+            submitLiveDuelAction();
+            return;
+        }
+        if (!isDuelSelectionComplete(state.duel)) {
+            showToast("Сначала выбери оружие, выстрел и уворот.");
+            return;
+        }
+        resolveDuelRound(
+            getCurrentDuelAction(state.duel),
+            buildOpponentAction()
+        );
     }
 
     function closeDuelResult() {
@@ -5580,5 +5600,83 @@
         showToast("Куплено: " + item.name + ".");
         saveState();
         renderAll();
+    }
+
+    function renderSocialInbox() {
+        refreshStaticCopy();
+        if (!elements.socialChatPanel) {
+            return;
+        }
+        state.social = state.social || {};
+        state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
+        const threads = state.social.threads;
+        const activeThread = threads.find(function (thread) { return thread.id === state.social.activeThreadId; }) || null;
+
+        elements.socialChatFabBadge.textContent = String(Math.min(9, threads.length));
+        elements.socialChatFabBadge.classList.toggle("hidden", threads.length === 0);
+        elements.socialChatPanel.classList.toggle("hidden", !state.social.isOpen);
+        elements.socialChatPanel.setAttribute("aria-hidden", state.social.isOpen ? "false" : "true");
+        document.body.classList.toggle("social-open", Boolean(state.social.isOpen));
+
+        if (!threads.length) {
+            elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Чаты появятся здесь после первого диалога с другом.</article>';
+            elements.socialChatThreadTitle.textContent = "Выбери чат";
+            elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
+            elements.socialChatInput.disabled = true;
+            elements.socialChatSend.disabled = true;
+            return;
+        }
+
+        elements.socialChatThreadList.innerHTML = threads.map(function (thread) {
+            return [
+                '<button class="social-chat-thread-card' + (activeThread && activeThread.id === thread.id ? ' is-active' : '') + '" type="button" data-social-thread-id="' + escapeHtml(thread.id) + '">',
+                '<strong>' + escapeHtml(thread.friendName || "Друг") + '</strong>',
+                '<span>' + escapeHtml((thread.status === "online" ? "Онлайн" : "Оффлайн") + " · рейтинг " + (thread.rating || 0)) + '</span>',
+                '</button>'
+            ].join("");
+        }).join("");
+
+        if (!activeThread) {
+            elements.socialChatThreadTitle.textContent = "Выбери чат";
+            elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Выбери друга и начни переписку.</div>';
+            elements.socialChatInput.disabled = true;
+            elements.socialChatSend.disabled = true;
+            return;
+        }
+
+        elements.socialChatThreadTitle.textContent = activeThread.friendName || "Друг";
+        elements.socialChatMessages.innerHTML = (activeThread.messages || []).map(function (message) {
+            const own = message.author === "you";
+            return [
+                '<div class="social-chat-message' + (own ? " social-chat-message-own" : "") + '">',
+                '<div class="social-chat-message-bubble">',
+                '<strong>' + escapeHtml(own ? state.player.name : (activeThread.friendName || "Друг")) + '</strong>',
+                '<p>' + escapeHtml(message.text || "") + '</p>',
+                '<small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small>',
+                '</div>',
+                '</div>'
+            ].join("");
+        }).join("");
+        elements.socialChatInput.disabled = false;
+        elements.socialChatSend.disabled = false;
+        elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+    }
+
+    function submitCurrentDuelTurn() {
+        if (!state.duel || state.duel.finished) {
+            return;
+        }
+        if (state.duel.mode === "pvp-live") {
+            submitLiveDuelAction();
+            return;
+        }
+        if (!isDuelSelectionComplete(state.duel)) {
+            showToast("Сначала выбери оружие, выстрел и уворот.");
+            return;
+        }
+        resolveDuelRound(
+            getCurrentDuelAction(state.duel),
+            buildOpponentAction()
+        );
     }
 })();
