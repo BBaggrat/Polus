@@ -1,9 +1,9 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v21";
+    const STORAGE_KEY = "polus_frontend_prototype_v22";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
-    const JOURNAL_EVENT_MS = 90000;
+    const JOURNAL_EVENT_MS = 60000;
     const DUEL_ROUND_TIMEOUT_MS = 2 * 60 * 1000;
     const LEVEL_THRESHOLDS = [100, 200, 350, 500];
     const SHIELD_BLOCK_CHANCE = 0.30;
@@ -14,6 +14,16 @@
     const BATTLE_REWARD_EXPERIENCE = 0;
     const PVP_RATING_DELTA = 10;
     const CHAT_LINK_PATTERN = /(?:https?:\/\/|www\.|t\.me\/|telegram\.me\/|[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|\b))/i;
+    const SIMPLE_JOURNAL_EVENTS = [
+        "Случайное событие: на крыше снова воет ледяной ветер.",
+        "Случайное событие: на рынке заговорили о новой дуэльной площадке.",
+        "Случайное событие: соседний генератор пережил еще один морозный цикл.",
+        "Случайное событие: кто-то оставил ящик с пустыми гильзами у склада.",
+        "Случайное событие: в трактире спорят, кто держит лучшую линию огня.",
+        "Случайное событие: механик обещает скоро открыть теплую мастерскую.",
+        "Случайное событие: курьер привез свежие вести с южного коридора.",
+        "Случайное событие: сторож заметил свет в заброшенном ангаре."
+    ];
     const DIRECTION_TERMS = ["РїРѕ С†РµРЅС‚СЂСѓ", "РІР»РµРІРѕ", "РІРїСЂР°РІРѕ"];
     const ITEM_LIBRARY = {
         cartridges38: { id: "cartridges38", name: "РџР°С‚СЂРѕРЅС‹ .38", description: "Р”РµСЂР¶Р°С‚СЃСЏ РІ РєР°СЂРјР°РЅРµ. РўРµРїР»С‹Рµ РѕС‚ Р»Р°РґРѕРЅРё.", pocket: true },
@@ -4979,7 +4989,7 @@
 
     function buildInitialState() {
         return {
-            version: 20,
+            version: 22,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
@@ -4999,7 +5009,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 20;
+        next.version = 22;
         next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
         next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
@@ -5039,7 +5049,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 20 ? parsed : buildInitialState();
+            return parsed && parsed.version === 22 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -5057,6 +5067,18 @@
         elements.journalList.innerHTML = state.journal.slice(0, 6).map(function (entry) {
             return '<article class="journal-entry"><p>' + decorateText(entry.text) + '</p><small>' + escapeHtml(formatTimestamp(entry.createdAt)) + '</small></article>';
         }).join("");
+    }
+
+    function getDisplayFriends() {
+        const actual = Array.isArray(state.friends) ? state.friends.slice() : [];
+        const placeholderFriends = [
+            { id: "demo-friend-1", name: "ЛедовыйПульс", status: "online", rating: 120 },
+            { id: "demo-friend-2", name: "СеверныйУзел", status: "offline", rating: 95 }
+        ];
+        const takenIds = new Set(actual.map(function (friend) { return friend.id; }));
+        return actual.concat(placeholderFriends.filter(function (friend) {
+            return !takenIds.has(friend.id);
+        }));
     }
 
     function renderFriends() {
@@ -5148,6 +5170,36 @@
         elements.socialChatInput.disabled = false;
         elements.socialChatSend.disabled = false;
         elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+    }
+
+    function renderInventory() {
+        if (!elements.inventoryPlaceholder) {
+            return;
+        }
+        const inventoryLabels = {
+            medkit: "Аптечка",
+            brassGear: "Латунная шестерня",
+            cartridges38: "Патроны .38",
+            relicBox: "Шкатулка с гравировкой",
+            iceToken: "Ледяной жетон",
+            scrapMap: "Мятая карта льда"
+        };
+        const backpack = Array.isArray(state.inventory && state.inventory.backpack) ? state.inventory.backpack : [];
+        const backpackMarkup = backpack.length
+            ? backpack.map(function (item) {
+                return '<article class="inventory-card is-passive"><h3>' + escapeHtml(inventoryLabels[item.id] || item.id) + '</h3><p>Количество: ' + escapeHtml(String(item.quantity || 0)) + '</p><small class="inventory-meta">Без бонусов. Только для интерфейса и будущих систем.</small></article>';
+            }).join("")
+            : '<article class="inventory-card is-passive"><h3>Рюкзак пуст</h3><p>Предметы появятся после покупок и будущих механик.</p><small class="inventory-meta">Пока раздел работает как визуальная заглушка.</small></article>';
+        elements.inventoryPlaceholder.innerHTML = [
+            '<section class="inventory-layout">',
+            '<article class="inventory-card"><h3>Оружейная аугментация</h3><p>Слот свободен.</p><small class="inventory-meta">Без бонусов. Только для визуального прототипа.</small></article>',
+            '<article class="inventory-card"><h3>Броня</h3><p>Слот свободен.</p><small class="inventory-meta">Без бонусов. Только для визуального прототипа.</small></article>',
+            '<article class="inventory-card"><h3>Вспомогательная</h3><p>Слот свободен.</p><small class="inventory-meta">Без бонусов. Только для визуального прототипа.</small></article>',
+            '</section>',
+            '<section class="inventory-list">',
+            backpackMarkup,
+            '</section>'
+        ].join("");
     }
 
     function renderShop() {
@@ -5660,6 +5712,27 @@
         elements.socialChatInput.disabled = false;
         elements.socialChatSend.disabled = false;
         elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+    }
+
+    function triggerScheduledJournalEvent() {
+        if (!state.world) {
+            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0 };
+        }
+        if (state.duel && !state.duel.finished) {
+            return;
+        }
+        const now = Date.now();
+        const lastJournalEventAt = Number(state.world.lastJournalEventAt || 0);
+        if (now - lastJournalEventAt < JOURNAL_EVENT_MS) {
+            return;
+        }
+        state.world.lastJournalEventAt = now;
+        const eventText = SIMPLE_JOURNAL_EVENTS[Math.floor(Math.random() * SIMPLE_JOURNAL_EVENTS.length)];
+        addJournal(eventText);
+        saveState();
+        if (state.ui && state.ui.screen === "home") {
+            renderJournal();
+        }
     }
 
     function submitCurrentDuelTurn() {

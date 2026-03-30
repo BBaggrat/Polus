@@ -1524,7 +1524,7 @@ body.duel-open .bottom-nav {
 .social-chat-fab {
     position: fixed;
     right: 18px;
-    bottom: 98px;
+    bottom: 126px;
     z-index: 8;
     display: inline-flex;
     align-items: center;
@@ -1559,20 +1559,22 @@ body.duel-open .bottom-nav {
     position: fixed;
     top: max(72px, env(safe-area-inset-top) + 12px);
     right: 16px;
-    bottom: max(92px, env(safe-area-inset-bottom) + 16px);
+    bottom: max(132px, env(safe-area-inset-bottom) + 18px);
     left: 16px;
-    z-index: 20;
-    width: min(920px, calc(100vw - 32px));
+    z-index: 24;
+    width: min(860px, calc(100vw - 32px));
     margin: 0 auto;
     max-height: none;
     padding: 18px 14px 16px;
     border-radius: 28px;
     border: 1px solid var(--line);
-    background: linear-gradient(180deg, rgba(17, 25, 43, 0.99) 0%, rgba(12, 17, 29, 0.99) 100%);
-    box-shadow: var(--shadow);
+    background: #0d1424;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55), 0 0 0 999px rgba(4, 8, 16, 0.55);
     overflow: hidden;
     overscroll-behavior: contain;
     touch-action: pan-y;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
 }
 
 .social-chat-panel-header {
@@ -1587,8 +1589,8 @@ body.duel-open .bottom-nav {
     display: grid;
     grid-template-columns: 148px minmax(0, 1fr);
     gap: 12px;
-    min-height: 100%;
-    height: calc(100% - 58px);
+    min-height: 0;
+    height: 100%;
 }
 
 .social-chat-thread-list {
@@ -1598,7 +1600,7 @@ body.duel-open .bottom-nav {
     overflow: auto;
     padding: 6px;
     border-radius: 18px;
-    background: rgba(10, 16, 28, 1);
+    background: rgba(9, 14, 25, 1);
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     touch-action: pan-y;
@@ -1637,7 +1639,8 @@ body.duel-open .bottom-nav {
     min-height: 0;
     padding: 10px;
     border-radius: 18px;
-    background: rgba(10, 16, 28, 1);
+    background: rgba(9, 14, 25, 1);
+    overflow: hidden;
 }
 
 .social-chat-thread-head {
@@ -1709,6 +1712,7 @@ body.duel-open .bottom-nav {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
     align-items: stretch;
+    margin-top: auto;
 }
 
 .social-chat-input {
@@ -1735,6 +1739,10 @@ body.duel-open .social-chat-panel {
 }
 
 body.social-open {
+    overflow: hidden;
+}
+
+body.social-open .app-shell {
     overflow: hidden;
 }
 
@@ -2138,7 +2146,7 @@ body.social-open .social-chat-fab {
     .social-chat-panel {
         top: max(72px, env(safe-area-inset-top) + 10px);
         right: 10px;
-        bottom: max(108px, env(safe-area-inset-bottom) + 22px);
+        bottom: max(132px, env(safe-area-inset-bottom) + 26px);
         left: 10px;
         width: auto;
         max-height: none;
@@ -2150,7 +2158,7 @@ body.social-open .social-chat-fab {
         grid-template-columns: 1fr;
         grid-template-rows: auto minmax(0, 1fr);
         gap: 10px;
-        height: calc(100% - 48px);
+        height: 100%;
     }
 
     .social-chat-thread-list {
@@ -2172,7 +2180,7 @@ body.social-open .social-chat-fab {
 
     .social-chat-fab {
         right: 14px;
-        bottom: 92px;
+        bottom: 126px;
     }
 
     .bottom-nav {
