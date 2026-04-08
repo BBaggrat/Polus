@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v22";
+    const STORAGE_KEY = "polus_frontend_prototype_v23";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -14,6 +14,14 @@
     const BATTLE_REWARD_EXPERIENCE = 0;
     const PVP_RATING_DELTA = 10;
     const CHAT_LINK_PATTERN = /(?:https?:\/\/|www\.|t\.me\/|telegram\.me\/|[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|\b))/i;
+    const JOURNAL_FREQUENCY_WEIGHTS = {
+        COMMON: 1,
+        DAILY: 0.92,
+        RARE: 0.45,
+        VERY_RARE: 0.2,
+        UNIQUE: 0.08
+    };
+    const JOURNAL_EVENT_CATALOG = normalizeJournalEventCatalog(window.POLUS_JOURNAL_EVENTS || []);
     const SIMPLE_JOURNAL_EVENTS = [
         "Случайное событие: на крыше снова воет ледяной ветер.",
         "Случайное событие: на рынке заговорили о новой дуэльной площадке.",
@@ -2775,8 +2783,15 @@
         });
     }
 
-    function addJournal(text) {
-        state.journal.unshift({ id: uid("journal"), text: text, createdAt: Date.now() });
+    function addJournal(text, meta) {
+        const details = meta && typeof meta === "object" ? meta : {};
+        state.journal.unshift({
+            id: uid("journal"),
+            text: text,
+            createdAt: Date.now(),
+            sourceEventId: details.sourceEventId || null,
+            location: details.location || null
+        });
         state.journal = state.journal.slice(0, 12);
     }
 
@@ -4989,11 +5004,11 @@
 
     function buildInitialState() {
         return {
-            version: 22,
+            version: 23,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
-            world: { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0 },
+            world: { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} },
             ui: { screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, startDuelAction: null, duelResult: null },
             journal: [],
             inventory: { equipped: [], augmentSlots: {}, unlockedAugments: [], backpack: [] },
@@ -5009,7 +5024,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 22;
+        next.version = 23;
         next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
         next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
@@ -5021,7 +5036,11 @@
         delete next.player.strength;
         delete next.player.reaction;
         delete next.player.analysis;
-        next.world = Object.assign({ lastJournalEventAt: Date.now(), lastFriendSyncAt: 0 }, next.world || {});
+        next.world = Object.assign({ lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} }, next.world || {});
+        next.world.lastJournalEventId = next.world.lastJournalEventId || null;
+        next.world.journalEventHistory = next.world.journalEventHistory && typeof next.world.journalEventHistory === "object"
+            ? next.world.journalEventHistory
+            : {};
         next.ui = Object.assign({ screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, duelResult: null }, next.ui || {});
         next.ui.startDuelAction = null;
         next.inventory = next.inventory || { equipped: [], augmentSlots: {}, unlockedAugments: [], backpack: [] };
@@ -5049,11 +5068,163 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 22 ? parsed : buildInitialState();
+            return parsed && parsed.version === 23 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
         }
+    }
+
+    function normalizeJournalEventCatalog(rawEvents) {
+        if (!Array.isArray(rawEvents)) {
+            return [];
+        }
+        return rawEvents.map(function (entry) {
+            return {
+                id: normalizeJournalString(entry.id),
+                text: normalizeJournalString(entry.text),
+                location: (normalizeJournalString(entry.location) || "street").toLowerCase(),
+                frequency: (normalizeJournalString(entry.frequency) || "COMMON").toUpperCase(),
+                weight: Math.max(1, Number(entry.weight) || 1),
+                timeTag: (normalizeJournalString(entry.time_tag != null ? entry.time_tag : entry.timeTag) || "any").toLowerCase(),
+                mood: normalizeJournalString(entry.mood),
+                category: normalizeJournalString(entry.category),
+                uniqueDaily: normalizeJournalBoolean(entry.unique_daily != null ? entry.unique_daily : entry.is_unique_daily),
+                minDaysGap: Math.max(0, Number(entry.min_days_gap != null ? entry.min_days_gap : entry.minDaysGap) || 0),
+                enabled: normalizeJournalBoolean(entry.enabled),
+                effect: normalizeJournalNullableString(entry.effect)
+            };
+        }).filter(function (eventEntry) {
+            return Boolean(eventEntry.id && eventEntry.text && eventEntry.enabled);
+        });
+    }
+
+    function normalizeJournalString(value) {
+        if (value == null) {
+            return "";
+        }
+        return String(value).trim();
+    }
+
+    function normalizeJournalNullableString(value) {
+        const normalized = normalizeJournalString(value);
+        if (!normalized || normalized.toUpperCase() === "NULL") {
+            return null;
+        }
+        return normalized;
+    }
+
+    function normalizeJournalBoolean(value) {
+        const normalized = normalizeJournalString(value).toUpperCase();
+        return normalized === "TRUE"
+            || normalized === "1"
+            || normalized === "YES"
+            || normalized === "ДА"
+            || normalized === "ИСТИНА";
+    }
+
+    function getJournalDayStamp(timestamp) {
+        const date = new Date(timestamp);
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+    }
+
+    function getJournalDayDistance(fromTimestamp, toTimestamp) {
+        const from = new Date(fromTimestamp);
+        const to = new Date(toTimestamp);
+        const fromMidnight = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
+        const toMidnight = new Date(to.getFullYear(), to.getMonth(), to.getDate()).getTime();
+        return Math.floor((toMidnight - fromMidnight) / 86400000);
+    }
+
+    function getCurrentJournalTimeTag(now) {
+        const hour = new Date(now).getHours();
+        if (hour >= 5 && hour < 11) {
+            return "morning";
+        }
+        if (hour >= 11 && hour < 17) {
+            return "day";
+        }
+        if (hour >= 17 && hour < 23) {
+            return "evening";
+        }
+        return "night";
+    }
+
+    function getJournalEventHistoryMap() {
+        if (!state.world) {
+            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} };
+        }
+        if (!state.world.journalEventHistory || typeof state.world.journalEventHistory !== "object") {
+            state.world.journalEventHistory = {};
+        }
+        return state.world.journalEventHistory;
+    }
+
+    function isJournalEventEligible(eventEntry, now, matchTimeTag) {
+        const history = getJournalEventHistoryMap();
+        const previous = history[eventEntry.id];
+        const currentDay = getJournalDayStamp(now);
+        if (matchTimeTag) {
+            const currentTimeTag = getCurrentJournalTimeTag(now);
+            if (eventEntry.timeTag !== "any" && eventEntry.timeTag !== currentTimeTag) {
+                return false;
+            }
+        }
+        if (state.world && state.world.lastJournalEventId && JOURNAL_EVENT_CATALOG.length > 1 && state.world.lastJournalEventId === eventEntry.id) {
+            return false;
+        }
+        if (!previous) {
+            return true;
+        }
+        if ((eventEntry.uniqueDaily || eventEntry.frequency === "DAILY") && previous.dayStamp === currentDay) {
+            return false;
+        }
+        if (eventEntry.minDaysGap > 0 && getJournalDayDistance(previous.lastShownAt, now) < eventEntry.minDaysGap) {
+            return false;
+        }
+        return true;
+    }
+
+    function chooseWeightedJournalEvent(candidates) {
+        if (!candidates.length) {
+            return null;
+        }
+        const totalWeight = candidates.reduce(function (sum, eventEntry) {
+            return sum + Math.max(1, eventEntry.weight * (JOURNAL_FREQUENCY_WEIGHTS[eventEntry.frequency] || 1));
+        }, 0);
+        let cursor = Math.random() * totalWeight;
+        for (let index = 0; index < candidates.length; index += 1) {
+            const eventEntry = candidates[index];
+            cursor -= Math.max(1, eventEntry.weight * (JOURNAL_FREQUENCY_WEIGHTS[eventEntry.frequency] || 1));
+            if (cursor <= 0) {
+                return eventEntry;
+            }
+        }
+        return candidates[candidates.length - 1];
+    }
+
+    function pickJournalEvent(now) {
+        const strictCandidates = JOURNAL_EVENT_CATALOG.filter(function (eventEntry) {
+            return isJournalEventEligible(eventEntry, now, true);
+        });
+        if (strictCandidates.length) {
+            return chooseWeightedJournalEvent(strictCandidates);
+        }
+        const relaxedCandidates = JOURNAL_EVENT_CATALOG.filter(function (eventEntry) {
+            return isJournalEventEligible(eventEntry, now, false);
+        });
+        return chooseWeightedJournalEvent(relaxedCandidates);
+    }
+
+    function rememberJournalEvent(eventEntry, now) {
+        const history = getJournalEventHistoryMap();
+        history[eventEntry.id] = {
+            lastShownAt: now,
+            dayStamp: getJournalDayStamp(now),
+            location: eventEntry.location,
+            frequency: eventEntry.frequency
+        };
+        state.world.lastJournalEventId = eventEntry.id;
     }
 
     function renderJournal() {
@@ -5716,7 +5887,7 @@
 
     function triggerScheduledJournalEvent() {
         if (!state.world) {
-            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0 };
+            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} };
         }
         if (state.duel && !state.duel.finished) {
             return;
@@ -5727,8 +5898,13 @@
             return;
         }
         state.world.lastJournalEventAt = now;
-        const eventText = SIMPLE_JOURNAL_EVENTS[Math.floor(Math.random() * SIMPLE_JOURNAL_EVENTS.length)];
-        addJournal(eventText);
+        const eventEntry = pickJournalEvent(now);
+        if (!eventEntry) {
+            saveState();
+            return;
+        }
+        rememberJournalEvent(eventEntry, now);
+        addJournal(eventEntry.text, { sourceEventId: eventEntry.id, location: eventEntry.location });
         saveState();
         if (state.ui && state.ui.screen === "home") {
             renderJournal();
