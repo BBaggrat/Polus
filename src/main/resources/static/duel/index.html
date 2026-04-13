@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260413-3">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260413-4">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -84,13 +84,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Инвентарь</h2>
+                    <h2 class="panel-title">Доступные аугментации</h2>
                 </div>
             </div>
 
             <div class="empty-state-card" id="inventory-placeholder">
-                <h3>Оружейная аугментация</h3>
-                <p>Инвентарь вернулся в базовом виде и пока не влияет на бой.</p>
+                <h3>Пока аугментаций нет</h3>
+                <p>Купленные модули будут появляться здесь и распределяться по типам.</p>
             </div>
         </section>
     </section>
@@ -121,10 +121,10 @@
                 <span class="badge" id="shop-money">0 монет</span>
             </div>
             <div class="shop-tabs" id="shop-tabs">
-                <button class="shop-tab is-active" data-shop-section="standard" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('standard')">Снаряжение</button>
-                <button class="shop-tab" data-shop-section="premium" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('premium')">Премиум</button>
+                <button class="shop-tab is-active" data-shop-section="weapon" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('weapon')">Оружейная</button>
+                <button class="shop-tab" data-shop-section="defense" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('defense')">Защитная</button>
+                <button class="shop-tab" data-shop-section="support" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('support')">Вспомогательная</button>
             </div>
-            <div class="work-banner hidden" id="premium-work-banner">Временно в работе</div>
             <div class="shop-list" id="shop-list"></div>
         </section>
     </section>
@@ -392,8 +392,8 @@
 
 <div class="toast hidden" id="toast"></div>
 
-    <script src="/duel/journal-events.js?v=polus-20260413-3"></script>
-    <script src="/duel/app.js?v=polus-20260413-3"></script>
+    <script src="/duel/journal-events.js?v=polus-20260413-4"></script>
+    <script src="/duel/app.js?v=polus-20260413-4"></script>
 </body>
 </html>
 

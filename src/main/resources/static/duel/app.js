@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v26";
+    const STORAGE_KEY = "polus_frontend_prototype_v27";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -21,7 +21,7 @@
     };
     const JOURNAL_EVENT_CATALOG = normalizeJournalEventCatalog(window.POLUS_JOURNAL_EVENTS || []);
     const JOURNAL_LOCATION_LABELS = {
-        street: "Город",
+        street: "Улица",
         tavern: "Трактир",
         arena: "Арена",
         market: "Рынок"
@@ -1818,11 +1818,15 @@
     }
 
     function shouldSupportEvade(side) {
-        return false;
+        return side === "player" && hasAugment("defense-evasion") && Math.random() < 0.05;
     }
 
     function projectileBlocked(attackerSide, defenderWeapon, weaponCode, shotCode) {
-        if (defenderWeapon !== "PISTOLS" || ignoresBlocking(attackerSide)) {
+        const defenderSide = attackerSide === "player" ? "opponent" : "player";
+        if (defenderSide === "player" && hasAugment("support-block") && Math.random() < 0.05) {
+            return true;
+        }
+        if (weaponCode === "RIFLE" || defenderWeapon !== "PISTOLS" || ignoresBlocking(attackerSide)) {
             return false;
         }
         const blockChance = Math.max(0, SHIELD_BLOCK_CHANCE - getWeaponHitBonus(attackerSide, weaponCode, shotCode));
@@ -1838,19 +1842,28 @@
     }
 
     function getWeaponGrazeBonus(side, weaponCode) {
-        return 0;
+        return side === "player" && hasAugment("weapon-graze") ? 0.25 : 0;
     }
 
     function getWeaponDamageBonus(side, weaponCode) {
-        return 0;
+        return side === "player" && hasAugment("weapon-overdrive") ? 5 : 0;
     }
 
     function applyDefenseReduction(side, damage, isGraze, lines, defenderName) {
-        return damage;
+        const reduction = side === "player" && hasAugment("defense-plate") ? 3 : 0;
+        if (reduction <= 0) {
+            return damage;
+        }
+        const minimum = isGraze ? 1 : 0;
+        const reducedDamage = Math.max(minimum, damage - reduction);
+        if (reducedDamage < damage) {
+            lines.push(defenderName + " снижает урон на " + (damage - reducedDamage) + ".");
+        }
+        return reducedDamage;
     }
 
     function getPlayerMaxHp() {
-        return 100;
+        return hasAugment("support-hp") ? 115 : 100;
     }
 
     function triggerRandomJournalEvent() {
@@ -2303,7 +2316,7 @@
     }
 
     function setShopSection(section) {
-        state.ui.shopSection = section === "premium" ? "premium" : "standard";
+        state.ui.shopSection = ["weapon", "defense", "support"].indexOf(section) >= 0 ? section : "weapon";
         saveState();
         renderShop();
     }
@@ -2317,11 +2330,17 @@
     }
 
     function getOwnedAugments(slot) {
-        return [];
+        const normalizedSlot = slot || "";
+        return state.shop.filter(function (item) {
+            return item.kind === "augment"
+                && item.slot === normalizedSlot
+                && hasAugment(item.augmentId);
+        });
     }
 
     function getActiveAugment(slot) {
-        return null;
+        const owned = getOwnedAugments(slot);
+        return owned.length ? owned[0] : null;
     }
 
     function getAugmentSlotConfig(slot) {
@@ -2340,7 +2359,11 @@
     }
 
     function unlockAugment(augmentId) {
-        return;
+        if (!augmentId || hasAugment(augmentId)) {
+            return false;
+        }
+        state.inventory.unlockedAugments.push(augmentId);
+        return true;
     }
 
     function renderDuel() {
@@ -2795,7 +2818,8 @@
             text: text,
             createdAt: Date.now(),
             sourceEventId: details.sourceEventId || null,
-            location: details.location || null
+            location: details.location || null,
+            locationLabel: details.locationLabel || null
         });
         state.journal = state.journal.slice(0, 20);
     }
@@ -3853,6 +3877,11 @@
         const lines = [];
         const lineMatched = attackerAction.shot === defenderAction.dodge;
         if (!lineMatched && attackerAction.weapon !== "SHOTGUN") {
+            if (getWeaponGrazeBonus(attackerSide, attackerAction.weapon) > 0 && Math.random() < getWeaponGrazeBonus(attackerSide, attackerAction.weapon)) {
+                let grazeDamage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", 2, true, lines, defenderName);
+                lines.push(attackerName + " цепляет краем и наносит " + grazeDamage + " урона.");
+                return { damage: grazeDamage, lines: lines };
+            }
             lines.push(attackerName + " промахивается мимо линии.");
             return { damage: 0, lines: lines };
         }
@@ -4960,12 +4989,14 @@
         safeSetText("#queue-cancel-button", "Отменить");
         safeSetText("#home-journal-panel .panel-title-small", "Дневник");
         safeSetText(".journal-zone-label", "Зона");
-        safeSetText("#screen-inventory .panel-title", "Инвентарь");
+        safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
         safeSetText("#screen-friends .panel-title", "Друзья");
         safeSetText("#friend-search-input", null, "placeholder", "Найти игрока по никнейму");
         safeSetText("#friend-search-form .primary-button", "Добавить");
         safeSetText("#screen-shop .panel-title", "Магазин");
-        safeSetText("#premium-work-banner", "Временно в работе");
+        safeSetText(".shop-tab[data-shop-section='weapon']", "Оружейная");
+        safeSetText(".shop-tab[data-shop-section='defense']", "Защитная");
+        safeSetText(".shop-tab[data-shop-section='support']", "Вспомогательная");
         safeSetText(".nav-button[data-nav-target='home'] .nav-title", "Хаб");
         safeSetText(".nav-button[data-nav-target='inventory'] .nav-title", "Инвентарь");
         safeSetText(".nav-button[data-nav-target='friends'] .nav-title", "Друзья");
@@ -4997,22 +5028,83 @@
     }
     function buildShopCatalog() {
         return [
-            { id: "shop-medkit", section: "standard", kind: "item", itemId: "medkit", name: "Аптечка", price: 20 },
-            { id: "shop-gear", section: "standard", kind: "item", itemId: "brassGear", name: "Латунная шестерня", price: 18 },
-            { id: "shop-ammo", section: "standard", kind: "item", itemId: "cartridges38", name: "Патроны .38", price: 9 },
-            { id: "premium-skin-crimson", section: "premium", kind: "premium", name: "Скин «Багряный фронт»", price: 149, previewType: "skin", previewTone: "crimson" },
-            { id: "premium-backdrop-polar", section: "premium", kind: "premium", name: "Фон «Полярная витрина»", price: 199, previewType: "backdrop", previewTone: "polar" }
+            {
+                id: "augment-weapon-overdrive",
+                section: "weapon",
+                kind: "augment",
+                augmentId: "weapon-overdrive",
+                slot: "weapon",
+                name: "Разгонный контур",
+                effect: "+5 к урону",
+                copy: "Увеличивает урон любого оружия на 5.",
+                price: 500
+            },
+            {
+                id: "augment-weapon-graze",
+                section: "weapon",
+                kind: "augment",
+                augmentId: "weapon-graze",
+                slot: "weapon",
+                name: "Смещённый резонатор",
+                effect: "Зацеп 2 урона",
+                copy: "Любое оружие получает 25% шанс зацепить на 2 урона.",
+                price: 500
+            },
+            {
+                id: "augment-defense-plate",
+                section: "defense",
+                kind: "augment",
+                augmentId: "defense-plate",
+                slot: "defense",
+                name: "Северная бронепластина",
+                effect: "-3 входящего урона",
+                copy: "Уменьшает входящий урон на 3.",
+                price: 500
+            },
+            {
+                id: "augment-defense-evasion",
+                section: "defense",
+                kind: "augment",
+                augmentId: "defense-evasion",
+                slot: "defense",
+                name: "Инерционный кожух",
+                effect: "5% шанс избежать пули",
+                copy: "Добавляет 5% шанс избежать любого пулевого попадания.",
+                price: 500
+            },
+            {
+                id: "augment-support-hp",
+                section: "support",
+                kind: "augment",
+                augmentId: "support-hp",
+                slot: "support",
+                name: "Стим-петля",
+                effect: "+15 здоровья",
+                copy: "Повышает запас здоровья на 15.",
+                price: 500
+            },
+            {
+                id: "augment-support-block",
+                section: "support",
+                kind: "augment",
+                augmentId: "support-block",
+                slot: "support",
+                name: "Фазовый экран",
+                effect: "5% шанс блока",
+                copy: "С вероятностью 5% блокирует любой выстрел.",
+                price: 500
+            }
         ];
     }
 
     function buildInitialState() {
         return {
-            version: 25,
+            version: 27,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
-            world: { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} },
-            ui: { screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, startDuelAction: null, duelResult: null },
+            world: { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {}, currentJournalArea: "street", areaEventCount: 0 },
+            ui: { screen: "home", activeQuestId: null, shopSection: "weapon", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, startDuelAction: null, duelResult: null },
             journal: [],
             inventory: { equipped: [], augmentSlots: {}, unlockedAugments: [], backpack: [] },
             friends: [],
@@ -5027,7 +5119,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 25;
+        next.version = 27;
         next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
         next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
@@ -5039,14 +5131,18 @@
         delete next.player.strength;
         delete next.player.reaction;
         delete next.player.analysis;
-        next.world = Object.assign({ lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} }, next.world || {});
+        next.world = Object.assign({ lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {}, currentJournalArea: "street", areaEventCount: 0 }, next.world || {});
         next.world.lastJournalEventId = next.world.lastJournalEventId || null;
         next.world.journalEventHistory = next.world.journalEventHistory && typeof next.world.journalEventHistory === "object"
             ? next.world.journalEventHistory
             : {};
-        next.ui = Object.assign({ screen: "home", activeQuestId: null, shopSection: "standard", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, duelResult: null }, next.ui || {});
+        next.world.currentJournalArea = next.world.currentJournalArea || "street";
+        next.world.areaEventCount = Number(next.world.areaEventCount || 0);
+        next.ui = Object.assign({ screen: "home", activeQuestId: null, shopSection: "weapon", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, duelResult: null }, next.ui || {});
         next.ui.startDuelAction = null;
         next.inventory = next.inventory || { equipped: [], augmentSlots: {}, unlockedAugments: [], backpack: [] };
+        next.inventory.unlockedAugments = Array.isArray(next.inventory.unlockedAugments) ? next.inventory.unlockedAugments : [];
+        next.inventory.backpack = [];
         next.friends = Array.isArray(next.friends) ? next.friends.map(function (friend) {
             return Object.assign({}, friend, { rating: Number(friend.rating != null ? friend.rating : friend.level) || 0 });
         }) : [];
@@ -5071,7 +5167,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 25 ? parsed : buildInitialState();
+            return parsed && parsed.version === 27 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -5087,6 +5183,7 @@
                 id: normalizeJournalString(entry.id),
                 text: normalizeJournalString(entry.text),
                 location: (normalizeJournalString(entry.location) || "street").toLowerCase(),
+                locationLabel: normalizeJournalString(entry.locationLabel || entry.location_label),
                 frequency: (normalizeJournalString(entry.frequency) || "COMMON").toUpperCase(),
                 weight: Math.max(1, Number(entry.weight) || 1),
                 timeTag: (normalizeJournalString(entry.time_tag != null ? entry.time_tag : entry.timeTag) || "any").toLowerCase(),
@@ -5155,7 +5252,14 @@
 
     function getJournalEventHistoryMap() {
         if (!state.world) {
-            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} };
+            state.world = {
+                lastJournalEventAt: Date.now(),
+                lastFriendSyncAt: 0,
+                lastJournalEventId: null,
+                journalEventHistory: {},
+                currentJournalArea: "street",
+                areaEventCount: 0
+            };
         }
         if (!state.world.journalEventHistory || typeof state.world.journalEventHistory !== "object") {
             state.world.journalEventHistory = {};
@@ -5206,17 +5310,62 @@
         return candidates[candidates.length - 1];
     }
 
+    function getJournalAreas() {
+        const fromCatalog = JOURNAL_EVENT_CATALOG
+            .map(function (eventEntry) { return eventEntry.location; })
+            .filter(Boolean);
+        const uniqueAreas = Array.from(new Set(fromCatalog));
+        return uniqueAreas.length ? uniqueAreas : ["street"];
+    }
+
+    function chooseNextJournalArea() {
+        const areas = getJournalAreas();
+        const currentArea = state.world && state.world.currentJournalArea ? state.world.currentJournalArea : null;
+        const candidates = areas.filter(function (area) {
+            return area !== currentArea;
+        });
+        const pool = candidates.length ? candidates : areas;
+        return pool[Math.floor(Math.random() * pool.length)] || "street";
+    }
+
+    function getCurrentJournalArea() {
+        if (!state.world) {
+            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {}, currentJournalArea: "street", areaEventCount: 0 };
+        }
+        if (!state.world.currentJournalArea) {
+            state.world.currentJournalArea = chooseNextJournalArea();
+        }
+        return state.world.currentJournalArea;
+    }
+
     function pickJournalEvent(now) {
+        if (state.world && Number(state.world.areaEventCount || 0) >= 4) {
+            state.world.currentJournalArea = chooseNextJournalArea();
+            state.world.areaEventCount = 0;
+        }
+        const currentArea = getCurrentJournalArea();
         const strictCandidates = JOURNAL_EVENT_CATALOG.filter(function (eventEntry) {
-            return isJournalEventEligible(eventEntry, now, true);
+            return eventEntry.location === currentArea && isJournalEventEligible(eventEntry, now, true);
         });
         if (strictCandidates.length) {
             return chooseWeightedJournalEvent(strictCandidates);
         }
         const relaxedCandidates = JOURNAL_EVENT_CATALOG.filter(function (eventEntry) {
+            return eventEntry.location === currentArea && isJournalEventEligible(eventEntry, now, false);
+        });
+        if (relaxedCandidates.length) {
+            return chooseWeightedJournalEvent(relaxedCandidates);
+        }
+        const fallbackStrict = JOURNAL_EVENT_CATALOG.filter(function (eventEntry) {
+            return isJournalEventEligible(eventEntry, now, true);
+        });
+        if (fallbackStrict.length) {
+            return chooseWeightedJournalEvent(fallbackStrict);
+        }
+        const fallbackRelaxed = JOURNAL_EVENT_CATALOG.filter(function (eventEntry) {
             return isJournalEventEligible(eventEntry, now, false);
         });
-        return chooseWeightedJournalEvent(relaxedCandidates);
+        return chooseWeightedJournalEvent(fallbackRelaxed);
     }
 
     function rememberJournalEvent(eventEntry, now) {
@@ -5225,18 +5374,21 @@
             lastShownAt: now,
             dayStamp: getJournalDayStamp(now),
             location: eventEntry.location,
+            locationLabel: eventEntry.locationLabel || JOURNAL_LOCATION_LABELS[eventEntry.location] || "Город",
             frequency: eventEntry.frequency
         };
         state.world.lastJournalEventId = eventEntry.id;
+        state.world.currentJournalArea = eventEntry.location || getCurrentJournalArea();
+        state.world.areaEventCount = Number(state.world.areaEventCount || 0) + 1;
     }
 
     function renderJournal() {
         if (!elements.journalList) {
             return;
         }
-        const latestLocation = state.journal.length && state.journal[0].location
-            ? state.journal[0].location
-            : "street";
+        const latestLocation = state.world && state.world.currentJournalArea
+            ? state.world.currentJournalArea
+            : (state.journal.length && state.journal[0].location ? state.journal[0].location : "street");
         if (elements.journalZone) {
             elements.journalZone.textContent = JOURNAL_LOCATION_LABELS[latestLocation] || "Город";
         }
@@ -5245,7 +5397,7 @@
             return;
         }
         elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-            const zoneLabel = JOURNAL_LOCATION_LABELS[entry.location] || "Город";
+            const zoneLabel = entry.locationLabel || JOURNAL_LOCATION_LABELS[entry.location] || "Город";
             return '<article class="journal-entry"><p>' + decorateText(entry.text) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt)) + '</small></article>';
         }).join("");
     }
@@ -5355,61 +5507,54 @@
         if (!elements.inventoryPlaceholder) {
             return;
         }
-        const inventoryLabels = {
-            medkit: "Аптечка",
-            brassGear: "Латунная шестерня",
-            cartridges38: "Патроны .38",
-            relicBox: "Реликварий",
-            iceToken: "Ледяной жетон",
-            scrapMap: "Схема тоннелей"
-        };
-        const backpack = Array.isArray(state.inventory && state.inventory.backpack) ? state.inventory.backpack : [];
-        const backpackMarkup = backpack.length
-            ? backpack.map(function (item) {
-                return '<article class="inventory-card is-passive"><h3>' + escapeHtml(inventoryLabels[item.id] || item.id) + '</h3><p>Количество: ' + escapeHtml(String(item.quantity || 0)) + '</p></article>';
-            }).join("")
-            : '<article class="inventory-card is-passive"><h3>Рюкзак пуст</h3><p>Новые предметы будут появляться здесь после покупок и событий.</p></article>';
-        elements.inventoryPlaceholder.innerHTML = [
-            '<section class="inventory-layout">',
-            '<article class="inventory-card"><h3>Оружейная аугментация</h3><p>Слот пуст.</p></article>',
-            '<article class="inventory-card"><h3>Броня</h3><p>Слот пуст.</p></article>',
-            '<article class="inventory-card"><h3>Вспомогательная</h3><p>Слот пуст.</p></article>',
-            '</section>',
-            '<section class="inventory-list">',
-            backpackMarkup,
-            '</section>'
-        ].join("");
+        const sections = [
+            { id: "weapon", title: "Оружейная аугментация", empty: "Купленные оружейные модули появятся здесь." },
+            { id: "defense", title: "Защитная аугментация", empty: "Купленные защитные модули появятся здесь." },
+            { id: "support", title: "Вспомогательная аугментация", empty: "Купленные вспомогательные модули появятся здесь." }
+        ];
+        elements.inventoryPlaceholder.innerHTML = sections.map(function (section) {
+            const owned = getOwnedAugments(section.id);
+            const cards = owned.length
+                ? owned.map(function (item) {
+                    return [
+                        '<article class="inventory-card augment-card is-passive">',
+                        '<span class="augment-type">' + escapeHtml(section.title) + '</span>',
+                        '<h3>' + escapeHtml(item.name) + '</h3>',
+                        '<p class="augment-effect">' + escapeHtml(item.effect) + '</p>',
+                        '<p class="augment-footnote">' + escapeHtml(item.copy) + '</p>',
+                        '</article>'
+                    ].join("");
+                }).join("")
+                : '<article class="inventory-card is-passive"><h3>' + escapeHtml(section.title) + '</h3><p>' + escapeHtml(section.empty) + '</p></article>';
+            return '<section class="inventory-list">' + cards + '</section>';
+        }).join("");
     }
     function renderShop() {
-        const activeSection = state.ui.shopSection || "standard";
+        const activeSection = state.ui.shopSection || "weapon";
         elements.shopTabButtons.forEach(function (button) {
             button.classList.toggle("is-active", button.getAttribute("data-shop-section") === activeSection);
         });
-        if (elements.premiumWorkBanner) {
-            elements.premiumWorkBanner.classList.toggle("hidden", activeSection !== "premium");
-        }
         elements.shopList.innerHTML = renderShopSection(activeSection);
     }
 
     function renderShopSection(section) {
         const items = state.shop.filter(function (item) { return item.section === section; });
+        if (!items.length) {
+            return '<section class="shop-section"><article class="shop-card is-passive"><h3>Пусто</h3><p>Тут скоро появятся новые аугментации.</p></article></section>';
+        }
         return ['<section class="shop-section">', items.map(function (item) {
-            const ownedPremium = item.section === "premium" && state.premium.owned.indexOf(item.id) >= 0;
-            const alreadyOwned = ownedPremium || item.section === "premium";
-            const priceLabel = item.section === "premium" ? item.price + " " + RUBLE_SIGN : item.price + " монет";
-            const buttonLabel = item.section === "premium" ? "Подробнее" : "Купить";
-            return '<article class="shop-card' + (item.section === "premium" ? " shop-card-premium" : "") + '">' + renderShopPreview(item) + '<h3>' + escapeHtml(item.name) + '</h3><div class="shop-price-row"><strong>' + escapeHtml(priceLabel) + '</strong></div><div class="shop-actions"><button class="' + (item.section === "premium" ? "secondary-button" : "primary-button") + '" data-shop-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.buy(\'' + escapeJs(item.id) + '\')"' + (alreadyOwned ? " disabled" : "") + '>' + escapeHtml(buttonLabel) + '</button></div></article>';
+            const alreadyOwned = hasAugment(item.augmentId);
+            const buttonLabel = alreadyOwned ? "Куплено" : "Купить";
+            return [
+                '<article class="shop-card">',
+                '<h3>' + escapeHtml(item.name) + '</h3>',
+                '<p class="shop-meta">' + escapeHtml(item.effect) + '</p>',
+                '<p>' + escapeHtml(item.copy) + '</p>',
+                '<div class="shop-price-row"><strong>' + escapeHtml(item.price + " монет") + '</strong></div>',
+                '<div class="shop-actions"><button class="primary-button" data-shop-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.buy(\'' + escapeJs(item.id) + '\')"' + (alreadyOwned ? ' disabled' : '') + '>' + escapeHtml(buttonLabel) + '</button></div>',
+                '</article>'
+            ].join("");
         }).join(""), '</section>'].join("");
-    }
-
-    function renderShopPreview(item) {
-        if (item.section !== "premium") {
-            return "";
-        }
-        if (item.previewType === "skin") {
-            return '<div class="shop-preview shop-preview-skin shop-preview-' + escapeHtml(item.previewTone || "crimson") + '"><div class="shop-preview-avatar">П</div></div>';
-        }
-        return '<div class="shop-preview shop-preview-backdrop shop-preview-' + escapeHtml(item.previewTone || "polar") + '"></div>';
     }
 
     function viewFriendProfile(friendId) {
@@ -5812,8 +5957,8 @@
         if (!item) {
             return;
         }
-        if (item.section === "premium") {
-            showToast("Премиальный раздел временно в работе.");
+        if (hasAugment(item.augmentId)) {
+            showToast("Эта аугментация уже куплена.");
             return;
         }
         if (state.player.money < item.price) {
@@ -5825,8 +5970,8 @@
         }
 
         state.player.money -= item.price;
-        addItem(item.itemId, 1);
-        addJournal("Покупка: «" + item.name + "». -" + item.price + " монет.");
+        unlockAugment(item.augmentId);
+        addJournal("Покупка аугментации: «" + item.name + "». -" + item.price + " монет.");
         showToast("Куплено: " + item.name + ".");
         saveState();
         renderAll();
@@ -5890,7 +6035,14 @@
     }
     function triggerScheduledJournalEvent() {
         if (!state.world) {
-            state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} };
+            state.world = {
+                lastJournalEventAt: Date.now(),
+                lastFriendSyncAt: 0,
+                lastJournalEventId: null,
+                journalEventHistory: {},
+                currentJournalArea: "street",
+                areaEventCount: 0
+            };
         }
         const now = Date.now();
         const lastJournalEventAt = Number(state.world.lastJournalEventAt || 0);
@@ -5905,7 +6057,11 @@
             const eventEntry = pickJournalEvent(pointer);
             if (eventEntry) {
                 rememberJournalEvent(eventEntry, pointer);
-                addJournal(eventEntry.text, { sourceEventId: eventEntry.id, location: eventEntry.location });
+                addJournal(eventEntry.text, {
+                    sourceEventId: eventEntry.id,
+                    location: eventEntry.location,
+                    locationLabel: eventEntry.locationLabel || JOURNAL_LOCATION_LABELS[eventEntry.location] || "Город"
+                });
             }
         }
         state.world.lastJournalEventAt = now;
