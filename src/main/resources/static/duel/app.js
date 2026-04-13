@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v28";
+    const STORAGE_KEY = "polus_frontend_prototype_v29";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -5081,7 +5081,7 @@
 
     function buildInitialState() {
         return {
-            version: 28,
+            version: 29,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
@@ -5101,7 +5101,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 28;
+        next.version = 29;
         next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
         next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
@@ -5152,7 +5152,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 28 ? parsed : buildInitialState();
+            return parsed && parsed.version === 29 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();

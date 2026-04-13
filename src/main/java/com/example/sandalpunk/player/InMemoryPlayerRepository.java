@@ -4,9 +4,11 @@ import java.util.Optional;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@ConditionalOnProperty(name = "app.storage", havingValue = "inmemory")
 public class InMemoryPlayerRepository implements PlayerRepository {
 
     private final ConcurrentHashMap<String, PlayerProfile> players = new ConcurrentHashMap<>();

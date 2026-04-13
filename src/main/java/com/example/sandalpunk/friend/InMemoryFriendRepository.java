@@ -6,9 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@ConditionalOnProperty(name = "app.storage", havingValue = "inmemory")
 public class InMemoryFriendRepository implements FriendRepository {
 
     private final ConcurrentHashMap<String, FriendRequest> requests = new ConcurrentHashMap<>();

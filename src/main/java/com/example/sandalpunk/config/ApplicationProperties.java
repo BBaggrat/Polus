@@ -7,7 +7,7 @@ public class ApplicationProperties {
 
     private String name = "sandalpunk";
     private String baseUrl = "http://localhost:8080";
-    private String storage = "inmemory";
+    private String storage = "jdbc";
     private boolean allowDevSessions = true;
     private final Bot bot = new Bot();
     private final Database db = new Database();
@@ -107,4 +107,3 @@ public class ApplicationProperties {
         }
     }
 }
-
