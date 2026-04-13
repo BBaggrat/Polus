@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v27";
+    const STORAGE_KEY = "polus_frontend_prototype_v28";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -1818,14 +1818,10 @@
     }
 
     function shouldSupportEvade(side) {
-        return side === "player" && hasAugment("defense-evasion") && Math.random() < 0.05;
+        return false;
     }
 
     function projectileBlocked(attackerSide, defenderWeapon, weaponCode, shotCode) {
-        const defenderSide = attackerSide === "player" ? "opponent" : "player";
-        if (defenderSide === "player" && hasAugment("support-block") && Math.random() < 0.05) {
-            return true;
-        }
         if (weaponCode === "RIFLE" || defenderWeapon !== "PISTOLS" || ignoresBlocking(attackerSide)) {
             return false;
         }
@@ -1842,11 +1838,20 @@
     }
 
     function getWeaponGrazeBonus(side, weaponCode) {
-        return side === "player" && hasAugment("weapon-graze") ? 0.25 : 0;
+        return 0;
     }
 
     function getWeaponDamageBonus(side, weaponCode) {
         return side === "player" && hasAugment("weapon-overdrive") ? 5 : 0;
+    }
+
+    function rollWeaponGamble(side) {
+        if (side !== "player" || !hasAugment("weapon-gamble")) {
+            return { jammed: false, doubleDamage: false };
+        }
+        const jammed = Math.random() < 0.05;
+        const doubleDamage = !jammed && Math.random() < 0.05;
+        return { jammed: jammed, doubleDamage: doubleDamage };
     }
 
     function applyDefenseReduction(side, damage, isGraze, lines, defenderName) {
@@ -1863,7 +1868,7 @@
     }
 
     function getPlayerMaxHp() {
-        return hasAugment("support-hp") ? 115 : 100;
+        return hasAugment("defense-vital") ? 115 : 100;
     }
 
     function triggerRandomJournalEvent() {
@@ -2316,7 +2321,7 @@
     }
 
     function setShopSection(section) {
-        state.ui.shopSection = ["weapon", "defense", "support"].indexOf(section) >= 0 ? section : "weapon";
+        state.ui.shopSection = ["weapon", "defense"].indexOf(section) >= 0 ? section : "weapon";
         saveState();
         renderShop();
     }
@@ -3875,13 +3880,13 @@
 
     function resolveAttack(attackerName, defenderName, attackerAction, defenderAction, attackerSide) {
         const lines = [];
+        const gamble = rollWeaponGamble(attackerSide);
+        if (gamble.jammed) {
+            lines.push(attackerName + " дает осечку и не стреляет.");
+            return { damage: 0, lines: lines };
+        }
         const lineMatched = attackerAction.shot === defenderAction.dodge;
         if (!lineMatched && attackerAction.weapon !== "SHOTGUN") {
-            if (getWeaponGrazeBonus(attackerSide, attackerAction.weapon) > 0 && Math.random() < getWeaponGrazeBonus(attackerSide, attackerAction.weapon)) {
-                let grazeDamage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", 2, true, lines, defenderName);
-                lines.push(attackerName + " цепляет краем и наносит " + grazeDamage + " урона.");
-                return { damage: grazeDamage, lines: lines };
-            }
             lines.push(attackerName + " промахивается мимо линии.");
             return { damage: 0, lines: lines };
         }
@@ -4996,7 +5001,6 @@
         safeSetText("#screen-shop .panel-title", "Магазин");
         safeSetText(".shop-tab[data-shop-section='weapon']", "Оружейная");
         safeSetText(".shop-tab[data-shop-section='defense']", "Защитная");
-        safeSetText(".shop-tab[data-shop-section='support']", "Вспомогательная");
         safeSetText(".nav-button[data-nav-target='home'] .nav-title", "Хаб");
         safeSetText(".nav-button[data-nav-target='inventory'] .nav-title", "Инвентарь");
         safeSetText(".nav-button[data-nav-target='friends'] .nav-title", "Друзья");
@@ -5040,14 +5044,14 @@
                 price: 500
             },
             {
-                id: "augment-weapon-graze",
+                id: "augment-weapon-gamble",
                 section: "weapon",
                 kind: "augment",
-                augmentId: "weapon-graze",
+                augmentId: "weapon-gamble",
                 slot: "weapon",
-                name: "Смещённый резонатор",
-                effect: "Зацеп 2 урона",
-                copy: "Любое оружие получает 25% шанс зацепить на 2 урона.",
+                name: "Рискованный затвор",
+                effect: "5% двойной урон · 5% осечка",
+                copy: "Иногда удваивает урон, но с тем же шансом срывает выстрел.",
                 price: 500
             },
             {
@@ -5062,36 +5066,14 @@
                 price: 500
             },
             {
-                id: "augment-defense-evasion",
+                id: "augment-defense-vital",
                 section: "defense",
                 kind: "augment",
-                augmentId: "defense-evasion",
+                augmentId: "defense-vital",
                 slot: "defense",
-                name: "Инерционный кожух",
-                effect: "5% шанс избежать пули",
-                copy: "Добавляет 5% шанс избежать любого пулевого попадания.",
-                price: 500
-            },
-            {
-                id: "augment-support-hp",
-                section: "support",
-                kind: "augment",
-                augmentId: "support-hp",
-                slot: "support",
-                name: "Стим-петля",
+                name: "Усиленный каркас",
                 effect: "+15 здоровья",
                 copy: "Повышает запас здоровья на 15.",
-                price: 500
-            },
-            {
-                id: "augment-support-block",
-                section: "support",
-                kind: "augment",
-                augmentId: "support-block",
-                slot: "support",
-                name: "Фазовый экран",
-                effect: "5% шанс блока",
-                copy: "С вероятностью 5% блокирует любой выстрел.",
                 price: 500
             }
         ];
@@ -5099,7 +5081,7 @@
 
     function buildInitialState() {
         return {
-            version: 27,
+            version: 28,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
@@ -5119,7 +5101,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 27;
+        next.version = 28;
         next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
         next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
@@ -5139,6 +5121,9 @@
         next.world.currentJournalArea = next.world.currentJournalArea || "street";
         next.world.areaEventCount = Number(next.world.areaEventCount || 0);
         next.ui = Object.assign({ screen: "home", activeQuestId: null, shopSection: "weapon", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, duelResult: null }, next.ui || {});
+        if (["weapon", "defense"].indexOf(next.ui.shopSection) === -1) {
+            next.ui.shopSection = "weapon";
+        }
         next.ui.startDuelAction = null;
         next.inventory = next.inventory || { equipped: [], augmentSlots: {}, unlockedAugments: [], backpack: [] };
         next.inventory.unlockedAugments = Array.isArray(next.inventory.unlockedAugments) ? next.inventory.unlockedAugments : [];
@@ -5167,7 +5152,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 27 ? parsed : buildInitialState();
+            return parsed && parsed.version === 28 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -5402,15 +5387,7 @@
         }).join("");
     }
     function getDisplayFriends() {
-        const actual = Array.isArray(state.friends) ? state.friends.slice() : [];
-        const placeholderFriends = [
-            { id: "demo-friend-1", name: "Ледовый Пульс", status: "online", rating: 120 },
-            { id: "demo-friend-2", name: "Северный Узел", status: "offline", rating: 95 }
-        ];
-        const takenIds = new Set(actual.map(function (friend) { return friend.id; }));
-        return actual.concat(placeholderFriends.filter(function (friend) {
-            return !takenIds.has(friend.id);
-        }));
+        return Array.isArray(state.friends) ? state.friends.slice() : [];
     }
     function renderFriends() {
         refreshStaticCopy();
@@ -5509,8 +5486,7 @@
         }
         const sections = [
             { id: "weapon", title: "Оружейная аугментация", empty: "Купленные оружейные модули появятся здесь." },
-            { id: "defense", title: "Защитная аугментация", empty: "Купленные защитные модули появятся здесь." },
-            { id: "support", title: "Вспомогательная аугментация", empty: "Купленные вспомогательные модули появятся здесь." }
+            { id: "defense", title: "Защитная аугментация", empty: "Купленные защитные модули появятся здесь." }
         ];
         elements.inventoryPlaceholder.innerHTML = sections.map(function (section) {
             const owned = getOwnedAugments(section.id);
@@ -5685,12 +5661,20 @@
                 return { damage: 0, lines: lines };
             }
             let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+            if (gamble.doubleDamage) {
+                damage *= 2;
+                lines.push(attackerName + " срабатывает на двойной урон.");
+            }
             damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, defenderName);
             lines.push(attackerName + " попадает " + weaponInstrumentLabel(attackerAction.weapon) + " и наносит " + damage + " урона.");
             return { damage: damage, lines: lines };
         }
         if (attackerAction.weapon === "RIFLE") {
             let damage = 30 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+            if (gamble.doubleDamage) {
+                damage *= 2;
+                lines.push(attackerName + " срабатывает на двойной урон.");
+            }
             damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, defenderName);
             lines.push(attackerName + " попадает " + weaponInstrumentLabel(attackerAction.weapon) + " и наносит " + damage + " урона.");
             return { damage: damage, lines: lines };
@@ -5719,6 +5703,10 @@
             return { damage: 0, lines: lines };
         }
         let damage = pelletsHit * 5 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+        if (gamble.doubleDamage) {
+            damage *= 2;
+            lines.push(attackerName + " срабатывает на двойной урон.");
+        }
         damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, pelletsHit < 3, lines, defenderName);
         let summary = attackerName + " попадает " + pluralizeHits(pelletsHit) + " и наносит " + damage + " урона.";
         if (pelletsBlocked) {
