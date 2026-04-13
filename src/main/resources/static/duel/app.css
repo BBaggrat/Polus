@@ -534,7 +534,35 @@ button {
 }
 
 .journal-panel {
-    min-height: 260px;
+    min-height: 320px;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    margin-top: 8px;
+}
+
+.journal-panel .panel-header {
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 4px;
+}
+
+.journal-header-copy {
+    display: grid;
+    gap: 8px;
+}
+
+.journal-zone-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.journal-zone-label {
+    color: var(--muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .journal-list,
@@ -548,6 +576,16 @@ button {
 .duel-log-list {
     display: grid;
     gap: 12px;
+}
+
+.journal-panel .journal-list {
+    max-height: 440px;
+    overflow: auto;
+    margin-top: 4px;
+    padding-right: 4px;
+    align-content: start;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 .journal-entry,
@@ -1524,7 +1562,7 @@ body.duel-open .bottom-nav {
 .social-chat-fab {
     position: fixed;
     right: 18px;
-    bottom: 126px;
+    bottom: 172px;
     z-index: 8;
     display: inline-flex;
     align-items: center;
@@ -1557,18 +1595,18 @@ body.duel-open .bottom-nav {
 
 .social-chat-panel {
     position: fixed;
-    top: max(72px, env(safe-area-inset-top) + 12px);
+    top: max(60px, env(safe-area-inset-top) + 8px);
     right: 16px;
-    bottom: max(132px, env(safe-area-inset-bottom) + 18px);
+    bottom: max(10px, env(safe-area-inset-bottom) + 10px);
     left: 16px;
-    z-index: 24;
+    z-index: 28;
     width: min(860px, calc(100vw - 32px));
     margin: 0 auto;
     max-height: none;
     padding: 18px 14px 16px;
     border-radius: 28px;
     border: 1px solid var(--line);
-    background: #0d1424;
+    background: #0b1322;
     box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55), 0 0 0 999px rgba(4, 8, 16, 0.55);
     overflow: hidden;
     overscroll-behavior: contain;
@@ -1587,7 +1625,7 @@ body.duel-open .bottom-nav {
 
 .social-chat-layout {
     display: grid;
-    grid-template-columns: 148px minmax(0, 1fr);
+    grid-template-columns: 228px minmax(0, 1fr);
     gap: 12px;
     min-height: 0;
     height: 100%;
@@ -1598,7 +1636,8 @@ body.duel-open .bottom-nav {
     gap: 8px;
     align-content: start;
     overflow: auto;
-    padding: 6px;
+    min-height: 220px;
+    padding: 10px;
     border-radius: 18px;
     background: rgba(9, 14, 25, 1);
     -webkit-overflow-scrolling: touch;
@@ -1637,7 +1676,8 @@ body.duel-open .bottom-nav {
     grid-template-rows: auto 1fr auto;
     gap: 10px;
     min-height: 0;
-    padding: 10px;
+    min-width: 0;
+    padding: 12px;
     border-radius: 18px;
     background: rgba(9, 14, 25, 1);
     overflow: hidden;
@@ -1713,6 +1753,7 @@ body.duel-open .bottom-nav {
     gap: 10px;
     align-items: stretch;
     margin-top: auto;
+    min-width: 0;
 }
 
 .social-chat-input {
@@ -1720,7 +1761,7 @@ body.duel-open .bottom-nav {
 }
 
 .social-chat-send {
-    min-width: 120px;
+    min-width: 104px;
     width: 100%;
     padding-inline: 12px;
 }
@@ -2144,43 +2185,44 @@ body.social-open .social-chat-fab {
     }
 
     .social-chat-panel {
-        top: max(72px, env(safe-area-inset-top) + 10px);
+        top: max(56px, env(safe-area-inset-top) + 6px);
         right: 10px;
-        bottom: max(132px, env(safe-area-inset-bottom) + 26px);
+        bottom: max(8px, env(safe-area-inset-bottom) + 8px);
         left: 10px;
         width: auto;
         max-height: none;
-        padding: 14px 12px 14px;
+        padding: 14px 12px 12px;
         border-radius: 24px;
     }
 
     .social-chat-layout {
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(0, 1fr);
+        grid-template-rows: minmax(180px, auto) minmax(0, 1fr);
         gap: 10px;
         height: 100%;
     }
 
     .social-chat-thread-list {
-        max-height: 136px;
+        min-height: 180px;
+        max-height: 240px;
     }
 
     .social-chat-thread-view {
-        padding: 10px 8px;
+        padding: 12px 10px;
     }
 
     .social-chat-form {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 8px;
     }
 
     .social-chat-send {
-        min-width: 0;
+        min-width: 92px;
     }
 
     .social-chat-fab {
         right: 14px;
-        bottom: 126px;
+        bottom: 164px;
     }
 
     .bottom-nav {

@@ -1,17 +1,15 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v23";
+    const STORAGE_KEY = "polus_frontend_prototype_v26";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
     const JOURNAL_EVENT_MS = 60000;
     const DUEL_ROUND_TIMEOUT_MS = 2 * 60 * 1000;
-    const LEVEL_THRESHOLDS = [100, 200, 350, 500];
     const SHIELD_BLOCK_CHANCE = 0.30;
     const SHOTGUN_EDGE_GRAZE_CHANCE = 0.35;
     const SHOTGUN_EDGE_DAMAGE = 5;
     const BATTLE_VICTORY_COINS = 100;
     const BATTLE_DEFEAT_COINS = 25;
-    const BATTLE_REWARD_EXPERIENCE = 0;
     const PVP_RATING_DELTA = 10;
     const CHAT_LINK_PATTERN = /(?:https?:\/\/|www\.|t\.me\/|telegram\.me\/|[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|\b))/i;
     const JOURNAL_FREQUENCY_WEIGHTS = {
@@ -22,6 +20,12 @@
         UNIQUE: 0.08
     };
     const JOURNAL_EVENT_CATALOG = normalizeJournalEventCatalog(window.POLUS_JOURNAL_EVENTS || []);
+    const JOURNAL_LOCATION_LABELS = {
+        street: "Город",
+        tavern: "Трактир",
+        arena: "Арена",
+        market: "Рынок"
+    };
     const SIMPLE_JOURNAL_EVENTS = [
         "Случайное событие: на крыше снова воет ледяной ветер.",
         "Случайное событие: на рынке заговорили о новой дуэльной площадке.",
@@ -32,14 +36,14 @@
         "Случайное событие: курьер привез свежие вести с южного коридора.",
         "Случайное событие: сторож заметил свет в заброшенном ангаре."
     ];
-    const DIRECTION_TERMS = ["РїРѕ С†РµРЅС‚СЂСѓ", "РІР»РµРІРѕ", "РІРїСЂР°РІРѕ"];
+    const DIRECTION_TERMS = ["по центру", "влево", "вправо"];
     const ITEM_LIBRARY = {
-        cartridges38: { id: "cartridges38", name: "РџР°С‚СЂРѕРЅС‹ .38", description: "Р”РµСЂР¶Р°С‚СЃСЏ РІ РєР°СЂРјР°РЅРµ. РўРµРїР»С‹Рµ РѕС‚ Р»Р°РґРѕРЅРё.", pocket: true },
-        medkit: { id: "medkit", name: "РђРїС‚РµС‡РєР°", description: "Р‘РёРЅС‚С‹ Рё СЃС‚РёРј. +30 HP РІ Р±РѕСЋ.", pocket: true, usable: true },
-        brassGear: { id: "brassGear", name: "Р›Р°С‚СѓРЅРЅР°СЏ С€РµСЃС‚РµСЂРЅСЏ", description: "РўСЏР¶РµР»Р°СЏ, Р·СѓР±Р°СЃС‚Р°СЏ, РїР°С…РЅРµС‚ РјР°СЃР»РѕРј." },
-        relicBox: { id: "relicBox", name: "РЁРєР°С‚СѓР»РєР° СЃ РіСЂР°РІРёСЂРѕРІРєРѕР№", description: "РЎРµРјРµР№РЅР°СЏ РІРµС‰СЊ РёР· С‚СЂР°РєС‚РёСЂР°. Р—Р° РЅРµРµ РјРЅРѕРіРѕ СЃРїРѕСЂСЏС‚." },
-        iceToken: { id: "iceToken", name: "Р›РµРґСЏРЅРѕР№ Р¶РµС‚РѕРЅ", description: "РћС‚РєСЂС‹РІР°РµС‚ СЃС‚Р°СЂС‹Рµ РєР°РјРµСЂС‹ Рё С‡СѓР¶РёРµ СЂР°Р·РіРѕРІРѕСЂС‹.", pocket: true },
-        scrapMap: { id: "scrapMap", name: "РњСЏС‚Р°СЏ РєР°СЂС‚Р° Р»СЊРґР°", description: "РќР° РїРѕР»СЏС… РѕС‚РјРµС‡РµРЅС‹ Р±РµР·РѕРїР°СЃРЅС‹Рµ С‚СЂРѕРїС‹.", pocket: true }
+        cartridges38: { id: "cartridges38", name: "Патроны .38", description: "Стандартный боезапас для короткой линии.", pocket: true },
+        medkit: { id: "medkit", name: "Аптечка", description: "Полевой набор для быстрого восстановления.", pocket: true, usable: true },
+        brassGear: { id: "brassGear", name: "Латунная шестерня", description: "Тяжелая деталь для мастерских заказов." },
+        relicBox: { id: "relicBox", name: "Реликварий", description: "Старая коробка с приметами прежнего хозяина." },
+        iceToken: { id: "iceToken", name: "Ледяной жетон", description: "Холодный знак доступа к старым секторам.", pocket: true },
+        scrapMap: { id: "scrapMap", name: "Схема тоннелей", description: "Смятая карта с безопасными обходами.", pocket: true }
     };
     const QUEST_SCENES = {
         familyRelic: {
@@ -293,6 +297,7 @@
         elements.registrationError = document.getElementById("registration-error");
         elements.registrationSubmit = document.getElementById("registration-submit");
         elements.journalList = document.getElementById("journal-list");
+        elements.journalZone = document.getElementById("journal-zone");
         elements.questList = document.getElementById("quest-list");
         elements.questDetailTitle = document.getElementById("quest-detail-title");
         elements.questDetailSubtitle = document.getElementById("quest-detail-subtitle");
@@ -2280,7 +2285,7 @@
             return "";
         }
         if (item.previewType === "skin") {
-            return '<div class="shop-preview shop-preview-skin shop-preview-' + escapeHtml(item.previewTone || "crimson") + '"><div class="shop-preview-avatar">Р</div></div>';
+            return '<div class="shop-preview shop-preview-skin shop-preview-' + escapeHtml(item.previewTone || "crimson") + '"><div class="shop-preview-avatar">Р В</div></div>';
         }
         return '<div class="shop-preview shop-preview-backdrop shop-preview-' + escapeHtml(item.previewTone || "polar") + '"></div>';
     }
@@ -2349,7 +2354,7 @@
         duel.chatError = duel.chatError || "";
         syncDuelInputs(duel);
         elements.duelTitle.textContent = "Р”СѓСЌР»СЊ";
-        elements.duelRoundPill.textContent = "Р Р°СѓРЅРґ " + duel.round;
+        elements.duelRoundPill.textContent = "Р В Р В°РЎС“Р Р…Р Т‘ " + duel.round;
         elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
         elements.duelYouName.textContent = duel.playerName || "РРіСЂРѕРє";
         elements.duelYouMeta.textContent = "";
@@ -2382,7 +2387,7 @@
             elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(function (entry) {
                 const roundNumber = typeof entry.round === "number" ? entry.round : entry.roundNumber;
                 const lines = Array.isArray(entry.lines) ? entry.lines : [];
-                const title = lines.length ? lines[0] : "Р Р°СѓРЅРґ " + roundNumber;
+                const title = lines.length ? lines[0] : "Р В Р В°РЎС“Р Р…Р Т‘ " + roundNumber;
                 const detailLines = lines.slice(1);
                 return '<div class="duel-log-round"><p class="duel-log-round-title">' + decorateText(title) + '</p>' + detailLines.map(function (line) {
                     return '<p class="duel-log-line">' + decorateText(line) + "</p>";
@@ -2792,7 +2797,7 @@
             sourceEventId: details.sourceEventId || null,
             location: details.location || null
         });
-        state.journal = state.journal.slice(0, 12);
+        state.journal = state.journal.slice(0, 20);
     }
 
     function hasItem(itemId) {
@@ -3001,12 +3006,12 @@
         const remainderTen = count % 10;
         const remainderHundred = count % 100;
         if (remainderTen === 1 && remainderHundred !== 11) {
-            return count + " СЂР°Р·";
+            return count + " РЎР‚Р В°Р В·";
         }
         if (remainderTen >= 2 && remainderTen <= 4 && (remainderHundred < 12 || remainderHundred > 14)) {
-            return count + " СЂР°Р·Р°";
+            return count + " РЎР‚Р В°Р В·Р В°";
         }
-        return count + " СЂР°Р·";
+        return count + " РЎР‚Р В°Р В·";
     }
 
     function getLevelProgressSnapshot(experience) {
@@ -3645,7 +3650,7 @@
         elements.duelYouAvatar.textContent = (duel.playerName || "И").slice(0, 1).toUpperCase();
         elements.duelOpponentName.textContent = duel.opponentName || "Соперник";
         elements.duelOpponentMeta.textContent = "";
-        elements.duelOpponentAvatar.textContent = (duel.opponentName || "С").slice(0, 1).toUpperCase();
+        elements.duelOpponentAvatar.textContent = (duel.opponentName || "РЎ").slice(0, 1).toUpperCase();
         elements.duelYouHp.textContent = duel.playerHp + " HP";
         elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
@@ -4062,7 +4067,7 @@
         elements.duelYouAvatar.textContent = (duel.playerName || "И").slice(0, 1).toUpperCase();
         elements.duelOpponentName.textContent = duel.opponentName || "Соперник";
         elements.duelOpponentMeta.textContent = "";
-        elements.duelOpponentAvatar.textContent = (duel.opponentName || "С").slice(0, 1).toUpperCase();
+        elements.duelOpponentAvatar.textContent = (duel.opponentName || "РЎ").slice(0, 1).toUpperCase();
         elements.duelYouHp.textContent = duel.playerHp + " HP";
         elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
@@ -4815,7 +4820,7 @@
         elements.duelYouAvatar.textContent = (duel.playerName || "И").slice(0, 1).toUpperCase();
         elements.duelOpponentName.textContent = duel.opponentName || "Соперник";
         elements.duelOpponentMeta.textContent = "";
-        elements.duelOpponentAvatar.textContent = (duel.opponentName || "С").slice(0, 1).toUpperCase();
+        elements.duelOpponentAvatar.textContent = (duel.opponentName || "РЎ").slice(0, 1).toUpperCase();
         elements.duelYouHp.textContent = duel.playerHp + " HP";
         elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
@@ -4954,9 +4959,8 @@
         safeSetText(".queue-status-label", "Поиск дуэли");
         safeSetText("#queue-cancel-button", "Отменить");
         safeSetText("#home-journal-panel .panel-title-small", "Дневник");
+        safeSetText(".journal-zone-label", "Зона");
         safeSetText("#screen-inventory .panel-title", "Инвентарь");
-        safeSetText("#inventory-placeholder h3", "Раздел в переработке");
-        safeSetText("#inventory-placeholder p", "Инвентарь временно скрыт до следующей версии.");
         safeSetText("#screen-friends .panel-title", "Друзья");
         safeSetText("#friend-search-input", null, "placeholder", "Найти игрока по никнейму");
         safeSetText("#friend-search-form .primary-button", "Добавить");
@@ -4973,15 +4977,15 @@
         safeSetText("#social-chat-input", null, "placeholder", "Напиши сообщение");
         safeSetText("#social-chat-send", "Отправить");
         safeSetText("#registration-modal .panel-title-small", "Регистрация игрока");
-        safeSetText("#registration-copy", "Введи никнейм. Аккаунт будет закреплен за твоим Telegram ID.");
+        safeSetText("#registration-copy", "Ник будет привязан к твоему Telegram ID.");
         safeSetText("label[for='registration-nickname']", "Никнейм");
-        safeSetText("#registration-nickname", null, "placeholder", "Например, СеверныйВолк");
+        safeSetText("#registration-nickname", null, "placeholder", "Например, Бакунин");
         safeSetText("#registration-submit", "Создать аккаунт");
         safeSetText("#start-duel-title", "Начать бой?");
         safeSetText("#start-duel-copy", "Подтверди, что хочешь войти в бой.");
-        safeSetText("#start-duel-cancel", "Нет, остаться в хабе");
+        safeSetText("#start-duel-cancel", "Нет, вернуться в хаб");
         safeSetText("#start-duel-confirm", "Да, начать бой");
-        safeSetText("#duel-exit-cancel", "Нет, вернуться");
+        safeSetText("#duel-exit-cancel", "Нет, остаться");
         safeSetText("#duel-exit-confirm", "Да, выйти");
         safeSetText("#duel-tab-logs", "Логи");
         safeSetText("#duel-tab-chat", "Чат");
@@ -4991,20 +4995,19 @@
         safeSetText("#duel-result-title", "Бой завершен");
         safeSetText("#duel-result-close", "В хаб");
     }
-
     function buildShopCatalog() {
         return [
             { id: "shop-medkit", section: "standard", kind: "item", itemId: "medkit", name: "Аптечка", price: 20 },
             { id: "shop-gear", section: "standard", kind: "item", itemId: "brassGear", name: "Латунная шестерня", price: 18 },
             { id: "shop-ammo", section: "standard", kind: "item", itemId: "cartridges38", name: "Патроны .38", price: 9 },
-            { id: "premium-skin-crimson", section: "premium", kind: "premium", name: "Скин «Багряный кобальт»", price: 149, previewType: "skin", previewTone: "crimson" },
-            { id: "premium-backdrop-polar", section: "premium", kind: "premium", name: "Фон «Полярная латунь»", price: 199, previewType: "backdrop", previewTone: "polar" }
+            { id: "premium-skin-crimson", section: "premium", kind: "premium", name: "Скин «Багряный фронт»", price: 149, previewType: "skin", previewTone: "crimson" },
+            { id: "premium-backdrop-polar", section: "premium", kind: "premium", name: "Фон «Полярная витрина»", price: 199, previewType: "backdrop", previewTone: "polar" }
         ];
     }
 
     function buildInitialState() {
         return {
-            version: 23,
+            version: 25,
             auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
             player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
@@ -5024,7 +5027,7 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 23;
+        next.version = 25;
         next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
         next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
@@ -5056,7 +5059,7 @@
         }) : [];
         next.premium = next.premium || { owned: [] };
         next.shop = buildShopCatalog();
-        next.journal = Array.isArray(next.journal) ? next.journal.filter(Boolean).slice(0, 12) : [];
+        next.journal = Array.isArray(next.journal) ? next.journal.filter(Boolean).slice(0, 20) : [];
         next.quests = Array.isArray(next.quests) ? next.quests : [];
         return next;
     }
@@ -5068,7 +5071,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 23 ? parsed : buildInitialState();
+            return parsed && parsed.version === 25 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();
@@ -5231,28 +5234,34 @@
         if (!elements.journalList) {
             return;
         }
+        const latestLocation = state.journal.length && state.journal[0].location
+            ? state.journal[0].location
+            : "street";
+        if (elements.journalZone) {
+            elements.journalZone.textContent = JOURNAL_LOCATION_LABELS[latestLocation] || "Город";
+        }
         if (!state.journal.length) {
-            elements.journalList.innerHTML = '<article class="journal-entry"><p>Записей пока нет.</p><small>Новые заметки появятся здесь.</small></article>';
+            elements.journalList.innerHTML = '<article class="journal-entry"><p>Записей пока нет.</p><small>Новые заметки появятся здесь автоматически.</small></article>';
             return;
         }
-        elements.journalList.innerHTML = state.journal.slice(0, 6).map(function (entry) {
-            return '<article class="journal-entry"><p>' + decorateText(entry.text) + '</p><small>' + escapeHtml(formatTimestamp(entry.createdAt)) + '</small></article>';
+        elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
+            const zoneLabel = JOURNAL_LOCATION_LABELS[entry.location] || "Город";
+            return '<article class="journal-entry"><p>' + decorateText(entry.text) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt)) + '</small></article>';
         }).join("");
     }
-
     function getDisplayFriends() {
         const actual = Array.isArray(state.friends) ? state.friends.slice() : [];
         const placeholderFriends = [
-            { id: "demo-friend-1", name: "ЛедовыйПульс", status: "online", rating: 120 },
-            { id: "demo-friend-2", name: "СеверныйУзел", status: "offline", rating: 95 }
+            { id: "demo-friend-1", name: "Ледовый Пульс", status: "online", rating: 120 },
+            { id: "demo-friend-2", name: "Северный Узел", status: "offline", rating: 95 }
         ];
         const takenIds = new Set(actual.map(function (friend) { return friend.id; }));
         return actual.concat(placeholderFriends.filter(function (friend) {
             return !takenIds.has(friend.id);
         }));
     }
-
     function renderFriends() {
+        refreshStaticCopy();
         const requests = Array.isArray(state.friendRequests) ? state.friendRequests : [];
         const friends = getDisplayFriends();
         elements.friendRequestBadge.textContent = String(Math.min(9, requests.length));
@@ -5288,7 +5297,6 @@
             ].join('');
         }).join('') : '<article class="friend-card"><p>Пока друзей нет. Найди игрока по никнейму и отправь запрос.</p></article>';
     }
-
     function renderSocialInbox() {
         refreshStaticCopy();
         if (!elements.socialChatPanel) {
@@ -5351,28 +5359,27 @@
             medkit: "Аптечка",
             brassGear: "Латунная шестерня",
             cartridges38: "Патроны .38",
-            relicBox: "Шкатулка с гравировкой",
+            relicBox: "Реликварий",
             iceToken: "Ледяной жетон",
-            scrapMap: "Мятая карта льда"
+            scrapMap: "Схема тоннелей"
         };
         const backpack = Array.isArray(state.inventory && state.inventory.backpack) ? state.inventory.backpack : [];
         const backpackMarkup = backpack.length
             ? backpack.map(function (item) {
-                return '<article class="inventory-card is-passive"><h3>' + escapeHtml(inventoryLabels[item.id] || item.id) + '</h3><p>Количество: ' + escapeHtml(String(item.quantity || 0)) + '</p><small class="inventory-meta">Без бонусов. Только для интерфейса и будущих систем.</small></article>';
+                return '<article class="inventory-card is-passive"><h3>' + escapeHtml(inventoryLabels[item.id] || item.id) + '</h3><p>Количество: ' + escapeHtml(String(item.quantity || 0)) + '</p></article>';
             }).join("")
-            : '<article class="inventory-card is-passive"><h3>Рюкзак пуст</h3><p>Предметы появятся после покупок и будущих механик.</p><small class="inventory-meta">Пока раздел работает как визуальная заглушка.</small></article>';
+            : '<article class="inventory-card is-passive"><h3>Рюкзак пуст</h3><p>Новые предметы будут появляться здесь после покупок и событий.</p></article>';
         elements.inventoryPlaceholder.innerHTML = [
             '<section class="inventory-layout">',
-            '<article class="inventory-card"><h3>Оружейная аугментация</h3><p>Слот свободен.</p><small class="inventory-meta">Без бонусов. Только для визуального прототипа.</small></article>',
-            '<article class="inventory-card"><h3>Броня</h3><p>Слот свободен.</p><small class="inventory-meta">Без бонусов. Только для визуального прототипа.</small></article>',
-            '<article class="inventory-card"><h3>Вспомогательная</h3><p>Слот свободен.</p><small class="inventory-meta">Без бонусов. Только для визуального прототипа.</small></article>',
+            '<article class="inventory-card"><h3>Оружейная аугментация</h3><p>Слот пуст.</p></article>',
+            '<article class="inventory-card"><h3>Броня</h3><p>Слот пуст.</p></article>',
+            '<article class="inventory-card"><h3>Вспомогательная</h3><p>Слот пуст.</p></article>',
             '</section>',
             '<section class="inventory-list">',
             backpackMarkup,
             '</section>'
         ].join("");
     }
-
     function renderShop() {
         const activeSection = state.ui.shopSection || "standard";
         elements.shopTabButtons.forEach(function (button) {
@@ -5390,7 +5397,7 @@
             const ownedPremium = item.section === "premium" && state.premium.owned.indexOf(item.id) >= 0;
             const alreadyOwned = ownedPremium || item.section === "premium";
             const priceLabel = item.section === "premium" ? item.price + " " + RUBLE_SIGN : item.price + " монет";
-            const buttonLabel = item.section === "premium" ? "Скоро" : "Купить";
+            const buttonLabel = item.section === "premium" ? "Подробнее" : "Купить";
             return '<article class="shop-card' + (item.section === "premium" ? " shop-card-premium" : "") + '">' + renderShopPreview(item) + '<h3>' + escapeHtml(item.name) + '</h3><div class="shop-price-row"><strong>' + escapeHtml(priceLabel) + '</strong></div><div class="shop-actions"><button class="' + (item.section === "premium" ? "secondary-button" : "primary-button") + '" data-shop-id="' + escapeHtml(item.id) + '" type="button" onclick="window.PolusApp && window.PolusApp.buy(\'' + escapeJs(item.id) + '\')"' + (alreadyOwned ? " disabled" : "") + '>' + escapeHtml(buttonLabel) + '</button></div></article>';
         }).join(""), '</section>'].join("");
     }
@@ -5415,18 +5422,18 @@
     function buildLiveResultText(payload) {
         if (payload.status === "FINISHED") {
             if (payload.resultLabel === "VICTORY") {
-                return "Победа. Этот матч остался за тобой.";
+                return "Победа. Бой завершен в твою пользу.";
             }
             if (payload.resultLabel === "DEFEAT") {
-                return "Поражение. В этот раз темп ушел сопернику.";
+                return "Поражение. В этом бою верх взял соперник.";
             }
-            return "Ничья. Оба бойца удержали линию до конца.";
+            return "Ничья. Оба бойца пережили размен.";
         }
         if (payload.yourActionSubmitted && !payload.opponentActionSubmitted) {
-            return "Ход зафиксирован. Ждем ответ соперника.";
+            return "Ход отправлен. Ждем решение соперника.";
         }
         if (payload.yourActionSubmitted && payload.opponentActionSubmitted) {
-            return "Оба хода зафиксированы. Раунд раскрывается.";
+            return "Оба хода отправлены. Раунд разрешается.";
         }
         return "";
     }
@@ -5441,7 +5448,7 @@
         } else if (isDefeat) {
             addJournal("Поражение в PvP. +25 монет и -10 рейтинга.");
         } else {
-            addJournal("Матч завершился ничьей.");
+            addJournal("Ничья в бою. Рейтинг без изменений.");
         }
         openDuelResultModal({
             title: isVictory ? "Ты победил" : (isDefeat ? "Ты проиграл" : "Ничья"),
@@ -5449,7 +5456,7 @@
                 ? "Побежден " + (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "соперник") + "."
                 : (isDefeat
                     ? "Победил " + (payload.opponent && payload.opponent.displayName ? payload.opponent.displayName : "соперник") + "."
-                    : "Оба бойца удержали линию до конца."),
+                    : "Оба бойца пережили размен."),
             rating: rewardRating,
             money: rewardMoney
         });
@@ -5552,7 +5559,7 @@
                 lines.push(attackerName + " цепляет краем и наносит " + edgeDamage + " урона.");
                 return { damage: edgeDamage, lines: lines };
             }
-            lines.push(attackerName + " промахивается дробью.");
+            lines.push(attackerName + " промахивается мимо силуэта.");
             return { damage: 0, lines: lines };
         }
         for (let pellet = 0; pellet < 5; pellet++) {
@@ -5563,7 +5570,7 @@
             }
         }
         if (!pelletsHit) {
-            lines.push(defenderName + " полностью блокирует заряд.");
+            lines.push(defenderName + " блокирует дробовой размен.");
             return { damage: 0, lines: lines };
         }
         let damage = pelletsHit * 5 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
@@ -5599,20 +5606,20 @@
             }
 
             const duel = state.duel;
-            const opponentName = duel.opponentName || "Соперник";
+            const opponentName = duel.opponentName || "соперник";
             duel.finished = true;
             duel.playerHp = 0;
-            duel.resultText = "Поражение. Бой остановлен до следующего выхода.";
+            duel.resultText = "Поражение. Бой завершен из-за выхода.";
             state.player.losses += 1;
             state.player.money = (state.player.money || 0) + BATTLE_DEFEAT_COINS;
             duel.logs.push({
                 round: duel.round,
                 lines: [
-                    "Раунд " + duel.round + ": " + (duel.playerName || "Игрок") + " покидает бой.",
+                    "Раунд " + duel.round + ": " + (duel.playerName || "игрок") + " покидает бой.",
                     "Итог: " + opponentName + " получает автопобеду."
                 ]
             });
-            addJournal("Автопоражение в дуэли засчитано. +" + BATTLE_DEFEAT_COINS + " монет.");
+            addJournal("Автопоражение в бою. +" + BATTLE_DEFEAT_COINS + " монет.");
             openDuelResultModal({
                 title: "Ты проиграл",
                 copy: "Победил " + opponentName + ".",
@@ -5622,7 +5629,7 @@
             saveState();
             renderAll();
         } catch (error) {
-            showToast(error && error.message ? error.message : "Не удалось покинуть бой.");
+            showToast(error && error.message ? error.message : "Не удалось завершить бой.");
         } finally {
             if (elements.duelExitCancelButton) {
                 elements.duelExitCancelButton.disabled = false;
@@ -5760,8 +5767,8 @@
         elements.duelAutoToggle.classList.toggle("is-active", currentEnabled);
         elements.duelAutoToggle.classList.toggle("is-pending", pendingEnabled !== null && pendingEnabled !== currentEnabled);
         elements.duelAutoToggle.textContent = currentEnabled ? "Выключить автоматический бой" : "Включить автоматический бой";
-        elements.duelAutoNote.textContent = "";
-        elements.duelAutoNote.classList.add("hidden");
+        elements.duelAutoNote.textContent = "Автобой включится со следующего хода.";
+        elements.duelAutoNote.classList.remove("hidden");
         elements.duelAutoCover.classList.toggle("hidden", !currentEnabled || duel.finished);
     }
 
@@ -5774,8 +5781,8 @@
             duel.autoBattlePendingEnabled = null;
             appendLocalSystemLog(
                 duel.autoBattleEnabled
-                    ? "С этого раунда ходы игрока " + (duel.playerName || "Игрок") + " будут автоматическими."
-                    : "С этого раунда автоматические ходы игрока " + (duel.playerName || "Игрок") + " отключены."
+                    ? "С этого раунда ходы " + (duel.playerName || "игрока") + " автоматизированы."
+                    : "С этого раунда автоматические ходы " + (duel.playerName || "игрока") + " отключены."
             );
         }
         duel.roundStartedAt = Date.now();
@@ -5788,7 +5795,7 @@
         duel.opponentActionSubmitted = false;
         duel.autoResolutionAt = null;
         duel.canSubmitAction = !duel.autoBattleEnabled;
-        duel.resultText = duel.autoBattleEnabled ? "С этого раунда ход идет автоматически." : "";
+        duel.resultText = duel.autoBattleEnabled ? "С этого раунда ход будет собран автоматически." : "";
         if (duel.autoBattleEnabled) {
             const autoAction = buildAutoBattleAction();
             duel.submittedAction = autoAction;
@@ -5819,7 +5826,7 @@
 
         state.player.money -= item.price;
         addItem(item.itemId, 1);
-        addJournal("Куплен предмет «" + item.name + "». -" + item.price + " монет.");
+        addJournal("Покупка: «" + item.name + "». -" + item.price + " монет.");
         showToast("Куплено: " + item.name + ".");
         saveState();
         renderAll();
@@ -5834,83 +5841,79 @@
         state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
         const threads = state.social.threads;
         const activeThread = threads.find(function (thread) { return thread.id === state.social.activeThreadId; }) || null;
-
         elements.socialChatFabBadge.textContent = String(Math.min(9, threads.length));
         elements.socialChatFabBadge.classList.toggle("hidden", threads.length === 0);
         elements.socialChatPanel.classList.toggle("hidden", !state.social.isOpen);
         elements.socialChatPanel.setAttribute("aria-hidden", state.social.isOpen ? "false" : "true");
         document.body.classList.toggle("social-open", Boolean(state.social.isOpen));
-
         if (!threads.length) {
-            elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Чаты появятся здесь после первого диалога с другом.</article>';
-            elements.socialChatThreadTitle.textContent = "Выбери чат";
-            elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
-            elements.socialChatInput.disabled = true;
-            elements.socialChatSend.disabled = true;
-            return;
-        }
-
-        elements.socialChatThreadList.innerHTML = threads.map(function (thread) {
-            return [
-                '<button class="social-chat-thread-card' + (activeThread && activeThread.id === thread.id ? ' is-active' : '') + '" type="button" data-social-thread-id="' + escapeHtml(thread.id) + '">',
-                '<strong>' + escapeHtml(thread.friendName || "Друг") + '</strong>',
-                '<span>' + escapeHtml((thread.status === "online" ? "Онлайн" : "Оффлайн") + " · рейтинг " + (thread.rating || 0)) + '</span>',
-                '</button>'
-            ].join("");
-        }).join("");
-
-        if (!activeThread) {
+            elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Открытые диалоги появятся здесь после первого сообщения другу.</article>';
             elements.socialChatThreadTitle.textContent = "Выбери чат";
             elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Выбери друга и начни переписку.</div>';
             elements.socialChatInput.disabled = true;
             elements.socialChatSend.disabled = true;
             return;
         }
-
-        elements.socialChatThreadTitle.textContent = activeThread.friendName || "Друг";
-        elements.socialChatMessages.innerHTML = (activeThread.messages || []).map(function (message) {
-            const own = message.author === "you";
+        elements.socialChatThreadList.innerHTML = threads.map(function (thread) {
             return [
-                '<div class="social-chat-message' + (own ? " social-chat-message-own" : "") + '">',
-                '<div class="social-chat-message-bubble">',
-                '<strong>' + escapeHtml(own ? state.player.name : (activeThread.friendName || "Друг")) + '</strong>',
-                '<p>' + escapeHtml(message.text || "") + '</p>',
-                '<small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small>',
-                '</div>',
-                '</div>'
+                '<button class="social-chat-thread-card' + (activeThread && activeThread.id === thread.id ? ' is-active' : '') + '" type="button" data-social-thread-id="' + escapeHtml(thread.id) + '">',
+                '<strong>' + escapeHtml(thread.friendName || "Друг") + '</strong>',
+                '<span>' + escapeHtml((thread.status === "online" ? "Онлайн" : "Оффлайн") + " · Рейтинг " + (thread.rating || 0)) + '</span>',
+                '</button>'
             ].join("");
         }).join("");
+        if (!activeThread) {
+            elements.socialChatThreadTitle.textContent = "Выбери чат";
+            elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
+            elements.socialChatInput.disabled = true;
+            elements.socialChatSend.disabled = true;
+            return;
+        }
+        elements.socialChatThreadTitle.textContent = activeThread.friendName || "Друг";
+        elements.socialChatMessages.innerHTML = (activeThread.messages || []).length
+            ? (activeThread.messages || []).map(function (message) {
+                const own = message.author === "you";
+                return [
+                    '<div class="social-chat-message' + (own ? " social-chat-message-own" : "") + '">',
+                    '<div class="social-chat-message-bubble">',
+                    '<strong>' + escapeHtml(own ? state.player.name : (activeThread.friendName || "Друг")) + '</strong>',
+                    '<p>' + escapeHtml(message.text || "") + '</p>',
+                    '<small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small>',
+                    '</div>',
+                    '</div>'
+                ].join("");
+            }).join("")
+            : '<div class="social-chat-empty">Пока сообщений нет. Напиши первым.</div>';
         elements.socialChatInput.disabled = false;
         elements.socialChatSend.disabled = false;
         elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
     }
-
     function triggerScheduledJournalEvent() {
         if (!state.world) {
             state.world = { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {} };
         }
-        if (state.duel && !state.duel.finished) {
-            return;
-        }
         const now = Date.now();
         const lastJournalEventAt = Number(state.world.lastJournalEventAt || 0);
-        if (now - lastJournalEventAt < JOURNAL_EVENT_MS) {
+        const elapsed = now - lastJournalEventAt;
+        if (elapsed < JOURNAL_EVENT_MS) {
             return;
+        }
+        const pendingCount = Math.min(20, Math.floor(elapsed / JOURNAL_EVENT_MS));
+        let pointer = lastJournalEventAt;
+        for (let index = 0; index < pendingCount; index += 1) {
+            pointer += JOURNAL_EVENT_MS;
+            const eventEntry = pickJournalEvent(pointer);
+            if (eventEntry) {
+                rememberJournalEvent(eventEntry, pointer);
+                addJournal(eventEntry.text, { sourceEventId: eventEntry.id, location: eventEntry.location });
+            }
         }
         state.world.lastJournalEventAt = now;
-        const eventEntry = pickJournalEvent(now);
-        if (!eventEntry) {
-            saveState();
-            return;
-        }
-        rememberJournalEvent(eventEntry, now);
-        addJournal(eventEntry.text, { sourceEventId: eventEntry.id, location: eventEntry.location });
         saveState();
         if (state.ui && state.ui.screen === "home") {
             renderJournal();
         }
     }
-
     function submitCurrentDuelTurn() {
         if (!state.duel || state.duel.finished) {
             return;
