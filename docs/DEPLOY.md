@@ -29,6 +29,7 @@ sudo apt install -y openjdk-17-jdk maven nginx certbot python3-certbot-nginx
 ```bash
 sudo useradd --system --home /opt/sandalpunk --shell /usr/sbin/nologin sandalpunk
 sudo mkdir -p /opt/sandalpunk
+sudo mkdir -p /opt/sandalpunk/data
 sudo chown -R sandalpunk:sandalpunk /opt/sandalpunk
 ```
 
@@ -59,11 +60,12 @@ PORT=8080
 BASE_URL=https://play.example.com
 BOT_TOKEN=replace_me
 BOT_USERNAME=replace_me_bot
-APP_STORAGE=inmemory
+APP_STORAGE=jdbc
 LOG_LEVEL=INFO
-DB_URL=jdbc:postgresql://localhost:5432/sandalpunk
-DB_USERNAME=sandalpunk
-DB_PASSWORD=replace_me
+DB_DATA_DIR=/opt/sandalpunk/data
+DB_URL=
+DB_USERNAME=sa
+DB_PASSWORD=
 EOF
 sudo chown sandalpunk:sandalpunk /opt/sandalpunk/.env
 sudo chmod 600 /opt/sandalpunk/.env
@@ -111,9 +113,19 @@ sudo tail -f /var/log/nginx/access.log
 sudo tail -f /var/log/nginx/error.log
 ```
 
-## 13. Telegram bot setup
+## 13. Persistent player data
+
+Player profiles and friends are stored in a separate file database under `/opt/sandalpunk/data`.
+That directory is not replaced during jar deploys, so account progress survives application updates.
+
+If you want to verify it after deploy:
+
+```bash
+ls -la /opt/sandalpunk/data
+```
+
+## 14. Telegram bot setup
 
 - Create the bot with BotFather.
 - Set the Mini App button flow by using `/start` in chat with the bot.
 - Make sure `BASE_URL` is HTTPS and reachable from Telegram clients.
-

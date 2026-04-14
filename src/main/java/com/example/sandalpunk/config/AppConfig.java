@@ -41,7 +41,10 @@ public class AppConfig {
     public DataSource appDataSource(ApplicationProperties applicationProperties) {
         String url = applicationProperties.getDb().getUrl();
         if (url == null || url.isBlank()) {
-            Path dataDirectory = Path.of("data").toAbsolutePath();
+            String configuredDataDir = applicationProperties.getDb().getDataDir();
+            Path dataDirectory = (configuredDataDir == null || configuredDataDir.isBlank())
+                    ? Path.of("data").toAbsolutePath()
+                    : Path.of(configuredDataDir).toAbsolutePath();
             try {
                 Files.createDirectories(dataDirectory);
             } catch (IOException exception) {

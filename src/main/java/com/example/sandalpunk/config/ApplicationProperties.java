@@ -79,6 +79,7 @@ public class ApplicationProperties {
 
     public static class Database {
         private String url = "";
+        private String dataDir = "";
         private String username = "";
         private String password = "";
 
@@ -88,6 +89,14 @@ public class ApplicationProperties {
 
         public void setUrl(String url) {
             this.url = url;
+        }
+
+        public String getDataDir() {
+            return dataDir;
+        }
+
+        public void setDataDir(String dataDir) {
+            this.dataDir = dataDir;
         }
 
         public String getUsername() {

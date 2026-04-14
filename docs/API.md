@@ -12,7 +12,7 @@ Response:
 {
   "status": "UP",
   "appName": "sandalpunk",
-  "storage": "inmemory",
+  "storage": "jdbc",
   "time": "2026-03-14T10:00:00Z"
 }
 ```
@@ -135,4 +135,3 @@ Returns the updated duel state. If both players have submitted, the response inc
 ## `GET /api/zrp/events`
 
 Returns the most recent in-memory app events captured by the logging module.
-

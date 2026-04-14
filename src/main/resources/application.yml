@@ -19,6 +19,7 @@ app:
     username: ${BOT_USERNAME:}
   db:
     url: ${DB_URL:}
+    data-dir: ${DB_DATA_DIR:}
     username: ${DB_USERNAME:}
     password: ${DB_PASSWORD:}
 
