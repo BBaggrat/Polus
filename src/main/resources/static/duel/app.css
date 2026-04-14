@@ -21,6 +21,7 @@
     --radius-md: 18px;
     --radius-sm: 14px;
     --shell-width: 430px;
+    --bottom-ui-clearance: 124px;
     --font-head: "Trebuchet MS", "Segoe UI", sans-serif;
     --font-body: "Segoe UI", "Helvetica Neue", sans-serif;
 }
@@ -553,10 +554,12 @@ button {
 }
 
 .journal-panel {
-    min-height: 320px;
+    min-height: 0;
+    max-height: calc(100dvh - 420px - var(--bottom-ui-clearance));
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     margin-top: 8px;
+    overflow: hidden;
 }
 
 .journal-panel .panel-header {
@@ -598,13 +601,14 @@ button {
 }
 
 .journal-panel .journal-list {
-    max-height: 440px;
+    max-height: clamp(170px, calc(100dvh - 520px), 440px);
     overflow: auto;
     margin-top: 4px;
     padding-right: 4px;
     align-content: start;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    scrollbar-gutter: stable;
 }
 
 .journal-entry,
