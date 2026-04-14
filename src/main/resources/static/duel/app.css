@@ -203,6 +203,17 @@ button {
     overflow: hidden;
 }
 
+.panel-cover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 18%, rgba(255, 246, 215, 0.38), transparent 16%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 38%),
+        linear-gradient(180deg, rgba(8, 14, 24, 0) 35%, rgba(9, 15, 29, 0.36) 100%);
+    pointer-events: none;
+}
+
 .cover-glow {
     position: absolute;
     border-radius: 999px;
@@ -264,6 +275,9 @@ button {
     color: #f8f2ff;
     font-size: 2rem;
     font-weight: 800;
+    background-size: cover;
+    background-position: center 24%;
+    overflow: hidden;
 }
 
 .profile-side {
@@ -1115,6 +1129,50 @@ body.duel-open .bottom-nav {
 .registration-form {
     display: grid;
     gap: 12px;
+}
+
+.field-group {
+    display: grid;
+    gap: 10px;
+}
+
+.field-label-spaced {
+    margin-bottom: 0;
+}
+
+.registration-style-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.registration-style-option {
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.registration-style-option input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.registration-style-copy {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    line-height: 1.35;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.registration-style-option input:checked + .registration-style-copy {
+    border-color: rgba(216, 176, 123, 0.52);
+    background: linear-gradient(180deg, rgba(216, 176, 123, 0.12), rgba(255, 255, 255, 0.04));
+    transform: translateY(-1px);
 }
 
 .field-label {

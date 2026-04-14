@@ -39,6 +39,7 @@ public class PlayerService {
                         authenticatedUser.firstName(),
                         authenticatedUser.lastName(),
                         authenticatedUser.languageCode(),
+                        null,
                         0,
                         0,
                         now,
@@ -63,14 +64,16 @@ public class PlayerService {
         return playerProfile;
     }
 
-    public synchronized PlayerProfile registerNickname(String playerId, String nickname) {
+    public synchronized PlayerProfile registerNickname(String playerId, String nickname, String journalStyle) {
         String normalizedNickname = normalizeNickname(nickname);
+        String normalizedJournalStyle = normalizeJournalStyle(journalStyle);
         PlayerProfile existing = playerRepository.findByNicknameKey(normalizedNickname).orElse(null);
         if (existing != null && !existing.getId().equals(playerId)) {
             throw new ConflictException("Ник уже занят");
         }
         PlayerProfile playerProfile = findRequiredById(playerId);
         playerProfile.setNickname(nickname.trim());
+        playerProfile.setJournalStyle(normalizedJournalStyle);
         playerProfile.setUpdatedAt(clock.instant());
         playerRepository.save(playerProfile);
         appEventLogger.info(
@@ -78,7 +81,8 @@ public class PlayerService {
                 "Player nickname registered",
                 Map.of(
                         "playerId", playerProfile.getId(),
-                        "nickname", playerProfile.getNickname()
+                        "nickname", playerProfile.getNickname(),
+                        "journalStyle", playerProfile.getJournalStyle()
                 )
         );
         return playerProfile;
@@ -164,5 +168,16 @@ public class PlayerService {
             throw new BadRequestException("Ник может содержать только буквы, цифры, _ и -");
         }
         return trimmed.toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizeJournalStyle(String journalStyle) {
+        if (journalStyle == null || journalStyle.isBlank()) {
+            throw new BadRequestException("Выбери стиль дневника");
+        }
+        String normalized = journalStyle.trim().toUpperCase(Locale.ROOT);
+        if (!normalized.equals("M") && !normalized.equals("W")) {
+            throw new BadRequestException("Стиль дневника должен быть M или W");
+        }
+        return normalized;
     }
 }

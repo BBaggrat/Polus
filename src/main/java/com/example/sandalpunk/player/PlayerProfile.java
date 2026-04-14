@@ -12,6 +12,7 @@ public class PlayerProfile {
     private String firstName;
     private String lastName;
     private String languageCode;
+    private String journalStyle;
     private int coins;
     private int rating;
     private int wins;
@@ -29,6 +30,7 @@ public class PlayerProfile {
             String firstName,
             String lastName,
             String languageCode,
+            String journalStyle,
             int coins,
             int rating,
             Instant createdAt,
@@ -42,6 +44,7 @@ public class PlayerProfile {
         this.firstName = firstName;
         this.lastName = lastName;
         this.languageCode = languageCode;
+        this.journalStyle = journalStyle;
         this.coins = coins;
         this.rating = rating;
         this.createdAt = createdAt;
@@ -102,6 +105,14 @@ public class PlayerProfile {
 
     public void setLanguageCode(String languageCode) {
         this.languageCode = languageCode;
+    }
+
+    public String getJournalStyle() {
+        return journalStyle;
+    }
+
+    public void setJournalStyle(String journalStyle) {
+        this.journalStyle = journalStyle;
     }
 
     public int getCoins() {

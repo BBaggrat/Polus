@@ -38,6 +38,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                     first_name varchar(190),
                     last_name varchar(190),
                     language_code varchar(32),
+                    journal_style varchar(1),
                     coins integer not null,
                     rating integer not null,
                     wins integer not null,
@@ -47,6 +48,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                     updated_at_ms bigint not null
                 )
                 """);
+        jdbcTemplate.execute("alter table players add column if not exists journal_style varchar(1)");
         jdbcTemplate.execute("create unique index if not exists idx_players_nickname_key on players(nickname_key)");
         jdbcTemplate.execute("create index if not exists idx_players_identity_key on players(identity_key)");
     }
@@ -63,6 +65,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                             first_name = ?,
                             last_name = ?,
                             language_code = ?,
+                            journal_style = ?,
                             coins = ?,
                             rating = ?,
                             wins = ?,
@@ -80,6 +83,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                 playerProfile.getFirstName(),
                 playerProfile.getLastName(),
                 playerProfile.getLanguageCode(),
+                playerProfile.getJournalStyle(),
                 playerProfile.getCoins(),
                 playerProfile.getRating(),
                 playerProfile.getWins(),
@@ -101,6 +105,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                                 first_name,
                                 last_name,
                                 language_code,
+                                journal_style,
                                 coins,
                                 rating,
                                 wins,
@@ -108,7 +113,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                                 active_duel_id,
                                 created_at_ms,
                                 updated_at_ms
-                            ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """,
                     playerProfile.getId(),
                     playerProfile.getIdentityKey(),
@@ -119,6 +124,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                     playerProfile.getFirstName(),
                     playerProfile.getLastName(),
                     playerProfile.getLanguageCode(),
+                    playerProfile.getJournalStyle(),
                     playerProfile.getCoins(),
                     playerProfile.getRating(),
                     playerProfile.getWins(),
@@ -160,6 +166,7 @@ public class JdbcPlayerRepository implements PlayerRepository {
                 resultSet.getString("first_name"),
                 resultSet.getString("last_name"),
                 resultSet.getString("language_code"),
+                resultSet.getString("journal_style"),
                 resultSet.getInt("coins"),
                 resultSet.getInt("rating"),
                 Instant.ofEpochMilli(resultSet.getLong("created_at_ms")),

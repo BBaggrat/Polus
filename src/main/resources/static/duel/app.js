@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v29";
+    const STORAGE_KEY = "polus_frontend_prototype_v30";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -545,6 +545,7 @@
             playerId: player.id,
             telegramUserId: player.telegramUserId || null,
             nickname: player.nickname || "",
+            journalStyle: player.journalStyle || "",
             registered: Boolean(player.registered),
             demoMode: false,
             initError: ""
@@ -4259,6 +4260,10 @@
         state.player.id = player.id || state.player.id || null;
         state.player.name = player.nickname || player.displayName || state.player.name || "Новый игрок";
         state.player.telegramUserId = player.telegramUserId || state.player.telegramUserId || null;
+        state.player.journalStyle = player.journalStyle || state.player.journalStyle || "";
+        if (state.auth) {
+            state.auth.journalStyle = player.journalStyle || state.auth.journalStyle || "";
+        }
         state.player.wins = typeof player.wins === "number" ? player.wins : (state.player.wins || 0);
         state.player.losses = typeof player.losses === "number" ? player.losses : (state.player.losses || 0);
         if (resetEconomy || typeof player.coins === "number") {
@@ -4329,6 +4334,10 @@
         if (!elements.registrationNickname.value) {
             elements.registrationNickname.value = auth.nickname || "";
         }
+        const selectedJournalStyle = auth.journalStyle || state.player.journalStyle || "";
+        document.querySelectorAll("input[name='registration-journal-style']").forEach(function (input) {
+            input.checked = input.value === selectedJournalStyle;
+        });
         if (auth.initError && !auth.demoMode) {
             showRegistrationError(auth.initError);
         } else {
@@ -4339,6 +4348,8 @@
 
     async function submitRegistration() {
         const nickname = elements.registrationNickname.value.trim();
+        const journalStyleInput = document.querySelector("input[name='registration-journal-style']:checked");
+        const journalStyle = journalStyleInput ? journalStyleInput.value : "";
         elements.registrationError.textContent = "";
         elements.registrationError.classList.add("hidden");
         if (!nickname) {
@@ -4353,12 +4364,18 @@
             showRegistrationError("Ник может содержать только буквы, цифры, _ и -.");
             return;
         }
+        if (!journalStyle) {
+            showRegistrationError("Выбери стиль дневника.");
+            return;
+        }
         elements.registrationSubmit.disabled = true;
         try {
             if (state.auth && state.auth.demoMode) {
                 state.auth.nickname = nickname;
+                state.auth.journalStyle = journalStyle;
                 state.auth.registered = true;
                 state.player.name = nickname;
+                state.player.journalStyle = journalStyle;
                 state.player.money = 0;
                 state.player.rating = 0;
                 saveState();
@@ -4375,13 +4392,14 @@
                     "Content-Type": "application/json",
                     "X-Session-Token": state.auth.sessionToken
                 },
-                body: JSON.stringify({ nickname: nickname })
+                body: JSON.stringify({ nickname: nickname, journalStyle: journalStyle })
             });
             if (!response.ok) {
                 throw new Error(await readApiError(response));
             }
             const player = await response.json();
             state.auth.nickname = player.nickname || nickname;
+            state.auth.journalStyle = player.journalStyle || journalStyle;
             state.auth.registered = Boolean(player.registered);
             syncPlayerFromServer(player, true);
             await loadFriendsOverview();
@@ -5015,6 +5033,9 @@
         safeSetText("#registration-copy", "Ник будет привязан к твоему Telegram ID.");
         safeSetText("label[for='registration-nickname']", "Никнейм");
         safeSetText("#registration-nickname", null, "placeholder", "Например, Бакунин");
+        safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
+        safeSetText(".registration-style-option:first-child .registration-style-copy", "Я прибыл в Полюс.");
+        safeSetText(".registration-style-option:last-child .registration-style-copy", "Я прибыла в Полюс.");
         safeSetText("#registration-submit", "Создать аккаунт");
         safeSetText("#start-duel-title", "Начать бой?");
         safeSetText("#start-duel-copy", "Подтверди, что хочешь войти в бой.");
@@ -5081,10 +5102,10 @@
 
     function buildInitialState() {
         return {
-            version: 29,
-            auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" },
+            version: 30,
+            auth: { sessionToken: null, playerId: null, telegramUserId: null, nickname: "", journalStyle: "", registered: false, demoMode: false, initError: "" },
             matchmaking: { status: "IDLE", duelId: null, message: "", queuedAt: null },
-            player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null },
+            player: { id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null, journalStyle: "" },
             world: { lastJournalEventAt: Date.now(), lastFriendSyncAt: 0, lastJournalEventId: null, journalEventHistory: {}, currentJournalArea: "street", areaEventCount: 0 },
             ui: { screen: "home", activeQuestId: null, shopSection: "weapon", augmentPickerSlot: null, duelExitConfirmOpen: false, startDuelConfirm: null, startDuelAction: null, duelResult: null },
             journal: [],
@@ -5101,10 +5122,10 @@
 
     function hydrateState(source) {
         const next = source && typeof source === "object" ? source : buildInitialState();
-        next.version = 29;
-        next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
+        next.version = 30;
+        next.auth = Object.assign({ sessionToken: null, playerId: null, telegramUserId: null, nickname: "", journalStyle: "", registered: false, demoMode: false, initError: "" }, next.auth || {});
         next.matchmaking = Object.assign({ status: "IDLE", duelId: null, message: "", queuedAt: null }, next.matchmaking || {});
-        next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null }, next.player || {});
+        next.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, wins: 0, losses: 0, telegramUserId: null, journalStyle: "" }, next.player || {});
         delete next.player.level;
         delete next.player.experience;
         delete next.player.levelProgressCurrent;
@@ -5152,7 +5173,7 @@
                 return buildInitialState();
             }
             const parsed = JSON.parse(raw);
-            return parsed && parsed.version === 29 ? parsed : buildInitialState();
+            return parsed && parsed.version === 30 ? parsed : buildInitialState();
         } catch (error) {
             console.error(error);
             return buildInitialState();

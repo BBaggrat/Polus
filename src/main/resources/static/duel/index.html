@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260413-6">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260414-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -183,6 +183,19 @@
         <form class="registration-form" id="registration-form">
             <label class="field-label" for="registration-nickname">Никнейм</label>
             <input class="text-input" id="registration-nickname" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Например, Бакунин">
+            <div class="field-group">
+                <p class="field-label field-label-spaced" id="registration-style-label">В каком стиле вы будете вести дневник?</p>
+                <div class="registration-style-grid" role="radiogroup" aria-labelledby="registration-style-label">
+                    <label class="registration-style-option">
+                        <input type="radio" name="registration-journal-style" value="M">
+                        <span class="registration-style-copy">Я прибыл в Полюс.</span>
+                    </label>
+                    <label class="registration-style-option">
+                        <input type="radio" name="registration-journal-style" value="W">
+                        <span class="registration-style-copy">Я прибыла в Полюс.</span>
+                    </label>
+                </div>
+            </div>
             <p class="field-error hidden" id="registration-error"></p>
             <button class="primary-button full-width" id="registration-submit" type="submit">Создать аккаунт</button>
         </form>
@@ -391,8 +404,8 @@
 
 <div class="toast hidden" id="toast"></div>
 
-    <script src="/duel/journal-events.js?v=polus-20260413-6"></script>
-    <script src="/duel/app.js?v=polus-20260413-6"></script>
+    <script src="/duel/journal-events.js?v=polus-20260414-1"></script>
+    <script src="/duel/app.js?v=polus-20260414-1"></script>
 </body>
 </html>
 

@@ -86,7 +86,7 @@ public class SessionService {
             throw new BadRequestException("Registration request body is required");
         }
         PlayerProfile playerProfile = requirePlayer(sessionToken);
-        return PlayerResponse.from(playerService.registerNickname(playerProfile.getId(), request.nickname()));
+        return PlayerResponse.from(playerService.registerNickname(playerProfile.getId(), request.nickname(), request.journalStyle()));
     }
 
     private AuthenticatedUser resolveUser(SessionRequest request) {
