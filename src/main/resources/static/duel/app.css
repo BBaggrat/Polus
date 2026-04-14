@@ -198,8 +198,11 @@ button {
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background:
-        linear-gradient(180deg, rgba(157, 205, 255, 0.12), transparent 70%),
+        linear-gradient(180deg, rgba(157, 205, 255, 0.1), rgba(9, 15, 29, 0.18) 82%),
+        url("/duel/assets/universal-cover.svg?v=polus-20260414-3"),
         linear-gradient(135deg, rgba(49, 92, 130, 0.9), rgba(76, 25, 58, 0.86));
+    background-size: auto, cover, auto;
+    background-position: center, center 52%, center;
     overflow: hidden;
 }
 
@@ -270,14 +273,16 @@ button {
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background:
-        radial-gradient(circle at 35% 35%, rgba(143, 216, 255, 0.32), transparent 44%),
+        linear-gradient(180deg, rgba(10, 14, 22, 0.06), rgba(10, 14, 22, 0.24)),
+        url("/duel/assets/universal-avatar.svg?v=polus-20260414-3"),
         linear-gradient(180deg, rgba(63, 80, 116, 0.92), rgba(25, 32, 51, 0.92));
-    color: #f8f2ff;
-    font-size: 2rem;
+    color: transparent;
+    font-size: 0;
     font-weight: 800;
     background-size: cover;
-    background-position: center 24%;
+    background-position: center;
     overflow: hidden;
+    text-indent: -9999px;
 }
 
 .profile-side {
@@ -1364,14 +1369,26 @@ body.duel-open .bottom-nav {
     height: 52px;
     border-radius: 16px;
     border: 1px solid rgba(143, 216, 255, 0.24);
-    background: radial-gradient(circle at 35% 35%, rgba(143, 216, 255, 0.3), transparent 48%), linear-gradient(180deg, rgba(43, 59, 95, 0.92), rgba(21, 28, 45, 0.92));
-    font-size: 1.4rem;
+    background:
+        linear-gradient(180deg, rgba(10, 14, 22, 0.08), rgba(10, 14, 22, 0.28)),
+        url("/duel/assets/universal-avatar.svg?v=polus-20260414-3"),
+        linear-gradient(180deg, rgba(43, 59, 95, 0.92), rgba(21, 28, 45, 0.92));
+    background-size: cover;
+    background-position: center;
+    color: transparent;
+    font-size: 0;
     font-weight: 800;
+    text-indent: -9999px;
 }
 
 .duel-avatar-opponent {
     border-color: rgba(203, 142, 118, 0.28);
-    background: radial-gradient(circle at 35% 35%, rgba(228, 112, 132, 0.32), transparent 48%), linear-gradient(180deg, rgba(83, 49, 66, 0.92), rgba(34, 22, 34, 0.92));
+    background:
+        linear-gradient(180deg, rgba(91, 35, 46, 0.28), rgba(23, 10, 16, 0.36)),
+        url("/duel/assets/universal-avatar.svg?v=polus-20260414-3"),
+        linear-gradient(180deg, rgba(83, 49, 66, 0.92), rgba(34, 22, 34, 0.92));
+    background-size: cover;
+    background-position: center;
 }
 
 .duelist-card h3 {
@@ -1640,7 +1657,7 @@ body.duel-open .bottom-nav {
 .social-chat-fab {
     position: fixed;
     right: 18px;
-    bottom: 172px;
+    bottom: 126px;
     z-index: 8;
     display: inline-flex;
     align-items: center;
@@ -2333,7 +2350,7 @@ body.social-open .social-chat-fab {
 
     .social-chat-fab {
         right: 14px;
-        bottom: 164px;
+        bottom: 118px;
     }
 
     .bottom-nav {
