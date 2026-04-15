@@ -20,8 +20,18 @@ public class DuelEngine {
     }
 
     public RoundResolution resolveRound(Duel duel, DuelRoundAction playerOneAction, DuelRoundAction playerTwoAction) {
-        AttackResolution playerOneAttack = resolveAttack(duel.getPlayerOneName(), playerOneAction, duel.getPlayerTwoName(), playerTwoAction);
-        AttackResolution playerTwoAttack = resolveAttack(duel.getPlayerTwoName(), playerTwoAction, duel.getPlayerOneName(), playerOneAction);
+        AttackResolution playerOneAttack = resolveAttack(
+                duel.getPlayerOneName(),
+                playerOneAction,
+                duel.getPlayerTwoName(),
+                playerTwoAction
+        );
+        AttackResolution playerTwoAttack = resolveAttack(
+                duel.getPlayerTwoName(),
+                playerTwoAction,
+                duel.getPlayerOneName(),
+                playerOneAction
+        );
 
         int playerOneHpAfter = Math.max(0, duel.getPlayerOneHp() - playerTwoAttack.damage());
         int playerTwoHpAfter = Math.max(0, duel.getPlayerTwoHp() - playerOneAttack.damage());
@@ -77,19 +87,19 @@ public class DuelEngine {
             WeaponType defenderWeapon
     ) {
         if (!lineMatched) {
-            return new AttackResolution(0, attackerName + " уводит выстрел мимо линии.");
+            return new AttackResolution(0, attackerName + " промахивается мимо линии.");
         }
-        if (isBlocked(defenderWeapon, false)) {
-            return new AttackResolution(0, defenderName + " закрывается щитом и блокирует пулю.");
+        if (isBlocked(defenderWeapon)) {
+            return new AttackResolution(0, defenderName + " закрывается щитом и блокирует выстрел.");
         }
         return new AttackResolution(18, attackerName + " попадает из пистоля и наносит 18 урона.");
     }
 
     private AttackResolution resolveRifle(String attackerName, boolean lineMatched) {
         if (!lineMatched) {
-            return new AttackResolution(0, attackerName + " уводит выстрел мимо линии.");
+            return new AttackResolution(0, attackerName + " промахивается мимо линии.");
         }
-        return new AttackResolution(30, attackerName + " попадает из винтовки и срезает защиту на линии.");
+        return new AttackResolution(30, attackerName + " попадает из винтовки и игнорирует блокирование.");
     }
 
     private AttackResolution resolveShotgun(
@@ -102,13 +112,13 @@ public class DuelEngine {
             if (ThreadLocalRandom.current().nextDouble() < SHOTGUN_EDGE_GRAZE_CHANCE) {
                 return new AttackResolution(SHOTGUN_EDGE_DAMAGE, attackerName + " цепляет краем и наносит 5 урона.");
             }
-            return new AttackResolution(0, attackerName + " не цепляет цель дробью.");
+            return new AttackResolution(0, attackerName + " не задевает цель дробью.");
         }
 
         int pelletsHit = 0;
         int pelletsBlocked = 0;
         for (int index = 0; index < 5; index++) {
-            if (isBlocked(defenderWeapon, false)) {
+            if (isBlocked(defenderWeapon)) {
                 pelletsBlocked++;
             } else {
                 pelletsHit++;
@@ -131,8 +141,8 @@ public class DuelEngine {
         return new AttackResolution(damage, summary.toString());
     }
 
-    private boolean isBlocked(WeaponType defenderWeapon, boolean ignoreBlocking) {
-        if (ignoreBlocking || defenderWeapon != WeaponType.PISTOLS) {
+    private boolean isBlocked(WeaponType defenderWeapon) {
+        if (defenderWeapon != WeaponType.PISTOLS) {
             return false;
         }
         return ThreadLocalRandom.current().nextDouble() < SHIELD_BLOCK_CHANCE;
@@ -142,7 +152,7 @@ public class DuelEngine {
         return switch (action.source()) {
             case MANUAL -> playerName + " стреляет " + shotDirectionPhrase(action.shotDirection())
                     + " " + weaponInstrument(action.weapon()) + " и " + dodgeDirectionPhrase(action.dodgeDirection()) + ".";
-            case AUTO_BATTLE -> playerName + " действует автоматически: стреляет " + shotDirectionPhrase(action.shotDirection())
+            case AUTO_BATTLE -> playerName + " стреляет " + shotDirectionPhrase(action.shotDirection())
                     + " " + weaponInstrument(action.weapon()) + " и " + dodgeDirectionPhrase(action.dodgeDirection()) + ".";
             case TIMEOUT_DEFAULT -> playerName + " не успевает выбрать ход и по таймеру стреляет "
                     + shotDirectionPhrase(action.shotDirection()) + " " + weaponInstrument(action.weapon())

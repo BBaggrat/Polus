@@ -97,9 +97,6 @@ public class DuelService {
             if (duel.getStatus() != DuelStatus.ACTIVE) {
                 throw new ConflictException("Duel is already finished");
             }
-            if (isAutoBattleEnabled(duel, actor.getId())) {
-                throw new ConflictException("Автоматический бой уже ведет этот раунд");
-            }
 
             duel.getPendingActions().put(
                     actor.getId(),
@@ -167,19 +164,7 @@ public class DuelService {
             if (duel.getStatus() != DuelStatus.ACTIVE) {
                 throw new ConflictException("Бой уже завершен");
             }
-            boolean current = isAutoBattleEnabled(duel, actor.getId());
-            Boolean pending = getPendingAutoBattleEnabled(duel, actor.getId());
-            boolean desired = request.enabled();
-            if (desired == current) {
-                setPendingAutoBattleEnabled(duel, actor.getId(), null);
-            } else if (pending != null && pending == desired) {
-                setPendingAutoBattleEnabled(duel, actor.getId(), null);
-            } else {
-                setPendingAutoBattleEnabled(duel, actor.getId(), desired);
-            }
-            duel.setUpdatedAt(clock.instant());
-            duelRepository.save(duel);
-            return toState(duel, actor.getId());
+            throw new BadRequestException("Автобой отключен");
         }
     }
 
@@ -251,31 +236,12 @@ public class DuelService {
             duel.setRoundDeadlineAt(now.plusSeconds(ROUND_TIMEOUT_SECONDS));
         }
 
-        applyAutoActionsIfNeeded(duel, now);
-        if (duel.getPendingActions().size() == 2) {
-            resolveRound(duel);
-            return;
-        }
-
         if (!now.isBefore(duel.getRoundDeadlineAt())) {
             applyTimeoutDefaultsIfNeeded(duel, now);
             if (duel.getPendingActions().size() == 2) {
                 resolveRound(duel);
             }
         }
-    }
-
-    private void applyAutoActionsIfNeeded(Duel duel, Instant now) {
-        submitAutoActionIfNeeded(duel, duel.getPlayerOneId(), now);
-        submitAutoActionIfNeeded(duel, duel.getPlayerTwoId(), now);
-    }
-
-    private void submitAutoActionIfNeeded(Duel duel, String playerId, Instant now) {
-        if (!isAutoBattleEnabled(duel, playerId) || duel.getPendingActions().containsKey(playerId)) {
-            return;
-        }
-        duel.getPendingActions().put(playerId, randomAutoAction(playerId, duel.getRoundNumber(), now));
-        duel.setUpdatedAt(now);
     }
 
     private void applyTimeoutDefaultsIfNeeded(Duel duel, Instant now) {
@@ -289,13 +255,6 @@ public class DuelService {
         }
         duel.getPendingActions().put(playerId, timeoutDefaultAction(playerId, duel.getRoundNumber(), now));
         duel.setUpdatedAt(now);
-    }
-
-    private DuelRoundAction randomAutoAction(String playerId, int roundNumber, Instant now) {
-        WeaponType weapon = randomWeapon();
-        ShotDirection shot = randomShotDirection();
-        DodgeDirection dodge = randomDodgeDirection();
-        return new DuelRoundAction(playerId, roundNumber, weapon, shot, dodge, DuelActionSource.AUTO_BATTLE, now);
     }
 
     private DuelRoundAction timeoutDefaultAction(String playerId, int roundNumber, Instant now) {
@@ -375,40 +334,6 @@ public class DuelService {
         duel.incrementRoundNumber();
         duel.setRoundStartedAt(now);
         duel.setRoundDeadlineAt(now.plusSeconds(ROUND_TIMEOUT_SECONDS));
-        applyPendingAutoBattleChanges(duel, now);
-    }
-
-    private void applyPendingAutoBattleChanges(Duel duel, Instant now) {
-        applyPendingAutoBattleChange(duel, duel.getPlayerOneId(), duel.getPlayerOneName(), now);
-        applyPendingAutoBattleChange(duel, duel.getPlayerTwoId(), duel.getPlayerTwoName(), now);
-    }
-
-    private void applyPendingAutoBattleChange(Duel duel, String playerId, String playerName, Instant now) {
-        Boolean pending = getPendingAutoBattleEnabled(duel, playerId);
-        if (pending == null) {
-            return;
-        }
-        boolean current = isAutoBattleEnabled(duel, playerId);
-        setPendingAutoBattleEnabled(duel, playerId, null);
-        if (pending == current) {
-            return;
-        }
-        setAutoBattleEnabled(duel, playerId, pending);
-        String text = pending
-                ? "С этого раунда ходы игрока " + playerName + " будут автоматическими."
-                : "С этого раунда автоматические ходы игрока " + playerName + " отключены.";
-        addSystemRoundLog(duel, text, now);
-    }
-
-    private void addSystemRoundLog(Duel duel, String text, Instant now) {
-        duel.getRoundLogs().add(new RoundLog(
-                duel.getRoundNumber(),
-                List.of("Раунд " + duel.getRoundNumber() + ": " + text),
-                duel.getPlayerOneHp(),
-                duel.getPlayerTwoHp(),
-                now
-        ));
-        duel.setUpdatedAt(now);
     }
 
     private void trimChatIfNeeded(Duel duel) {
@@ -451,12 +376,12 @@ public class DuelService {
                 opponentView,
                 yourAction != null,
                 duel.getPendingActions().containsKey(duel.opponentId(viewerPlayerId)),
-                duel.getStatus() == DuelStatus.ACTIVE && !isAutoBattleEnabled(duel, viewerPlayerId),
+                duel.getStatus() == DuelStatus.ACTIVE,
                 DuelSelectedActionView.from(yourAction),
                 duel.getRoundStartedAt(),
                 duel.getRoundDeadlineAt(),
-                isAutoBattleEnabled(duel, viewerPlayerId),
-                getPendingAutoBattleEnabled(duel, viewerPlayerId),
+                false,
+                null,
                 duel.getWinnerPlayerId(),
                 resultLabel,
                 duel.getRoundLogs().stream().map(RoundLogView::from).toList(),
@@ -528,3 +453,4 @@ public class DuelService {
         return normalized;
     }
 }
+

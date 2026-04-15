@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260414-4">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260415-3">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -84,13 +84,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Доступные аугментации</h2>
+                    <h2 class="panel-title">Р”РѕСЃС‚СѓРїРЅС‹Рµ Р°СѓРіРјРµРЅС‚Р°С†РёРё</h2>
                 </div>
             </div>
 
             <div class="empty-state-card" id="inventory-placeholder">
-                <h3>Пока аугментаций нет</h3>
-                <p>Купленные модули будут появляться здесь и распределяться по типам.</p>
+                <h3>РџРѕРєР° Р°СѓРіРјРµРЅС‚Р°С†РёР№ РЅРµС‚</h3>
+                <p>РљСѓРїР»РµРЅРЅС‹Рµ РјРѕРґСѓР»Рё Р±СѓРґСѓС‚ РїРѕСЏРІР»СЏС‚СЊСЃСЏ Р·РґРµСЃСЊ Рё СЂР°СЃРїСЂРµРґРµР»СЏС‚СЊСЃСЏ РїРѕ С‚РёРїР°Рј.</p>
             </div>
         </section>
     </section>
@@ -99,13 +99,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Друзья</h2>
+                    <h2 class="panel-title">Р”СЂСѓР·СЊСЏ</h2>
                 </div>
                 <span class="badge badge-muted" id="friend-request-badge">0</span>
             </div>
             <form class="friend-search-form" id="friend-search-form">
                 <input class="text-input" id="friend-search-input" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Найти игрока по никнейму">
-                <button class="primary-button" type="submit">Добавить</button>
+                <button class="primary-button" type="submit">Р”РѕР±Р°РІРёС‚СЊ</button>
             </form>
             <section class="friend-request-panel" id="friend-request-panel"></section>
             <div class="friend-list" id="friend-list"></div>
@@ -116,13 +116,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Магазин</h2>
+                    <h2 class="panel-title">РњР°РіР°Р·РёРЅ</h2>
                 </div>
-                <span class="badge" id="shop-money">0 монет</span>
+                <span class="badge" id="shop-money">0 РјРѕРЅРµС‚</span>
             </div>
             <div class="shop-tabs" id="shop-tabs">
-                <button class="shop-tab is-active" data-shop-section="weapon" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('weapon')">Оружейная</button>
-                <button class="shop-tab" data-shop-section="defense" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('defense')">Защитная</button>
+                <button class="shop-tab is-active" data-shop-section="weapon" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('weapon')">РћСЂСѓР¶РµР№РЅР°СЏ</button>
+                <button class="shop-tab" data-shop-section="defense" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('defense')">Р—Р°С‰РёС‚РЅР°СЏ</button>
             </div>
             <div class="shop-list" id="shop-list"></div>
         </section>
@@ -130,21 +130,21 @@
 
     <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-button is-active" data-nav-target="home" type="button" onclick="window.PolusApp && window.PolusApp.navigate('home')">
-            <span class="nav-title">Хаб</span>
+            <span class="nav-title">РҐР°Р±</span>
         </button>
         <button class="nav-button" data-nav-target="inventory" type="button" onclick="window.PolusApp && window.PolusApp.navigate('inventory')">
-            <span class="nav-title">Инвентарь</span>
+            <span class="nav-title">РРЅРІРµРЅС‚Р°СЂСЊ</span>
         </button>
         <button class="nav-button" data-nav-target="friends" type="button" onclick="window.PolusApp && window.PolusApp.navigate('friends')">
-            <span class="nav-title">Друзья</span>
+            <span class="nav-title">Р”СЂСѓР·СЊСЏ</span>
         </button>
         <button class="nav-button" data-nav-target="shop" type="button" onclick="window.PolusApp && window.PolusApp.navigate('shop')">
-            <span class="nav-title">Магазин</span>
+            <span class="nav-title">РњР°РіР°Р·РёРЅ</span>
         </button>
     </nav>
 
     <button class="social-chat-fab" id="social-chat-fab" type="button" onclick="window.PolusApp && window.PolusApp.openSocialInbox()">
-        <span class="social-chat-fab-label">Чаты</span>
+        <span class="social-chat-fab-label">Р§Р°С‚С‹</span>
         <span class="social-chat-fab-badge hidden" id="social-chat-fab-badge">0</span>
     </button>
 </main>
@@ -152,20 +152,20 @@
 <section class="social-chat-panel hidden" id="social-chat-panel" aria-hidden="true">
     <div class="social-chat-panel-header">
         <div>
-            <h3 class="panel-title panel-title-small">Чаты</h3>
+            <h3 class="panel-title panel-title-small">РџРѕРєРёРЅСѓС‚СЊ Р±РѕР№?</h3>
         </div>
-        <button class="ghost-button social-chat-close" id="social-chat-close" type="button" onclick="window.PolusApp && window.PolusApp.closeSocialInbox()">Закрыть</button>
+        <button class="ghost-button social-chat-close" id="social-chat-close" type="button" onclick="window.PolusApp && window.PolusApp.closeSocialInbox()">Р—Р°РєСЂС‹С‚СЊ</button>
     </div>
     <div class="social-chat-layout">
         <aside class="social-chat-thread-list" id="social-chat-thread-list"></aside>
         <section class="social-chat-thread-view">
             <div class="social-chat-thread-head" id="social-chat-thread-head">
-                <h4 class="social-chat-thread-title" id="social-chat-thread-title">Выбери чат</h4>
+                <h4 class="social-chat-thread-title" id="social-chat-thread-title">Р’С‹Р±РµСЂРё С‡Р°С‚</h4>
             </div>
             <div class="social-chat-messages" id="social-chat-messages"></div>
             <form class="social-chat-form" id="social-chat-form">
-                <input class="text-input social-chat-input" id="social-chat-input" type="text" maxlength="280" placeholder="Напиши сообщение">
-                <button class="primary-button social-chat-send" id="social-chat-send" type="submit">Отправить</button>
+                <input class="text-input social-chat-input" id="social-chat-input" type="text" maxlength="280" placeholder="РќР°РїРёС€Рё СЃРѕРѕР±С‰РµРЅРёРµ">
+                <button class="primary-button social-chat-send" id="social-chat-send" type="submit">РћС‚РїСЂР°РІРёС‚СЊ</button>
             </form>
         </section>
     </div>
@@ -175,24 +175,24 @@
     <div class="modal-sheet registration-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small">Регистрация игрока</h3>
-                <p class="panel-copy" id="registration-copy">Ник будет привязан к твоему Telegram ID.</p>
+                <h3 class="panel-title panel-title-small">РџРѕРєРёРЅСѓС‚СЊ Р±РѕР№?</h3>
+                <p class="panel-copy" id="registration-copy">РќРёРє Р±СѓРґРµС‚ РїСЂРёРІСЏР·Р°РЅ Рє С‚РІРѕРµРјСѓ Telegram ID.</p>
             </div>
         </div>
 
         <form class="registration-form" id="registration-form">
-            <label class="field-label" for="registration-nickname">Никнейм</label>
+            <label class="field-label" for="registration-nickname">РќРёРєРЅРµР№Рј</label>
             <input class="text-input" id="registration-nickname" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Например, Бакунин">
             <div class="field-group">
-                <p class="field-label field-label-spaced" id="registration-style-label">В каком стиле вы будете вести дневник?</p>
+                <p class="field-label field-label-spaced" id="registration-style-label">Р’ РєР°РєРѕРј СЃС‚РёР»Рµ РІС‹ Р±СѓРґРµС‚Рµ РІРµСЃС‚Рё РґРЅРµРІРЅРёРє?</p>
                 <div class="registration-style-grid" role="radiogroup" aria-labelledby="registration-style-label">
                     <label class="registration-style-option">
                         <input type="radio" name="registration-journal-style" value="M">
-                        <span class="registration-style-copy">Я прибыл в Полюс.</span>
+                        <span class="registration-style-copy">РЇ РїСЂРёР±С‹Р» РІ РџРѕР»СЋСЃ.</span>
                     </label>
                     <label class="registration-style-option">
                         <input type="radio" name="registration-journal-style" value="W">
-                        <span class="registration-style-copy">Я прибыла в Полюс.</span>
+                        <span class="registration-style-copy">РЇ РїСЂРёР±С‹Р»Р° РІ РџРѕР»СЋСЃ.</span>
                     </label>
                 </div>
             </div>
@@ -293,8 +293,6 @@
             </div>
 
             <div class="duel-control-stack" id="duel-control-stack">
-                <div class="duel-auto-cover hidden" id="duel-auto-cover">Автоматизировано</div>
-
                 <div class="weapon-grid">
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
                         <strong>Пистоль и щит</strong>
@@ -336,11 +334,6 @@
                 <div class="duel-action-row">
                 <button class="primary-button" id="duel-submit-button" type="button" onclick="window.PolusApp && window.PolusApp.submitDuelTurn()">Сделать ход</button>
                 </div>
-            </div>
-
-            <div class="duel-auto-row">
-                <button class="ghost-button duel-auto-toggle" id="duel-auto-toggle" type="button" onclick="window.PolusApp && window.PolusApp.toggleAutoBattle()">Включить автоматический бой</button>
-                <p class="duel-auto-note hidden" id="duel-auto-note"></p>
             </div>
 
             <p class="duel-rule-note hidden" id="duel-round-status"></p>
@@ -404,8 +397,8 @@
 
 <div class="toast hidden" id="toast"></div>
 
-    <script src="/duel/journal-events.js?v=polus-20260414-4"></script>
-    <script src="/duel/app.js?v=polus-20260414-4"></script>
+    <script src="/duel/journal-events.js?v=polus-20260415-3"></script>
+    <script src="/duel/app.js?v=polus-20260415-3"></script>
 </body>
 </html>
 

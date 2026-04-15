@@ -34,6 +34,16 @@ html,
 body {
     margin: 0;
     min-height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+}
+
+input,
+textarea,
+select {
+    font-size: 16px;
 }
 
 body {
@@ -1197,6 +1207,7 @@ body.duel-open .bottom-nav {
     width: 100%;
     min-height: 52px;
     padding: 12px 14px;
+    font-size: 16px;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.05);
@@ -1629,33 +1640,11 @@ body.duel-open .bottom-nav {
     justify-content: center;
 }
 
-.duel-auto-row {
-    display: grid;
-    gap: 8px;
-    justify-content: center;
-}
-
-.duel-auto-toggle {
-    min-height: 44px;
-}
-
-.duel-auto-toggle.is-active {
-    border-color: rgba(203, 142, 118, 0.42);
-    color: #ffd5dd;
-    background: rgba(137, 51, 77, 0.14);
-}
-
-.duel-auto-toggle.is-pending {
-    border-color: rgba(95, 187, 215, 0.34);
-    color: var(--icy);
-    background: rgba(39, 91, 122, 0.16);
-}
-
-.duel-auto-note {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.84rem;
-    line-height: 1.4;
+.duel-auto-row,
+.duel-auto-toggle,
+.duel-auto-note,
+.duel-auto-cover {
+    display: none !important;
 }
 
 .full-width {
@@ -1716,6 +1705,78 @@ body.duel-open .bottom-nav {
     touch-action: pan-y;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
+}
+
+/* 20260414-8: stabilize mobile chat and duel panels */
+.social-chat-fab {
+    bottom: 148px;
+}
+
+.social-chat-panel {
+    top: max(56px, env(safe-area-inset-top) + 8px);
+    right: 12px;
+    bottom: max(18px, env(safe-area-inset-bottom) + 18px);
+    left: 12px;
+    width: auto;
+    max-width: 860px;
+    max-height: calc(100dvh - max(74px, env(safe-area-inset-top) + 16px) - max(28px, env(safe-area-inset-bottom) + 18px));
+    background: linear-gradient(180deg, rgba(20, 27, 46, 0.98), rgba(12, 18, 34, 0.98));
+    backdrop-filter: none;
+    overflow: hidden;
+    transform: none !important;
+}
+
+.social-chat-layout,
+.social-chat-thread-view,
+.social-chat-thread-list,
+.social-chat-messages,
+.duel-chat-pane,
+.duel-chat-list {
+    min-height: 0;
+}
+
+.social-chat-thread-list,
+.social-chat-messages,
+.duel-chat-list {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+.social-chat-form,
+.duel-chat-form {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    align-items: end;
+}
+
+.social-chat-input,
+.duel-chat-input {
+    min-width: 0;
+    font-size: 16px !important;
+}
+
+.social-chat-send,
+.duel-chat-send {
+    min-width: 96px;
+    max-width: 96px;
+    justify-self: stretch;
+}
+
+@media (max-width: 640px) {
+    .social-chat-fab {
+        right: 14px;
+        bottom: 142px;
+    }
+
+    .social-chat-panel {
+        top: max(54px, env(safe-area-inset-top) + 6px);
+        right: 10px;
+        bottom: max(14px, env(safe-area-inset-bottom) + 14px);
+        left: 10px;
+        border-radius: 24px;
+        padding: 14px 12px 12px;
+    }
 }
 
 .social-chat-panel-header {
@@ -1861,10 +1922,11 @@ body.duel-open .bottom-nav {
 
 .social-chat-input {
     min-width: 0;
+    font-size: 16px !important;
 }
 
 .social-chat-send {
-    min-width: 104px;
+    min-width: 96px;
     width: 100%;
     padding-inline: 12px;
 }
@@ -2037,14 +2099,19 @@ body.social-open .social-chat-fab {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
     margin-top: 12px;
+    width: 100%;
+    min-width: 0;
 }
 
 .duel-chat-input {
     min-height: 48px;
+    min-width: 0;
+    font-size: 16px !important;
 }
 
 .duel-chat-send {
-    min-width: 122px;
+    min-width: 96px;
+    max-width: 120px;
 }
 
 .duel-chat-error {
@@ -2366,8 +2433,324 @@ body.social-open .social-chat-fab {
         padding: 8px;
     }
 
-    .nav-button {
+.nav-button {
         min-height: 64px;
         padding: 10px 8px;
     }
 }
+
+/* Final mobile stability overrides */
+.social-chat-fab {
+    bottom: 86px !important;
+}
+
+.social-chat-panel {
+    top: max(56px, env(safe-area-inset-top) + 8px) !important;
+    right: 12px !important;
+    bottom: max(12px, env(safe-area-inset-bottom) + 8px) !important;
+    left: 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    background: linear-gradient(180deg, rgba(20, 27, 46, 0.995), rgba(11, 17, 31, 0.995)) !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+}
+
+.social-chat-layout {
+    height: 100% !important;
+    min-height: 0 !important;
+}
+
+.social-chat-thread-view,
+.social-chat-thread-list,
+.social-chat-messages,
+.duel-chat-pane,
+.duel-chat-list {
+    min-height: 0 !important;
+}
+
+.social-chat-thread-view {
+    overflow: hidden !important;
+}
+
+.social-chat-messages,
+.duel-chat-list {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+}
+
+.social-chat-form,
+.duel-chat-form {
+    grid-template-columns: minmax(0, 1fr) 84px !important;
+    gap: 8px !important;
+}
+
+.social-chat-send,
+.duel-chat-send {
+    min-width: 84px !important;
+    max-width: 84px !important;
+    width: 84px !important;
+}
+
+.social-chat-input,
+.duel-chat-input,
+.friend-search-form .text-input,
+.registration-form .text-input {
+    font-size: 16px !important;
+}
+
+@media (max-width: 640px) {
+    .social-chat-panel {
+        inset: max(54px, env(safe-area-inset-top) + 6px) 10px max(10px, env(safe-area-inset-bottom) + 6px) 10px !important;
+    }
+
+    .social-chat-fab {
+        bottom: 82px !important;
+        right: 14px !important;
+    }
+}
+
+/* Final duel/chat stability overrides */
+.duel-auto-row,
+.duel-auto-toggle,
+.duel-auto-note,
+.duel-auto-cover {
+    display: none !important;
+}
+
+body.social-open {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
+body.social-open .app-shell {
+    overflow: hidden !important;
+}
+
+.social-chat-panel {
+    position: fixed !important;
+    inset: max(56px, env(safe-area-inset-top) + 6px) 12px max(92px, env(safe-area-inset-bottom) + 8px) 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    z-index: 120 !important;
+    opacity: 1 !important;
+    background: linear-gradient(180deg, rgba(18, 24, 42, 1), rgba(12, 18, 32, 1)) !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+}
+
+.social-chat-layout {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: minmax(120px, 34%) minmax(0, 1fr) !important;
+    gap: 10px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+}
+
+.social-chat-thread-list,
+.social-chat-thread-view,
+.social-chat-messages,
+.duel-chat-pane,
+.duel-chat-list {
+    min-height: 0 !important;
+}
+
+.social-chat-thread-view {
+    overflow: hidden !important;
+}
+
+.social-chat-thread-list,
+.social-chat-messages,
+.duel-chat-list {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+.social-chat-form,
+.duel-chat-form {
+    grid-template-columns: minmax(0, 1fr) 88px !important;
+    align-items: end !important;
+    gap: 8px !important;
+}
+
+.social-chat-send,
+.duel-chat-send {
+    width: 88px !important;
+    min-width: 88px !important;
+    max-width: 88px !important;
+}
+
+.social-chat-input,
+.duel-chat-input,
+.text-input {
+    font-size: 16px !important;
+}
+
+/* 2026-04-15 final duel/chat stability */
+.duel-auto-row,
+.duel-auto-toggle,
+.duel-auto-note,
+.duel-auto-cover {
+    display: none !important;
+}
+
+.duel-log-panel {
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.duel-log-pane,
+.duel-chat-pane {
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.duel-log-track,
+.duel-chat-list {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+.duel-chat-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 88px !important;
+    gap: 8px !important;
+    align-items: end !important;
+    width: 100% !important;
+}
+
+.duel-chat-input {
+    min-width: 0 !important;
+    font-size: 16px !important;
+}
+
+.duel-chat-send {
+    width: 88px !important;
+    min-width: 88px !important;
+    max-width: 88px !important;
+}
+
+body.duel-open,
+body.social-open {
+    overflow: hidden !important;
+}
+
+body.duel-open .app-shell,
+body.social-open .app-shell {
+    overflow: hidden !important;
+}
+
+.social-chat-panel {
+    position: fixed !important;
+    inset: max(56px, env(safe-area-inset-top) + 6px) 12px max(102px, env(safe-area-inset-bottom) + 12px) 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    height: auto !important;
+    background: linear-gradient(180deg, rgba(18, 24, 42, 1), rgba(12, 18, 32, 1)) !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+    z-index: 120 !important;
+}
+
+.social-chat-layout {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: minmax(120px, 34%) minmax(0, 1fr) !important;
+    gap: 10px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+}
+
+.social-chat-thread-list,
+.social-chat-thread-view,
+.social-chat-messages {
+    min-height: 0 !important;
+}
+
+.social-chat-thread-view {
+    overflow: hidden !important;
+}
+
+.social-chat-thread-list,
+.social-chat-messages {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+.social-chat-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 88px !important;
+    gap: 8px !important;
+    align-items: end !important;
+}
+
+.social-chat-send {
+    width: 88px !important;
+    min-width: 88px !important;
+    max-width: 88px !important;
+}
+
+/* 2026-04-15 anti-zoom follow-up */
+html, body { -webkit-text-size-adjust: 100% !important; text-size-adjust: 100% !important; }
+.social-chat-panel, .duel-overlay, .duel-sheet, .social-chat-layout, .social-chat-thread-view { transform: none !important; zoom: 1 !important; }
+.social-chat-input, .duel-chat-input { font-size: 16px !important; line-height: 1.35 !important; }
+
+/* 2026-04-15 final mobile chat hotfix */
+body.social-open,
+body.duel-open {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;
+}
+
+body.social-open {
+    touch-action: manipulation !important;
+}
+
+.social-chat-panel {
+    inset: max(56px, env(safe-area-inset-top) + 6px) 12px calc(116px + env(safe-area-inset-bottom)) 12px !important;
+    border-radius: 28px !important;
+}
+
+.social-chat-layout {
+    grid-template-rows: minmax(112px, 30%) minmax(0, 1fr) !important;
+}
+
+.social-chat-thread-view {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    min-height: 0 !important;
+}
+
+.social-chat-messages {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    padding-bottom: 6px !important;
+}
+
+.social-chat-form {
+    position: relative;
+    z-index: 2;
+    padding-top: 8px !important;
+    background: linear-gradient(180deg, rgba(18, 24, 42, 0), rgba(18, 24, 42, 0.98) 22%) !important;
+}
+
