@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v35";
+    const STORAGE_KEY = "polus_frontend_prototype_v36";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -282,6 +282,7 @@
         elements.profileLevelProgressFill = document.getElementById("profile-level-progress-fill");
         elements.profileLevelProgressText = document.getElementById("profile-level-progress-text");
         elements.profileMoney = document.getElementById("profile-money");
+        elements.profileRating = document.getElementById("profile-rating");
         elements.statPointsBadge = document.getElementById("stat-points-badge");
         elements.heroStats = document.getElementById("hero-stats");
         elements.queueStatusCard = document.getElementById("queue-status-card");
@@ -4912,6 +4913,68 @@ function showToast(text) {
     toastTimer = window.setTimeout(function () {
         elements.toast.classList.add("hidden");
     }, 2600);
+}
+
+function safeSetText(selector, value) {
+    document.querySelectorAll(selector).forEach(function (node) {
+        node.textContent = value;
+    });
+}
+
+function renderProfile() {
+    const playerName = sanitizeVisibleText(state.player && state.player.name, "Новый игрок");
+    const playerMoney = Number(state.player && state.player.money || 0);
+    const playerRating = Number(state.player && state.player.rating || 0);
+    elements.profileName.textContent = playerName;
+    elements.profileMoney.textContent = formatMoney(playerMoney);
+    if (elements.profileRating) {
+        elements.profileRating.textContent = String(playerRating);
+    }
+    elements.shopMoney.textContent = playerMoney + " монет";
+    elements.profileAvatar.textContent = playerName.slice(0, 1).toUpperCase();
+}
+
+function renderInventory() {
+    if (elements.inventoryPlaceholder) {
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+    }
+}
+
+function renderFriends() {
+    const requests = Array.isArray(state.friendRequests) ? state.friendRequests : [];
+    const friends = getDisplayFriends();
+    elements.friendRequestBadge.textContent = String(Math.min(9, requests.length));
+    elements.friendRequestPanel.innerHTML = requests.length ? [
+        '<section class="friend-request-stack">',
+        '<div class="panel-header friend-subheader"><h3 class="panel-title panel-title-small">Приглашения</h3></div>',
+        requests.map(function (request) {
+            const online = request.status === "online";
+            return [
+                '<article class="friend-card friend-request-card">',
+                '<h3>' + escapeHtml(request.name) + '</h3>',
+                '<div class="friend-status-row"><span class="status-chip ' + (online ? 'is-online' : 'is-offline') + '">' + (online ? 'Онлайн' : 'Оффлайн') + '</span><span class="timer-chip">Рейтинг ' + escapeHtml(String(request.rating || 0)) + '</span></div>',
+                '<div class="friend-actions">',
+                '<button class="primary-button full-width" type="button" data-request-accept-id="' + escapeHtml(request.id) + '">Принять</button>',
+                '<button class="secondary-button full-width" type="button" data-request-reject-id="' + escapeHtml(request.id) + '">Отклонить</button>',
+                '</div>',
+                '</article>'
+            ].join("");
+        }).join(""),
+        '</section>'
+    ].join("") : "";
+    elements.friendList.innerHTML = friends.length ? friends.map(function (friend) {
+        const online = friend.status === "online";
+        return [
+            '<article class="friend-card">',
+            '<h3>' + escapeHtml(friend.name) + '</h3>',
+            '<div class="friend-status-row"><span class="status-chip ' + (online ? 'is-online' : 'is-offline') + '">' + (online ? 'Онлайн' : 'Оффлайн') + '</span><span class="timer-chip">Рейтинг ' + escapeHtml(String(friend.rating || 0)) + '</span></div>',
+            '<div class="friend-actions">',
+            '<button class="secondary-button full-width" data-friend-chat-id="' + escapeHtml(friend.id) + '" type="button">Написать сообщение</button>',
+            '<button class="secondary-button full-width friend-action-profile" data-friend-profile-id="' + escapeHtml(friend.id) + '" type="button">Посмотреть профиль</button>',
+            '</div>',
+            '</article>'
+        ].join("");
+    }).join("") : '<article class="friend-card"><p>Пока друзей нет. Найди игрока по никнейму и отправь запрос.</p></article>';
 }
 
 repairStateAfterLegacyLoad();
