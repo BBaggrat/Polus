@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260415-4">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260420-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -16,39 +16,39 @@
                 <div class="cover-glow cover-glow-right"></div>
                 <div class="cover-ridges"></div>
                 <div class="avatar-card">
-                    <div class="avatar-portrait" id="profile-avatar">И</div>
+                    <div class="avatar-portrait" id="profile-avatar">Р</div>
                 </div>
             </div>
 
             <div class="panel-header">
                 <div>
-                    <p class="panel-kicker">Профиль</p>
-                    <h1 class="panel-title" id="profile-name">Новый игрок</h1>
+                    <p class="panel-kicker">РџСЂРѕС„РёР»СЊ</p>
+                    <h1 class="panel-title" id="profile-name">РќРѕРІС‹Р№ РёРіСЂРѕРє</h1>
                 </div>
                 <div class="profile-side">
                     <div class="stat-chip stat-chip-accent">
-                        <span>Монеты</span>
+                        <span>РњРѕРЅРµС‚С‹</span>
                         <strong id="profile-money">0</strong>
                     </div>
                     <div class="stat-chip">
-                        <span>Рейтинг</span>
+                        <span>Р РµР№С‚РёРЅРі</span>
                         <strong id="profile-rating">0</strong>
                     </div>
                 </div>
             </div>
 
             <div class="action-row">
-                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Найти матч</button>
-                <button class="secondary-button" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()">Быстрая дуэль (бот)</button>
+                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">РќР°Р№С‚Рё РјР°С‚С‡</button>
+                <button class="secondary-button" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()">Р‘С‹СЃС‚СЂР°СЏ РґСѓСЌР»СЊ (Р±РѕС‚)</button>
             </div>
 
             <section class="queue-status hidden" id="queue-status-card" aria-live="polite">
                 <div class="queue-status-copy">
-                    <p class="queue-status-label">Поиск дуэли</p>
-                    <strong class="queue-status-time" id="queue-status-time">0 сек</strong>
-                    <p class="queue-status-note" id="queue-status-note">Ищем соперника в очереди.</p>
+                    <p class="queue-status-label">РџРѕРёСЃРє РґСѓСЌР»Рё</p>
+                    <strong class="queue-status-time" id="queue-status-time">0 СЃРµРє</strong>
+                    <p class="queue-status-note" id="queue-status-note">РС‰РµРј СЃРѕРїРµСЂРЅРёРєР° РІ РѕС‡РµСЂРµРґРё.</p>
                 </div>
-                <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
+                <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">РћС‚РјРµРЅРёС‚СЊ</button>
             </section>
 
             <div class="hidden" id="stat-points-badge">0</div>
@@ -69,10 +69,10 @@
         <section class="panel journal-panel" id="home-journal-panel">
             <div class="panel-header">
                 <div class="journal-header-copy">
-                    <h2 class="panel-title panel-title-small">Дневник</h2>
+                    <h2 class="panel-title panel-title-small">Р”РЅРµРІРЅРёРє</h2>
                     <div class="journal-zone-row">
-                        <span class="journal-zone-label">Зона</span>
-                        <span class="badge badge-muted" id="journal-zone">Город</span>
+                        <span class="journal-zone-label">Р—РѕРЅР°</span>
+                        <span class="badge badge-muted" id="journal-zone">Р“РѕСЂРѕРґ</span>
                     </div>
                 </div>
             </div>
@@ -84,13 +84,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Р”РѕСЃС‚СѓРїРЅС‹Рµ Р°СѓРіРјРµРЅС‚Р°С†РёРё</h2>
+                    <h2 class="panel-title">Р вЂќР С•РЎРѓРЎвЂљРЎС“Р С—Р Р…РЎвЂ№Р Вµ Р В°РЎС“Р С–Р СР ВµР Р…РЎвЂљР В°РЎвЂ Р С‘Р С‘</h2>
                 </div>
             </div>
 
             <div class="empty-state-card" id="inventory-placeholder">
-                <h3>РџРѕРєР° Р°СѓРіРјРµРЅС‚Р°С†РёР№ РЅРµС‚</h3>
-                <p>РљСѓРїР»РµРЅРЅС‹Рµ РјРѕРґСѓР»Рё Р±СѓРґСѓС‚ РїРѕСЏРІР»СЏС‚СЊСЃСЏ Р·РґРµСЃСЊ Рё СЂР°СЃРїСЂРµРґРµР»СЏС‚СЊСЃСЏ РїРѕ С‚РёРїР°Рј.</p>
+                <h3>Р СџР С•Р С”Р В° Р В°РЎС“Р С–Р СР ВµР Р…РЎвЂљР В°РЎвЂ Р С‘Р в„– Р Р…Р ВµРЎвЂљ</h3>
+                <p>Р С™РЎС“Р С—Р В»Р ВµР Р…Р Р…РЎвЂ№Р Вµ Р СР С•Р Т‘РЎС“Р В»Р С‘ Р В±РЎС“Р Т‘РЎС“РЎвЂљ Р С—Р С•РЎРЏР Р†Р В»РЎРЏРЎвЂљРЎРЉРЎРѓРЎРЏ Р В·Р Т‘Р ВµРЎРѓРЎРЉ Р С‘ РЎР‚Р В°РЎРѓР С—РЎР‚Р ВµР Т‘Р ВµР В»РЎРЏРЎвЂљРЎРЉРЎРѓРЎРЏ Р С—Р С• РЎвЂљР С‘Р С—Р В°Р С.</p>
             </div>
         </section>
     </section>
@@ -99,13 +99,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Р”СЂСѓР·СЊСЏ</h2>
+                    <h2 class="panel-title">Р вЂќРЎР‚РЎС“Р В·РЎРЉРЎРЏ</h2>
                 </div>
                 <span class="badge badge-muted" id="friend-request-badge">0</span>
             </div>
             <form class="friend-search-form" id="friend-search-form">
-                <input class="text-input" id="friend-search-input" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Найти игрока по никнейму">
-                <button class="primary-button" type="submit">Р”РѕР±Р°РІРёС‚СЊ</button>
+                <input class="text-input" id="friend-search-input" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="РќР°Р№С‚Рё РёРіСЂРѕРєР° РїРѕ РЅРёРєРЅРµР№РјСѓ">
+                <button class="primary-button" type="submit">Р вЂќР С•Р В±Р В°Р Р†Р С‘РЎвЂљРЎРЉ</button>
             </form>
             <section class="friend-request-panel" id="friend-request-panel"></section>
             <div class="friend-list" id="friend-list"></div>
@@ -116,30 +116,30 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">РњР°РіР°Р·РёРЅ</h2>
+                    <h2 class="panel-title">Р СљР В°Р С–Р В°Р В·Р С‘Р Р…</h2>
                 </div>
-                <span class="badge" id="shop-money">0 РјРѕРЅРµС‚</span>
+                <span class="badge" id="shop-money">0 Р СР С•Р Р…Р ВµРЎвЂљ</span>
             </div>
             <div class="shop-tabs" id="shop-tabs">
-                <button class="shop-tab is-active" data-shop-section="weapon" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('weapon')">РћСЂСѓР¶РµР№РЅР°СЏ</button>
-                <button class="shop-tab" data-shop-section="defense" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('defense')">Р—Р°С‰РёС‚РЅР°СЏ</button>
+                <button class="shop-tab is-active" data-shop-section="weapon" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('weapon')">Р С›РЎР‚РЎС“Р В¶Р ВµР в„–Р Р…Р В°РЎРЏ</button>
+                <button class="shop-tab" data-shop-section="defense" type="button" onclick="window.PolusApp && window.PolusApp.setShopSection('defense')">Р вЂ”Р В°РЎвЂ°Р С‘РЎвЂљР Р…Р В°РЎРЏ</button>
             </div>
             <div class="shop-list" id="shop-list"></div>
         </section>
     </section>
 
-    <nav class="bottom-nav" id="bottom-nav">
+        <nav class="bottom-nav" id="bottom-nav">
         <button class="nav-button is-active" data-nav-target="home" type="button" onclick="window.PolusApp && window.PolusApp.navigate('home')">
-            <span class="nav-title">РҐР°Р±</span>
+            <span class="nav-title">Хаб</span>
         </button>
         <button class="nav-button" data-nav-target="inventory" type="button" onclick="window.PolusApp && window.PolusApp.navigate('inventory')">
-            <span class="nav-title">РРЅРІРµРЅС‚Р°СЂСЊ</span>
+            <span class="nav-title">Инвентарь</span>
         </button>
         <button class="nav-button" data-nav-target="friends" type="button" onclick="window.PolusApp && window.PolusApp.navigate('friends')">
-            <span class="nav-title">Р”СЂСѓР·СЊСЏ</span>
+            <span class="nav-title">Друзья</span>
         </button>
         <button class="nav-button" data-nav-target="shop" type="button" onclick="window.PolusApp && window.PolusApp.navigate('shop')">
-            <span class="nav-title">РњР°РіР°Р·РёРЅ</span>
+            <span class="nav-title">Магазин</span>
         </button>
     </nav>
 
@@ -152,47 +152,46 @@
 <section class="social-chat-panel hidden" id="social-chat-panel" aria-hidden="true">
     <div class="social-chat-panel-header">
         <div>
-            <h3 class="panel-title panel-title-small">РџРѕРєРёРЅСѓС‚СЊ Р±РѕР№?</h3>
+            <h3 class="panel-title panel-title-small">Чаты</h3>
         </div>
-        <button class="ghost-button social-chat-close" id="social-chat-close" type="button" onclick="window.PolusApp && window.PolusApp.closeSocialInbox()">Р—Р°РєСЂС‹С‚СЊ</button>
+        <button class="ghost-button social-chat-close" id="social-chat-close" type="button" onclick="window.PolusApp && window.PolusApp.closeSocialInbox()">Закрыть</button>
     </div>
     <div class="social-chat-layout">
         <aside class="social-chat-thread-list" id="social-chat-thread-list"></aside>
         <section class="social-chat-thread-view">
             <div class="social-chat-thread-head" id="social-chat-thread-head">
-                <h4 class="social-chat-thread-title" id="social-chat-thread-title">Р’С‹Р±РµСЂРё С‡Р°С‚</h4>
+                <h4 class="social-chat-thread-title" id="social-chat-thread-title">Выбери чат</h4>
             </div>
             <div class="social-chat-messages" id="social-chat-messages"></div>
             <form class="social-chat-form" id="social-chat-form">
-                <input class="text-input social-chat-input" id="social-chat-input" type="text" maxlength="280" placeholder="РќР°РїРёС€Рё СЃРѕРѕР±С‰РµРЅРёРµ">
-                <button class="primary-button social-chat-send" id="social-chat-send" type="submit">РћС‚РїСЂР°РІРёС‚СЊ</button>
+                <input class="text-input social-chat-input" id="social-chat-input" type="text" maxlength="280" placeholder="Напиши сообщение">
+                <button class="primary-button social-chat-send" id="social-chat-send" type="submit">Отправить</button>
             </form>
         </section>
     </div>
 </section>
-
 <section class="modal-overlay modal-overlay-centered hidden" id="registration-modal" aria-hidden="true">
     <div class="modal-sheet registration-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small">РџРѕРєРёРЅСѓС‚СЊ Р±РѕР№?</h3>
-                <p class="panel-copy" id="registration-copy">РќРёРє Р±СѓРґРµС‚ РїСЂРёРІСЏР·Р°РЅ Рє С‚РІРѕРµРјСѓ Telegram ID.</p>
+                <h3 class="panel-title panel-title-small">Регистрация игрока</h3>
+                <p class="panel-copy" id="registration-copy">Ник будет привязан к твоему Telegram ID.</p>
             </div>
         </div>
 
         <form class="registration-form" id="registration-form">
-            <label class="field-label" for="registration-nickname">РќРёРєРЅРµР№Рј</label>
+            <label class="field-label" for="registration-nickname">Никнейм</label>
             <input class="text-input" id="registration-nickname" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Например, Бакунин">
             <div class="field-group">
-                <p class="field-label field-label-spaced" id="registration-style-label">Р’ РєР°РєРѕРј СЃС‚РёР»Рµ РІС‹ Р±СѓРґРµС‚Рµ РІРµСЃС‚Рё РґРЅРµРІРЅРёРє?</p>
+                <p class="field-label field-label-spaced" id="registration-style-label">В каком стиле вы будете вести дневник?</p>
                 <div class="registration-style-grid" role="radiogroup" aria-labelledby="registration-style-label">
                     <label class="registration-style-option">
                         <input type="radio" name="registration-journal-style" value="M">
-                        <span class="registration-style-copy">РЇ РїСЂРёР±С‹Р» РІ РџРѕР»СЋСЃ.</span>
+                        <span class="registration-style-copy">Я прибыл в Полюс.</span>
                     </label>
                     <label class="registration-style-option">
                         <input type="radio" name="registration-journal-style" value="W">
-                        <span class="registration-style-copy">РЇ РїСЂРёР±С‹Р»Р° РІ РџРѕР»СЋСЃ.</span>
+                        <span class="registration-style-copy">Я прибыла в Полюс.</span>
                     </label>
                 </div>
             </div>
@@ -201,18 +200,17 @@
         </form>
     </div>
 </section>
-
 <section class="modal-overlay modal-overlay-centered hidden" id="start-duel-modal" aria-hidden="true">
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="start-duel-title">Начать бой?</h3>
-                <p class="panel-copy duel-exit-copy" id="start-duel-copy">Подтверди, что хочешь войти в бой.</p>
+                <h3 class="panel-title panel-title-small" id="start-duel-title">РќР°С‡Р°С‚СЊ Р±РѕР№?</h3>
+                <p class="panel-copy duel-exit-copy" id="start-duel-copy">РџРѕРґС‚РІРµСЂРґРё, С‡С‚Рѕ С…РѕС‡РµС€СЊ РІРѕР№С‚Рё РІ Р±РѕР№.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
-            <button class="secondary-button full-width" id="start-duel-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelStartDuel()">Нет, вернуться в хаб</button>
-            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Да, начать бой</button>
+            <button class="secondary-button full-width" id="start-duel-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelStartDuel()">РќРµС‚, РІРµСЂРЅСѓС‚СЊСЃСЏ РІ С…Р°Р±</button>
+            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Р”Р°, РЅР°С‡Р°С‚СЊ Р±РѕР№</button>
         </div>
     </div>
 </section>
@@ -221,13 +219,13 @@
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small">Покинуть бой?</h3>
-                <p class="panel-copy duel-exit-copy">Если выйти сейчас, тебе будет засчитано автопоражение.</p>
+                <h3 class="panel-title panel-title-small">РџРѕРєРёРЅСѓС‚СЊ Р±РѕР№?</h3>
+                <p class="panel-copy duel-exit-copy">Р•СЃР»Рё РІС‹Р№С‚Рё СЃРµР№С‡Р°СЃ, С‚РµР±Рµ Р±СѓРґРµС‚ Р·Р°СЃС‡РёС‚Р°РЅРѕ Р°РІС‚РѕРїРѕСЂР°Р¶РµРЅРёРµ.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
-            <button class="secondary-button full-width" id="duel-exit-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelDuelExit()">Нет, остаться</button>
-            <button class="primary-button full-width" id="duel-exit-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmDuelExit()">Да, выйти</button>
+            <button class="secondary-button full-width" id="duel-exit-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelDuelExit()">РќРµС‚, РѕСЃС‚Р°С‚СЊСЃСЏ</button>
+            <button class="primary-button full-width" id="duel-exit-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmDuelExit()">Р”Р°, РІС‹Р№С‚Рё</button>
         </div>
     </div>
 </section>
@@ -236,21 +234,21 @@
     <div class="duel-sheet">
         <section class="duel-stage">
             <div class="duel-topbar">
-                <h2 class="sr-only" id="duel-title">Дуэль</h2>
-                <div class="duel-round-pill" id="duel-round-pill">Раунд 1</div>
+                <h2 class="sr-only" id="duel-title">Р”СѓСЌР»СЊ</h2>
+                <div class="duel-round-pill" id="duel-round-pill">Р Р°СѓРЅРґ 1</div>
                 <div class="duel-timer-box">
-                    <span class="duel-timer-label">Таймер</span>
+                    <span class="duel-timer-label">РўР°Р№РјРµСЂ</span>
                     <p class="duel-round-timer" id="duel-round-timer">02:00</p>
                 </div>
-                <button class="ghost-button duel-topbar-close" id="duel-close-button" type="button" onclick="window.PolusApp && window.PolusApp.closeDuel()">Выйти</button>
+                <button class="ghost-button duel-topbar-close" id="duel-close-button" type="button" onclick="window.PolusApp && window.PolusApp.closeDuel()">Р’С‹Р№С‚Рё</button>
             </div>
 
             <div class="duel-roster">
                 <article class="duelist-card duel-roster-card">
                     <div class="duelist-head">
-                        <div class="duelist-avatar" id="duel-you-avatar">И</div>
+                        <div class="duelist-avatar" id="duel-you-avatar">Р</div>
                         <div>
-                            <h3 id="duel-you-name">Игрок</h3>
+                            <h3 id="duel-you-name">РРіСЂРѕРє</h3>
                             <p class="duelist-meta" id="duel-you-meta"></p>
                         </div>
                     </div>
@@ -258,9 +256,9 @@
 
                 <article class="duelist-card duel-roster-card duel-roster-card-opponent">
                     <div class="duelist-head">
-                        <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">С</div>
+                        <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">РЎ</div>
                         <div>
-                            <h3 id="duel-opponent-name">Соперник</h3>
+                            <h3 id="duel-opponent-name">РЎРѕРїРµСЂРЅРёРє</h3>
                             <p class="duelist-meta" id="duel-opponent-meta"></p>
                         </div>
                     </div>
@@ -289,50 +287,50 @@
             <input id="duel-dodge-select" type="hidden" value="">
 
             <div class="duel-form-header duel-form-header-centered">
-                <h3 class="duel-block-title">Оружие</h3>
+                <h3 class="duel-block-title">РћСЂСѓР¶РёРµ</h3>
             </div>
 
             <div class="duel-control-stack" id="duel-control-stack">
                 <div class="weapon-grid">
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
-                        <strong>Пистоль и щит</strong>
-                        <span class="weapon-stat">18 урона</span>
-                        <span class="weapon-trait">Шанс блокировать выстрел 30%</span>
+                        <strong>РџРёСЃС‚РѕР»СЊ Рё С‰РёС‚</strong>
+                        <span class="weapon-stat">18 СѓСЂРѕРЅР°</span>
+                        <span class="weapon-trait">РЁР°РЅСЃ Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РІС‹СЃС‚СЂРµР» 30%</span>
                     </button>
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="RIFLE" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'RIFLE')">
-                        <strong>Винтовка</strong>
-                        <span class="weapon-stat">30 урона</span>
-                        <span class="weapon-trait">Игнорирует блокирование</span>
+                        <strong>Р’РёРЅС‚РѕРІРєР°</strong>
+                        <span class="weapon-stat">30 СѓСЂРѕРЅР°</span>
+                        <span class="weapon-trait">РРіРЅРѕСЂРёСЂСѓРµС‚ Р±Р»РѕРєРёСЂРѕРІР°РЅРёРµ</span>
                     </button>
                     <button class="weapon-option" type="button" data-duel-select="weapon" data-value="SHOTGUN" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'SHOTGUN')">
-                        <strong>Дробовик</strong>
-                        <span class="weapon-stat">5-25 урона</span>
-                        <span class="weapon-trait">Вероятность зацепа 35%</span>
+                        <strong>Р”СЂРѕР±РѕРІРёРє</strong>
+                        <span class="weapon-stat">5-25 СѓСЂРѕРЅР°</span>
+                        <span class="weapon-trait">Р’РµСЂРѕСЏС‚РЅРѕСЃС‚СЊ Р·Р°С†РµРїР° 35%</span>
                     </button>
                 </div>
 
                 <div class="duel-vector-grid">
                     <section class="vector-card">
-                        <h4>Выстрел</h4>
+                        <h4>Р’С‹СЃС‚СЂРµР»</h4>
                         <div class="toggle-row">
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')">Лево</button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')">Центр</button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')">Право</button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')">Р›РµРІРѕ</button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')">Р¦РµРЅС‚СЂ</button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')">РџСЂР°РІРѕ</button>
                         </div>
                     </section>
 
                     <section class="vector-card">
-                        <h4>Уворот</h4>
+                        <h4>РЈРІРѕСЂРѕС‚</h4>
                         <div class="toggle-row">
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')">Лево</button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')">Центр</button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')">Право</button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')">Р›РµРІРѕ</button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')">Р¦РµРЅС‚СЂ</button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')">РџСЂР°РІРѕ</button>
                         </div>
                     </section>
                 </div>
 
                 <div class="duel-action-row">
-                <button class="primary-button" id="duel-submit-button" type="button" onclick="window.PolusApp && window.PolusApp.submitDuelTurn()">Сделать ход</button>
+                <button class="primary-button" id="duel-submit-button" type="button" onclick="window.PolusApp && window.PolusApp.submitDuelTurn()">РЎРґРµР»Р°С‚СЊ С…РѕРґ</button>
                 </div>
             </div>
 
@@ -341,11 +339,11 @@
 
         <section class="panel duel-log-panel">
             <div class="duel-log-header">
-                <div class="duel-log-tabs" role="tablist" aria-label="Панели боя">
-                    <button class="duel-log-tab is-active" id="duel-tab-logs" type="button" role="tab" aria-selected="true" onclick="window.PolusApp && window.PolusApp.setDuelPanel('logs')">Логи</button>
-                    <button class="duel-log-tab" id="duel-tab-chat" type="button" role="tab" aria-selected="false" onclick="window.PolusApp && window.PolusApp.setDuelPanel('chat')">Чат</button>
+                <div class="duel-log-tabs" role="tablist" aria-label="РџР°РЅРµР»Рё Р±РѕСЏ">
+                    <button class="duel-log-tab is-active" id="duel-tab-logs" type="button" role="tab" aria-selected="true" onclick="window.PolusApp && window.PolusApp.setDuelPanel('logs')">Р›РѕРіРё</button>
+                    <button class="duel-log-tab" id="duel-tab-chat" type="button" role="tab" aria-selected="false" onclick="window.PolusApp && window.PolusApp.setDuelPanel('chat')">Р§Р°С‚</button>
                 </div>
-                <button class="ghost-button duel-clear-button" id="duel-clear-log-button" type="button" onclick="window.PolusApp && window.PolusApp.clearDuelLog()">Очистить</button>
+                <button class="ghost-button duel-clear-button" id="duel-clear-log-button" type="button" onclick="window.PolusApp && window.PolusApp.clearDuelLog()">РћС‡РёСЃС‚РёС‚СЊ</button>
             </div>
             <div class="duel-log-pane" id="duel-logs-pane" role="tabpanel" aria-labelledby="duel-tab-logs">
                 <div class="duel-log-list duel-log-track" id="duel-log-list"></div>
@@ -353,8 +351,8 @@
             <div class="duel-chat-pane hidden" id="duel-chat-pane" role="tabpanel" aria-labelledby="duel-tab-chat">
                 <div class="duel-chat-list duel-log-track" id="duel-chat-list"></div>
                 <form class="duel-chat-form" id="duel-chat-form">
-                    <input class="text-input duel-chat-input" id="duel-chat-input" type="text" maxlength="300" placeholder="Напиши сообщение сопернику">
-                    <button class="primary-button duel-chat-send" id="duel-chat-send-button" type="submit">Отправить</button>
+                    <input class="text-input duel-chat-input" id="duel-chat-input" type="text" maxlength="300" placeholder="РќР°РїРёС€Рё СЃРѕРѕР±С‰РµРЅРёРµ СЃРѕРїРµСЂРЅРёРєСѓ">
+                    <button class="primary-button duel-chat-send" id="duel-chat-send-button" type="submit">РћС‚РїСЂР°РІРёС‚СЊ</button>
                 </form>
                 <p class="duel-chat-error hidden" id="duel-chat-error"></p>
             </div>
@@ -366,21 +364,21 @@
     <div class="modal-sheet modal-sheet-compact duel-result-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="duel-result-title">Бой завершен</h3>
-                <p class="panel-copy duel-exit-copy" id="duel-result-copy">Победа за тобой.</p>
+                <h3 class="panel-title panel-title-small" id="duel-result-title">Р‘РѕР№ Р·Р°РІРµСЂС€РµРЅ</h3>
+                <p class="panel-copy duel-exit-copy" id="duel-result-copy">РџРѕР±РµРґР° Р·Р° С‚РѕР±РѕР№.</p>
             </div>
         </div>
         <div class="duel-result-rewards">
             <div class="duel-result-chip">
-                <span>Рейтинг</span>
+                <span>Р РµР№С‚РёРЅРі</span>
                 <strong id="duel-result-exp">+0</strong>
             </div>
             <div class="duel-result-chip">
-                <span>Монеты</span>
+                <span>РњРѕРЅРµС‚С‹</span>
                 <strong id="duel-result-money">+0</strong>
             </div>
         </div>
-        <button class="primary-button full-width" id="duel-result-close" type="button" onclick="window.PolusApp && window.PolusApp.closeDuelResult()">В хаб</button>
+        <button class="primary-button full-width" id="duel-result-close" type="button" onclick="window.PolusApp && window.PolusApp.closeDuelResult()">Р’ С…Р°Р±</button>
     </div>
 </section>
 
@@ -388,7 +386,7 @@
     <div class="modal-sheet modal-sheet-compact">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="augment-modal-title">Модуль</h3>
+                <h3 class="panel-title panel-title-small" id="augment-modal-title">РњРѕРґСѓР»СЊ</h3>
             </div>
         </div>
         <div id="augment-modal-list"></div>
@@ -397,8 +395,9 @@
 
 <div class="toast hidden" id="toast"></div>
 
-    <script src="/duel/journal-events.js?v=polus-20260415-4"></script>
-    <script src="/duel/app.js?v=polus-20260415-4"></script>
+    <script src="/duel/journal-events.js?v=polus-20260420-1"></script>
+    <script src="/duel/app.js?v=polus-20260420-1"></script>
 </body>
 </html>
+
 
