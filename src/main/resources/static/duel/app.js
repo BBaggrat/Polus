@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v44";
+    const STORAGE_KEY = "polus_frontend_prototype_v45";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -5382,7 +5382,7 @@ function renderSocialInbox() {
 }
 
 const LEGACY_RENDER_DUEL = renderDuel;
-const CLEAN_AUGMENT_COPY = {
+const FINAL_CLEAN_AUGMENT_COPY = {
     weaponBrassSights: { name: "Прицельная рамка", description: "+5 к урону", slot: "weapon", price: 100 },
     weaponDoubleTap: { name: "Рискованный затвор", description: "5% двойной урон · 5% осечка", slot: "weapon", price: 100 },
     defensePlating: { name: "Северная бронепластина", description: "-3 входящего урона", slot: "defense", price: 100 },
@@ -8415,7 +8415,7 @@ function sanitizeVisibleText(text, fallback) {
 }
 
 function getOverrideAugment(id) {
-    return CLEAN_AUGMENT_COPY[id] || null;
+    return FINAL_CLEAN_AUGMENT_COPY[id] || null;
 }
 
 function isPlaceholderPlayerName(value) {
