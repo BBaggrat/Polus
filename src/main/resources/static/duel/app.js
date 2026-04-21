@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v40";
+    const STORAGE_KEY = "polus_frontend_prototype_v41";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -392,6 +392,12 @@
     function bindEvents() {
         document.addEventListener("click", onDocumentClick);
         document.addEventListener("submit", onDocumentSubmit);
+    }
+
+    function stripInlineButtonActions() {
+        document.querySelectorAll("button[onclick]").forEach(function (button) {
+            button.removeAttribute("onclick");
+        });
     }
 
     function exposeGlobalActions() {
@@ -963,15 +969,63 @@
             return;
         }
 
-        if (target.hasAttribute("onclick")) {
-            return;
-        }
-
         if (target.id === "find-match-button") {
+            startQueueDuel();
             return;
         }
 
         if (target.id === "bot-duel-button") {
+            startBotDuel();
+            return;
+        }
+
+        if (target.id === "social-chat-fab") {
+            openSocialInbox();
+            return;
+        }
+
+        if (target.id === "social-chat-close") {
+            closeSocialInbox();
+            return;
+        }
+
+        if (target.id === "start-duel-cancel") {
+            cancelStartDuel();
+            return;
+        }
+
+        if (target.id === "start-duel-confirm") {
+            confirmStartDuel();
+            return;
+        }
+
+        if (target.id === "duel-exit-cancel") {
+            cancelDuelExit();
+            return;
+        }
+
+        if (target.id === "duel-exit-confirm") {
+            confirmDuelExit();
+            return;
+        }
+
+        if (target.id === "duel-result-close") {
+            closeDuelResult();
+            return;
+        }
+
+        if (target.id === "duel-submit-button") {
+            submitCurrentDuelTurn();
+            return;
+        }
+
+        if (target.id === "duel-tab-logs") {
+            setDuelPanel("logs");
+            return;
+        }
+
+        if (target.id === "duel-tab-chat") {
+            setDuelPanel("chat");
             return;
         }
 
@@ -5944,6 +5998,7 @@ function renderAll() {
     renderStartDuelModal();
     renderDuelExitModal();
     renderDuelResultModal();
+    stripInlineButtonActions();
 }
 
 const FINAL_DUEL_RENDER = renderDuel;
@@ -7169,6 +7224,490 @@ function renderAll() {
     renderStartDuelModal();
     renderDuelExitModal();
     renderDuelResultModal();
+}
+
+function refreshStaticCopy() {
+    document.title = "Полюс";
+
+    const setText = function (id, value) {
+        const node = document.getElementById(id);
+        if (node) {
+            node.textContent = value;
+        }
+    };
+    const setPlaceholder = function (id, value) {
+        const node = document.getElementById(id);
+        if (node) {
+            node.setAttribute("placeholder", value);
+        }
+    };
+
+    setText("find-match-button", "Найти матч");
+    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("queue-cancel-button", "Отменить");
+    setText("social-chat-close", "Закрыть");
+    setText("social-chat-thread-title", "Выбери чат");
+    setText("duel-tab-logs", "Логи");
+    setText("duel-tab-chat", "Чат");
+    setText("duel-clear-log-button", "Очистить");
+    setText("duel-title", "Дуэль");
+    setText("start-duel-title", "Начать бой?");
+    setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
+    setText("start-duel-cancel", "Нет, вернуться в хаб");
+    setText("start-duel-confirm", "Да, начать бой");
+    setText("duel-exit-cancel", "Нет, остаться");
+    setText("duel-exit-confirm", "Да, выйти");
+    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-close", "В хаб");
+    setText("journal-zone-label", "Зона");
+    setText("shop-money", String(Number(state.player && state.player.money || 0)) + " монет");
+
+    setPlaceholder("friend-search-input", "Найти игрока по никнейму");
+    setPlaceholder("social-chat-input", "Напиши сообщение");
+    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("registration-nickname", "Например, Бакунин");
+
+    safeSetText(".panel-kicker", "Профиль");
+    safeSetText(".queue-status-label", "Поиск дуэли");
+    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
+    safeSetText(".journal-zone-label", "Зона");
+    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
+    safeSetText("#screen-friends .panel-title", "Друзья");
+    safeSetText("#friend-search-form button", "Добавить");
+    safeSetText("#screen-shop .panel-title", "Магазин");
+    safeSetText(".shop-tab[data-shop-section='weapon']", "Оружейная");
+    safeSetText(".shop-tab[data-shop-section='defense']", "Защитная");
+    safeSetText(".social-chat-fab-label", "Чаты");
+    safeSetText("#social-chat-panel .panel-title.panel-title-small", "Чаты");
+    safeSetText("#registration-modal .panel-title.panel-title-small", "Регистрация игрока");
+    safeSetText("#registration-copy", state.auth && state.auth.demoMode
+        ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
+        : "Ник будет привязан к твоему Telegram ID.");
+    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-submit", "Создать аккаунт");
+    safeSetText(".duel-result-chip:nth-of-type(1) span", "Рейтинг");
+    safeSetText(".duel-result-chip:nth-of-type(2) span", "Монеты");
+    safeSetText(".duel-block-title", "Оружие");
+    safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Лево");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Центр");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Право");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Лево");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Центр");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Право");
+    safeSetText(".nav-button[data-nav-target='home'] .nav-title", "Хаб");
+    safeSetText(".nav-button[data-nav-target='inventory'] .nav-title", "Инвентарь");
+    safeSetText(".nav-button[data-nav-target='friends'] .nav-title", "Друзья");
+    safeSetText(".nav-button[data-nav-target='shop'] .nav-title", "Магазин");
+}
+
+function syncPlayerFromServer(player, resetEconomy) {
+    state.player.id = player.id;
+    state.player.name = sanitizeVisibleText(player.nickname, "")
+        || sanitizeVisibleText(player.displayName, "")
+        || sanitizeVisibleText(state.auth.nickname, "")
+        || sanitizeVisibleText(state.player.name, "Новый игрок")
+        || "Новый игрок";
+    state.player.telegramUserId = player.telegramUserId || null;
+    state.player.rating = typeof player.rating === "number" ? player.rating : Number(state.player.rating || 0);
+    if (resetEconomy || typeof state.player.money !== "number" || typeof player.coins === "number") {
+        state.player.money = typeof player.coins === "number" ? player.coins : Number(state.player.money || 0);
+    }
+    state.player.wins = typeof player.wins === "number" ? player.wins : Number(state.player.wins || 0);
+    state.player.losses = typeof player.losses === "number" ? player.losses : Number(state.player.losses || 0);
+}
+
+function renderProfile() {
+    const playerName = sanitizeVisibleText(state.player && state.player.name, sanitizeVisibleText(state.auth && state.auth.nickname, "Новый игрок")) || "Новый игрок";
+    const playerMoney = Number(state.player && state.player.money || 0);
+    const playerRating = Number(state.player && state.player.rating || 0);
+    elements.profileName.textContent = playerName;
+    elements.profileMoney.textContent = String(playerMoney);
+    if (elements.profileRating) {
+        elements.profileRating.textContent = String(playerRating);
+    }
+    if (elements.shopMoney) {
+        elements.shopMoney.textContent = playerMoney + " монет";
+    }
+    if (elements.profileAvatar) {
+        elements.profileAvatar.textContent = playerName.slice(0, 1).toUpperCase();
+    }
+}
+
+function renderJournal() {
+    if (!elements.journalList) {
+        return;
+    }
+    if (!Array.isArray(state.journal) || !state.journal.length) {
+        elements.journalList.innerHTML = '<article class="journal-entry"><p>Записей пока нет.</p></article>';
+        return;
+    }
+    elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город");
+        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись дневника обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+    }).join("");
+}
+
+function renderRegistrationModal() {
+    const auth = state.auth || {};
+    const currentName = sanitizeVisibleText(state.player && state.player.name, "");
+    const shouldOpen = !auth.registered || !sanitizeVisibleText(auth.nickname, "") || !currentName || currentName === "Новый игрок";
+    elements.registrationModal.classList.toggle("hidden", !shouldOpen);
+    elements.registrationModal.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+    if (!shouldOpen) {
+        return;
+    }
+    elements.registrationCopy.textContent = auth.demoMode
+        ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
+        : "Ник будет привязан к твоему Telegram ID.";
+    if (!elements.registrationNickname.value) {
+        elements.registrationNickname.value = sanitizeVisibleText(auth.nickname, "");
+    }
+    if (auth.journalStyle) {
+        const savedOption = document.querySelector('input[name="registration-journal-style"][value="' + auth.journalStyle + '"]');
+        if (savedOption) {
+            savedOption.checked = true;
+        }
+    }
+    if (auth.initError && !auth.demoMode) {
+        showRegistrationError(auth.initError);
+    } else {
+        elements.registrationError.textContent = "";
+        elements.registrationError.classList.add("hidden");
+    }
+}
+
+async function submitRegistration() {
+    const nickname = (elements.registrationNickname.value || "").trim();
+    const checkedStyle = document.querySelector('input[name="registration-journal-style"]:checked');
+    const journalStyle = checkedStyle ? checkedStyle.value : "";
+    elements.registrationError.textContent = "";
+    elements.registrationError.classList.add("hidden");
+
+    if (!nickname) {
+        showRegistrationError("Введи никнейм.");
+        return;
+    }
+    if (nickname.length < 3 || nickname.length > 20) {
+        showRegistrationError("Ник должен быть длиной от 3 до 20 символов.");
+        return;
+    }
+    if (!/^[\p{L}\p{N}_-]+$/u.test(nickname)) {
+        showRegistrationError("Ник может содержать только буквы, цифры, _ и -.");
+        return;
+    }
+    if (!journalStyle) {
+        showRegistrationError("Выбери стиль дневника.");
+        return;
+    }
+
+    elements.registrationSubmit.disabled = true;
+    try {
+        if (state.auth && state.auth.demoMode) {
+            state.auth.nickname = nickname;
+            state.auth.journalStyle = journalStyle;
+            state.auth.registered = true;
+            state.player.name = nickname;
+            state.player.money = 0;
+            state.player.rating = 0;
+            saveState();
+            renderAll();
+            showToast("Аккаунт зарегистрирован.");
+            return;
+        }
+        if (!state.auth || !state.auth.sessionToken) {
+            throw new Error("Открой Mini App через Telegram, чтобы зарегистрировать ник.");
+        }
+        const response = await fetch("/api/player/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Session-Token": state.auth.sessionToken
+            },
+            body: JSON.stringify({ nickname: nickname, journalStyle: journalStyle })
+        });
+        if (!response.ok) {
+            throw new Error(await readApiError(response));
+        }
+        const player = await response.json();
+        state.auth.nickname = player.nickname || nickname;
+        state.auth.journalStyle = player.journalStyle || journalStyle;
+        state.auth.registered = Boolean(player.registered);
+        syncPlayerFromServer(player, true);
+        await loadFriendsOverview();
+        saveState();
+        renderAll();
+        showToast("Аккаунт зарегистрирован.");
+    } catch (error) {
+        showRegistrationError(error && error.message ? error.message : "Не удалось зарегистрировать аккаунт.");
+    } finally {
+        elements.registrationSubmit.disabled = false;
+    }
+}
+
+function renderInventory() {
+    if (!elements.inventoryPlaceholder) {
+        return;
+    }
+    const unlocked = (Array.isArray(state.inventory && state.inventory.unlockedAugments) ? state.inventory.unlockedAugments : []).filter(function (id) {
+        return Boolean(getOverrideAugment(id));
+    });
+    if (!unlocked.length) {
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        return;
+    }
+    const grouped = {
+        weapon: unlocked.filter(function (id) { return getOverrideAugment(id).slot === "weapon"; }),
+        defense: unlocked.filter(function (id) { return getOverrideAugment(id).slot === "defense"; })
+    };
+    elements.inventoryPlaceholder.innerHTML = [
+        grouped.weapon.length ? '<section class="inventory-slot"><h3>Оружейная аугментация</h3>' + grouped.weapon.map(function (id) {
+            const item = getOverrideAugment(id);
+            return '<article class="inventory-card"><strong>' + escapeHtml(item.name) + '</strong><p>' + escapeHtml(item.description) + '</p></article>';
+        }).join("") + '</section>' : "",
+        grouped.defense.length ? '<section class="inventory-slot"><h3>Защитная аугментация</h3>' + grouped.defense.map(function (id) {
+            const item = getOverrideAugment(id);
+            return '<article class="inventory-card"><strong>' + escapeHtml(item.name) + '</strong><p>' + escapeHtml(item.description) + '</p></article>';
+        }).join("") + '</section>' : ""
+    ].join("");
+}
+
+function renderFriends() {
+    const requests = Array.isArray(state.friendRequests) ? state.friendRequests : [];
+    const friends = getDisplayFriends();
+    elements.friendRequestBadge.textContent = String(Math.min(9, requests.length));
+    elements.friendRequestPanel.innerHTML = requests.length ? [
+        '<section class="friend-request-stack">',
+        '<div class="panel-header friend-subheader"><h3 class="panel-title panel-title-small">Приглашения</h3></div>',
+        requests.map(function (request) {
+            const online = request.status === "online";
+            const requestName = sanitizeVisibleText(request.name, "Игрок");
+            return '<article class="friend-card friend-request-card"><h3>' + escapeHtml(requestName) + '</h3><div class="friend-status-row"><span class="status-chip ' + (online ? 'is-online' : 'is-offline') + '">' + (online ? 'Онлайн' : 'Оффлайн') + '</span><span class="timer-chip">Рейтинг ' + escapeHtml(String(request.rating || 0)) + '</span></div><div class="friend-actions"><button class="primary-button full-width" type="button" data-request-accept-id="' + escapeHtml(request.id) + '">Принять</button><button class="secondary-button full-width" type="button" data-request-reject-id="' + escapeHtml(request.id) + '">Отклонить</button></div></article>';
+        }).join(""),
+        '</section>'
+    ].join("") : "";
+    elements.friendList.innerHTML = friends.length ? friends.map(function (friend) {
+        const online = friend.status === "online";
+        const friendName = sanitizeVisibleText(friend.name, "Игрок");
+        return '<article class="friend-card"><h3>' + escapeHtml(friendName) + '</h3><div class="friend-status-row"><span class="status-chip ' + (online ? 'is-online' : 'is-offline') + '">' + (online ? 'Онлайн' : 'Оффлайн') + '</span><span class="timer-chip">Рейтинг ' + escapeHtml(String(friend.rating || 0)) + '</span></div><div class="friend-actions"><button class="secondary-button full-width" data-friend-chat-id="' + escapeHtml(friend.id) + '" type="button">Написать сообщение</button><button class="secondary-button full-width friend-action-profile" data-friend-profile-id="' + escapeHtml(friend.id) + '" type="button">Посмотреть профиль</button></div></article>';
+    }).join("") : '<article class="friend-card"><p>Пока друзей нет. Найди игрока по никнейму и отправь запрос.</p></article>';
+}
+
+function renderSocialInbox() {
+    if (!elements.socialChatPanel) {
+        return;
+    }
+    state.social = state.social || {};
+    state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
+    const threads = state.social.threads;
+    const activeThread = threads.find(function (thread) { return thread.id === state.social.activeThreadId; }) || null;
+    elements.socialChatFabBadge.textContent = String(Math.min(9, threads.length));
+    elements.socialChatFabBadge.classList.toggle("hidden", threads.length === 0);
+    elements.socialChatPanel.classList.toggle("hidden", !state.social.isOpen);
+    elements.socialChatPanel.setAttribute("aria-hidden", state.social.isOpen ? "false" : "true");
+    document.body.classList.toggle("social-open", Boolean(state.social.isOpen));
+
+    if (!threads.length) {
+        elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Открытые диалоги появятся здесь после первого сообщения другу.</article>';
+        elements.socialChatThreadTitle.textContent = "Выбери чат";
+        elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
+        elements.socialChatInput.disabled = true;
+        elements.socialChatSend.disabled = true;
+        return;
+    }
+
+    elements.socialChatThreadList.innerHTML = threads.map(function (thread) {
+        const friendName = sanitizeVisibleText(thread.friendName, "Друг");
+        const statusText = thread.status === "online" ? "Онлайн" : "Оффлайн";
+        return '<button class="social-chat-thread-card' + (activeThread && activeThread.id === thread.id ? ' is-active' : '') + '" type="button" data-social-thread-id="' + escapeHtml(thread.id) + '"><strong>' + escapeHtml(friendName) + '</strong><span>' + escapeHtml(statusText + " · Рейтинг " + (thread.rating || 0)) + '</span></button>';
+    }).join("");
+
+    if (!activeThread) {
+        elements.socialChatThreadTitle.textContent = "Выбери чат";
+        elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
+        elements.socialChatInput.disabled = true;
+        elements.socialChatSend.disabled = true;
+        return;
+    }
+
+    elements.socialChatThreadTitle.textContent = sanitizeVisibleText(activeThread.friendName, "Друг");
+    elements.socialChatMessages.innerHTML = (activeThread.messages || []).length
+        ? (activeThread.messages || []).map(function (message) {
+            const own = message.author === "you";
+            const authorName = own ? sanitizeVisibleText(state.player.name, "Ты") : sanitizeVisibleText(activeThread.friendName, "Друг");
+            const messageText = sanitizeVisibleText(message.text, "Сообщение скрыто.");
+            return '<div class="social-chat-message' + (own ? ' social-chat-message-own' : '') + '"><div class="social-chat-message-bubble"><strong>' + escapeHtml(authorName) + '</strong><p>' + escapeHtml(messageText) + '</p><small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small></div></div>';
+        }).join("")
+        : '<div class="social-chat-empty">Пока сообщений нет. Напиши первым.</div>';
+    elements.socialChatInput.disabled = false;
+    elements.socialChatSend.disabled = false;
+    elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+}
+
+function renderShop() {
+    const activeSection = state.ui.shopSection || "weapon";
+    elements.shopTabButtons.forEach(function (button) {
+        button.classList.toggle("is-active", button.getAttribute("data-shop-section") === activeSection);
+    });
+    const items = (Array.isArray(state.shop) ? state.shop : []).filter(function (item) {
+        return item.section === activeSection && getOverrideAugment(item.id);
+    });
+    elements.shopList.innerHTML = items.length ? '<section class="shop-section">' + items.map(function (item) {
+        const copy = getOverrideAugment(item.id);
+        const owned = item.kind === "augment" && hasAugment(item.augmentId);
+        return '<article class="shop-card"><h3>' + escapeHtml(copy.name) + '</h3><div class="shop-price-row"><strong>' + escapeHtml(String(copy.price) + " монет") + '</strong></div><p class="shop-card-copy">' + escapeHtml(copy.description) + '</p><div class="shop-actions"><button class="primary-button" data-shop-id="' + escapeHtml(item.id) + '" type="button"' + (owned ? ' disabled' : '') + '>' + (owned ? 'Куплено' : 'Купить') + '</button></div></article>';
+    }).join("") + '</section>' : '<article class="shop-card"><p>Пока товаров в этом разделе нет.</p></article>';
+}
+
+function buildDuelStatusText(duel) {
+    if (!duel) {
+        return "";
+    }
+    if (duel.finished) {
+        return sanitizeVisibleText(duel.resultText, "");
+    }
+    if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
+        return hasPendingDuelChanges(duel)
+            ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
+            : "Ход зафиксирован. Ждём соперника.";
+    }
+    return "";
+}
+
+function renderDuelChat(duel) {
+    const isLiveChat = duel.mode === "pvp-live";
+    const canWrite = isLiveChat && !duel.finished;
+    const messages = duel.chatMessages || [];
+    if (!messages.length) {
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+    } else {
+        elements.duelChatList.innerHTML = messages.map(function (message) {
+            const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
+            const systemMessage = Boolean(message.systemMessage);
+            const extraClass = systemMessage ? " duel-chat-entry-system" : (own ? " duel-chat-entry-own" : "");
+            const displayName = sanitizeVisibleText(message.displayName, systemMessage ? "Система" : "Игрок");
+            const messageText = sanitizeVisibleText(message.text, systemMessage ? "Системное сообщение обновлено." : "Сообщение скрыто.");
+            return '<div class="duel-chat-entry' + extraClass + '"><p class="duel-chat-meta">' + escapeHtml(displayName) + ' · ' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</p><p class="duel-chat-text">' + escapeHtml(messageText) + '</p></div>';
+        }).join("");
+    }
+    elements.duelChatInput.disabled = !canWrite;
+    elements.duelChatSendButton.disabled = !canWrite;
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
+    elements.duelChatError.classList.toggle("hidden", !duel.chatError);
+    elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
+}
+
+function renderDuel() {
+    refreshStaticCopy();
+    const duel = state.duel;
+    if (!duel) {
+        closeDuelSilently();
+        return;
+    }
+
+    duel.activePanel = duel.activePanel || "logs";
+    duel.autoBattleEnabled = false;
+    duel.autoBattlePendingEnabled = null;
+    duel.chatMessages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
+    duel.chatError = sanitizeVisibleText(duel.chatError, "");
+    duel.resultText = sanitizeVisibleText(duel.resultText, "");
+    duel.logs = (Array.isArray(duel.logs) ? duel.logs : []).map(function (entry) {
+        return Object.assign({}, entry, { lines: sanitizeLogLines(entry.lines) });
+    }).filter(function (entry) {
+        return entry.lines.length > 0;
+    });
+
+    syncDuelInputs(duel);
+    renderDuelControls();
+    hideAutoBattleUi();
+
+    elements.duelTitle.textContent = "Дуэль";
+    elements.duelRoundPill.textContent = "Раунд " + duel.round;
+    elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
+    elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
+    elements.duelYouMeta.textContent = "";
+    elements.duelYouAvatar.textContent = sanitizeVisibleText(duel.playerName, "И").slice(0, 1).toUpperCase();
+    elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
+    elements.duelOpponentMeta.textContent = "";
+    elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
+    elements.duelYouHp.textContent = duel.playerHp + " HP";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
+    elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
+
+    const duelStatus = buildDuelStatusText(duel);
+    elements.duelRoundStatus.innerHTML = duelStatus ? decorateText(duelStatus) : "";
+    elements.duelRoundStatus.classList.toggle("hidden", !duelStatus);
+
+    const duelSelectionComplete = isDuelSelectionComplete(duel);
+    const duelHasPendingChanges = hasPendingDuelChanges(duel);
+    elements.duelSubmitButton.textContent = duel.finished
+        ? "Бой завершен"
+        : duel.yourActionSubmitted
+            ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
+            : "Сделать ход";
+    elements.duelSubmitButton.disabled = duel.finished || !duelSelectionComplete || (duel.yourActionSubmitted && !duelHasPendingChanges);
+
+    if (!duel.logs.length) {
+        elements.duelLogList.innerHTML = '<div class="duel-log-round"><p class="duel-log-round-title">Логов пока нет. Первый обмен ходами появится здесь.</p></div>';
+    } else {
+        elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(function (entry) {
+            const roundNumber = typeof entry.round === "number" ? entry.round : entry.roundNumber;
+            const lines = sanitizeLogLines(entry.lines);
+            const title = lines.length ? lines[0] : "Раунд " + roundNumber;
+            const detailLines = lines.slice(1);
+            return '<div class="duel-log-round"><p class="duel-log-round-title">' + decorateText(title) + '</p>' + detailLines.map(function (line) {
+                return '<p class="duel-log-line">' + decorateText(line) + '</p>';
+            }).join('') + '</div>';
+        }).join('');
+    }
+
+    renderDuelChat(duel);
+    elements.duelTabLogs.classList.toggle("is-active", duel.activePanel === "logs");
+    elements.duelTabLogs.setAttribute("aria-selected", duel.activePanel === "logs" ? "true" : "false");
+    elements.duelTabChat.classList.toggle("is-active", duel.activePanel === "chat");
+    elements.duelTabChat.setAttribute("aria-selected", duel.activePanel === "chat" ? "true" : "false");
+    elements.duelLogsPane.classList.toggle("hidden", duel.activePanel !== "logs");
+    elements.duelChatPane.classList.toggle("hidden", duel.activePanel !== "chat");
+    elements.duelClearLogButton.classList.toggle("hidden", duel.activePanel !== "logs");
+    elements.duelOverlay.classList.remove("hidden");
+    elements.duelOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("duel-open");
+}
+
+function renderAll() {
+    repairStateAfterLegacyLoad();
+    refreshStaticCopy();
+    renderScreens();
+    renderProfile();
+    renderHeroStats();
+    renderRegistrationModal();
+    renderQueueStatus();
+    renderJournal();
+    renderInventory();
+    renderFriends();
+    decorateFriendCards();
+    renderSocialInbox();
+    renderShop();
+    renderDuel();
+    renderStartDuelModal();
+    renderDuelExitModal();
+    renderDuelResultModal();
+    stripInlineButtonActions();
 }
 
 repairStateAfterLegacyLoad();
