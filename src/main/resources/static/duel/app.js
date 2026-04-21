@@ -6516,43 +6516,81 @@ function renderDuelChat(duel) {
 }
 
 function renderDuel() {
-    FINAL_DUEL_RENDER();
-    const duel = state.duel;
     refreshStaticCopy();
-    hideAutoBattleUi();
+    const duel = state.duel;
     if (!duel) {
+        closeDuelSilently();
         return;
     }
+
+    duel.activePanel = duel.activePanel || "logs";
+    duel.autoBattleEnabled = false;
+    duel.autoBattlePendingEnabled = null;
+    duel.chatMessages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
+    duel.chatError = sanitizeVisibleText(duel.chatError, "");
+    duel.resultText = sanitizeVisibleText(duel.resultText, "");
+    duel.logs = (Array.isArray(duel.logs) ? duel.logs : []).map(function (entry) {
+        return Object.assign({}, entry, { lines: sanitizeLogLines(entry.lines) });
+    }).filter(function (entry) {
+        return entry.lines.length > 0;
+    });
+
+    syncDuelInputs(duel);
+    renderDuelControls();
+    hideAutoBattleUi();
+
     elements.duelTitle.textContent = "Дуэль";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
-    if (elements.duelRoundTimer && duel.roundDeadlineAt) {
-        elements.duelRoundTimer.textContent = formatDuration(Math.max(0, duel.roundDeadlineAt - Date.now()));
-    }
-    if (elements.duelSubmitButton) {
-        const hasPending = hasPendingDuelChanges(duel);
-        const selectionComplete = isDuelSelectionComplete(duel);
-        elements.duelSubmitButton.textContent = duel.finished
-            ? "Бой завершен"
-            : duel.yourActionSubmitted
-                ? (hasPending ? "Изменить ход" : "Ход сделан")
-                : "Сделать ход";
-        elements.duelSubmitButton.disabled = duel.finished || !duel.canSubmitAction || !selectionComplete || (duel.yourActionSubmitted && !hasPending);
-    }
-    if (elements.duelLogList && !(duel.logs || []).length) {
+    elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
+    elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
+    elements.duelYouMeta.textContent = "";
+    elements.duelYouAvatar.textContent = sanitizeVisibleText(duel.playerName, "И").slice(0, 1).toUpperCase();
+    elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
+    elements.duelOpponentMeta.textContent = "";
+    elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
+    elements.duelYouHp.textContent = duel.playerHp + " HP";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
+    elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
+
+    const duelStatus = buildDuelStatusText(duel);
+    elements.duelRoundStatus.innerHTML = duelStatus ? decorateText(duelStatus) : "";
+    elements.duelRoundStatus.classList.toggle("hidden", !duelStatus);
+
+    const duelSelectionComplete = isDuelSelectionComplete(duel);
+    const duelHasPendingChanges = hasPendingDuelChanges(duel);
+    elements.duelSubmitButton.textContent = duel.finished
+        ? "Бой завершен"
+        : duel.yourActionSubmitted
+            ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
+            : "Сделать ход";
+    elements.duelSubmitButton.disabled = duel.finished || !duelSelectionComplete || (duel.yourActionSubmitted && !duelHasPendingChanges);
+
+    if (!duel.logs.length) {
         elements.duelLogList.innerHTML = '<div class="duel-log-round"><p class="duel-log-round-title">Логов пока нет. Первый обмен ходами появится здесь.</p></div>';
+    } else {
+        elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(function (entry) {
+            const roundNumber = typeof entry.round === "number" ? entry.round : entry.roundNumber;
+            const lines = sanitizeLogLines(entry.lines);
+            const title = lines.length ? lines[0] : "Раунд " + roundNumber;
+            const detailLines = lines.slice(1);
+            return '<div class="duel-log-round"><p class="duel-log-round-title">' + decorateText(title) + '</p>' + detailLines.map(function (line) {
+                return '<p class="duel-log-line">' + decorateText(line) + '</p>';
+            }).join('') + '</div>';
+        }).join('');
     }
-    if (elements.duelYouName) {
-        elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
-    }
-    if (elements.duelOpponentName) {
-        elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
-    }
-    if (elements.duelYouMeta) {
-        elements.duelYouMeta.textContent = "";
-    }
-    if (elements.duelOpponentMeta) {
-        elements.duelOpponentMeta.textContent = "";
-    }
+
+    renderDuelChat(duel);
+    elements.duelTabLogs.classList.toggle("is-active", duel.activePanel === "logs");
+    elements.duelTabLogs.setAttribute("aria-selected", duel.activePanel === "logs" ? "true" : "false");
+    elements.duelTabChat.classList.toggle("is-active", duel.activePanel === "chat");
+    elements.duelTabChat.setAttribute("aria-selected", duel.activePanel === "chat" ? "true" : "false");
+    elements.duelLogsPane.classList.toggle("hidden", duel.activePanel !== "logs");
+    elements.duelChatPane.classList.toggle("hidden", duel.activePanel !== "chat");
+    elements.duelClearLogButton.classList.toggle("hidden", duel.activePanel !== "logs");
+    elements.duelOverlay.classList.remove("hidden");
+    elements.duelOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("duel-open");
 }
 
 function openDuelResultModal(config) {
