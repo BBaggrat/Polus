@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v45";
+    const STORAGE_KEY = "polus_frontend_prototype_v46";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -20,6 +20,55 @@
         VERY_RARE: 0.2,
         UNIQUE: 0.08
     };
+    function normalizeJournalEventCatalog(rawCatalog) {
+        if (!Array.isArray(rawCatalog)) {
+            return [];
+        }
+        return rawCatalog
+            .filter(function (entry) {
+                return entry && typeof entry === "object";
+            })
+            .map(function (entry, index) {
+                const frequency = typeof entry.frequency === "string"
+                    ? entry.frequency.trim().toUpperCase()
+                    : "COMMON";
+                const normalizedFrequency = Object.prototype.hasOwnProperty.call(JOURNAL_FREQUENCY_WEIGHTS, frequency)
+                    ? frequency
+                    : "COMMON";
+                const numericWeight = Number(entry.weight);
+                const normalizedWeight = Number.isFinite(numericWeight) && numericWeight > 0
+                    ? numericWeight
+                    : JOURNAL_FREQUENCY_WEIGHTS[normalizedFrequency];
+                const location = typeof entry.location === "string" && entry.location.trim()
+                    ? entry.location.trim().toLowerCase()
+                    : "street";
+                const timeTag = typeof entry.timeTag === "string" && entry.timeTag.trim()
+                    ? entry.timeTag.trim().toLowerCase()
+                    : "any";
+                const minDaysGap = Number(entry.minDaysGap);
+                const uniqueDaily = typeof entry.uniqueDaily === "boolean"
+                    ? entry.uniqueDaily
+                    : normalizedFrequency === "DAILY";
+                return {
+                    id: typeof entry.id === "string" && entry.id.trim() ? entry.id.trim() : "journal_" + index,
+                    text: typeof entry.text === "string" ? entry.text.trim() : "",
+                    location: location,
+                    locationLabel: typeof entry.locationLabel === "string" && entry.locationLabel.trim() ? entry.locationLabel.trim() : null,
+                    frequency: normalizedFrequency,
+                    weight: normalizedWeight,
+                    timeTag: timeTag,
+                    mood: typeof entry.mood === "string" ? entry.mood.trim() : "",
+                    category: typeof entry.category === "string" ? entry.category.trim() : "",
+                    uniqueDaily: uniqueDaily,
+                    minDaysGap: Number.isFinite(minDaysGap) && minDaysGap > 0 ? minDaysGap : 0,
+                    enabled: entry.enabled !== false,
+                    effect: entry.effect || null
+                };
+            })
+            .filter(function (entry) {
+                return entry.enabled && entry.text;
+            });
+    }
     const JOURNAL_EVENT_CATALOG = normalizeJournalEventCatalog(window.POLUS_JOURNAL_EVENTS || []);
     const JOURNAL_LOCATION_LABELS = {
         street: "Улица",
