@@ -12,6 +12,7 @@ import com.example.sandalpunk.logging.AppEventLogger;
 import com.example.sandalpunk.logging.AppEventType;
 import com.example.sandalpunk.player.PlayerProfile;
 import com.example.sandalpunk.player.PlayerService;
+import com.example.sandalpunk.web.NotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,13 +39,12 @@ public class MatchmakingService {
     }
 
     public synchronized MatchmakingStatusResponse join(PlayerProfile playerProfile) {
-        clearFinishedDuelIfNeeded(playerProfile);
-        if (playerProfile.getActiveDuelId() != null) {
-            Duel duel = duelService.findRequired(playerProfile.getActiveDuelId());
+        Duel activeDuel = resolveActiveDuel(playerProfile);
+        if (activeDuel != null) {
             return new MatchmakingStatusResponse(
-                    duel.getStatus() == DuelStatus.ACTIVE ? MatchmakingStatusType.IN_DUEL : MatchmakingStatusType.COMPLETED,
-                    duel.getId(),
-                    duel.getStatus() == DuelStatus.ACTIVE ? "Match already active" : "Last duel completed",
+                    activeDuel.getStatus() == DuelStatus.ACTIVE ? MatchmakingStatusType.IN_DUEL : MatchmakingStatusType.COMPLETED,
+                    activeDuel.getId(),
+                    activeDuel.getStatus() == DuelStatus.ACTIVE ? "Match already active" : "Last duel completed",
                     null
             );
         }
@@ -86,12 +86,12 @@ public class MatchmakingService {
     }
 
     public synchronized MatchmakingStatusResponse status(PlayerProfile playerProfile) {
-        if (playerProfile.getActiveDuelId() != null) {
-            Duel duel = duelService.findRequired(playerProfile.getActiveDuelId());
+        Duel activeDuel = resolveActiveDuel(playerProfile);
+        if (activeDuel != null) {
             return new MatchmakingStatusResponse(
-                    duel.getStatus() == DuelStatus.ACTIVE ? MatchmakingStatusType.IN_DUEL : MatchmakingStatusType.COMPLETED,
-                    duel.getId(),
-                    duel.getStatus() == DuelStatus.ACTIVE ? "Duel in progress" : "Duel finished",
+                    activeDuel.getStatus() == DuelStatus.ACTIVE ? MatchmakingStatusType.IN_DUEL : MatchmakingStatusType.COMPLETED,
+                    activeDuel.getId(),
+                    activeDuel.getStatus() == DuelStatus.ACTIVE ? "Duel in progress" : "Duel finished",
                     null
             );
         }
@@ -102,15 +102,24 @@ public class MatchmakingService {
         return new MatchmakingStatusResponse(MatchmakingStatusType.IDLE, null, "Ready to queue", null);
     }
 
-    private void clearFinishedDuelIfNeeded(PlayerProfile playerProfile) {
+    private Duel resolveActiveDuel(PlayerProfile playerProfile) {
         if (playerProfile.getActiveDuelId() == null) {
-            return;
+            return null;
         }
-        Duel duel = duelService.findRequired(playerProfile.getActiveDuelId());
+        Duel duel;
+        try {
+            duel = duelService.findRequired(playerProfile.getActiveDuelId());
+        } catch (NotFoundException exception) {
+            playerService.clearActiveDuel(playerProfile.getId());
+            playerProfile.setActiveDuelId(null);
+            return null;
+        }
         if (duel.getStatus() != DuelStatus.ACTIVE) {
             playerService.clearActiveDuel(playerProfile.getId());
             playerProfile.setActiveDuelId(null);
+            return null;
         }
+        return duel;
     }
 
     private MatchmakingStatusResponse queuedResponse(String message, Instant queuedAt) {
