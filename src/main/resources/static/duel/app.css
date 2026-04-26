@@ -2037,6 +2037,14 @@ body.social-open .social-chat-fab {
     border-bottom: 0;
 }
 
+.duel-log-round-caption {
+    margin: 0 0 8px;
+    color: rgba(255, 255, 255, 0.46);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
 .duel-log-round-title,
 .duel-log-line {
     margin: 0;
@@ -2050,6 +2058,14 @@ body.social-open .social-chat-fab {
 .duel-log-line {
     margin-top: 10px;
     color: var(--muted);
+}
+
+.duel-log-line-own {
+    color: var(--icy);
+}
+
+.duel-log-line-opponent {
+    color: #d87385;
 }
 
 .duel-chat-entry {

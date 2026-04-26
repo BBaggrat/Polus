@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260422-1">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260426-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -39,7 +39,7 @@
 
             <div class="action-row">
                 <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Найти матч</button>
-                <button class="secondary-button" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()">Быстрая дуэль (бот)</button>
+                <button class="secondary-button hidden" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()" hidden aria-hidden="true">Быстрая дуэль (бот)</button>
             </div>
 
             <section class="queue-status hidden" id="queue-status-card" aria-live="polite">
@@ -395,8 +395,8 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/journal-events.js?v=polus-20260422-1"></script>
-<script src="/duel/app.js?v=polus-20260422-1"></script>
+<script src="/duel/journal-events.js?v=polus-20260426-1"></script>
+<script src="/duel/app.js?v=polus-20260426-1"></script>
 </body>
 </html>
 
