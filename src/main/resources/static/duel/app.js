@@ -1,5 +1,5 @@
 (function () {
-    const STORAGE_KEY = "polus_frontend_prototype_v47";
+    const STORAGE_KEY = "polus_frontend_prototype_v48";
     const GUEST_ID_KEY = "polus_browser_guest_id";
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
@@ -6211,6 +6211,251 @@ function renderJournal() {
     }).join("");
 }
 
+const FINAL_JOURNAL_ZONE_LABELS = {
+    street: "Улица",
+    tavern: "Трактир",
+    arena: "Арена",
+    market: "Рынок",
+    city: "Город"
+};
+
+const FINAL_JOURNAL_FALLBACK_EVENTS = [
+    { id: "fallback_street_01", text: "На улице снова спорят о вчерашней дуэли.", location: "street", locationLabel: "Улица", weight: 5, timeTag: "any" },
+    { id: "fallback_street_02", text: "С дальнего квартала доносится гул работающего цеха.", location: "street", locationLabel: "Улица", weight: 4, timeTag: "any" },
+    { id: "fallback_tavern_01", text: "В трактире обсуждают свежие ставки на арену.", location: "tavern", locationLabel: "Трактир", weight: 5, timeTag: "any" },
+    { id: "fallback_arena_01", text: "У арены собираются первые зрители.", location: "arena", locationLabel: "Арена", weight: 5, timeTag: "any" },
+    { id: "fallback_market_01", text: "На рынке спорят о цене северных трофеев.", location: "market", locationLabel: "Рынок", weight: 5, timeTag: "any" }
+];
+
+function getCurrentJournalLocation() {
+    const location = state.ui && typeof state.ui.journalLocation === "string"
+        ? state.ui.journalLocation
+        : "street";
+    return FINAL_JOURNAL_ZONE_LABELS[location] ? location : "street";
+}
+
+function getJournalTimeTag(date) {
+    const hour = date.getHours();
+    if (hour >= 5 && hour < 11) {
+        return "morning";
+    }
+    if (hour >= 11 && hour < 18) {
+        return "day";
+    }
+    if (hour >= 18 && hour < 23) {
+        return "evening";
+    }
+    return "night";
+}
+
+function isJournalEventAllowedByTime(event, currentTag) {
+    const tag = String(event.timeTag || "any").toLowerCase();
+    return tag === "any" || tag === currentTag;
+}
+
+function getJournalHistory() {
+    state.world = state.world && typeof state.world === "object" ? state.world : {};
+    state.world.journalEventHistory = state.world.journalEventHistory && typeof state.world.journalEventHistory === "object"
+        ? state.world.journalEventHistory
+        : {};
+    return state.world.journalEventHistory;
+}
+
+function getDayStamp(timestamp) {
+    const date = new Date(timestamp);
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+}
+
+function isJournalEventAllowedByHistory(event, now) {
+    const history = getJournalHistory();
+    const lastTimestamp = Number(history[event.id] || 0);
+    if (!lastTimestamp) {
+        return true;
+    }
+    if (event.uniqueDaily && getDayStamp(lastTimestamp) === getDayStamp(now)) {
+        return false;
+    }
+    const minDaysGap = Number(event.minDaysGap || 0);
+    if (minDaysGap > 0) {
+        return now - lastTimestamp >= minDaysGap * 24 * 60 * 60 * 1000;
+    }
+    return true;
+}
+
+function pickWeightedJournalEvent(events) {
+    const totalWeight = events.reduce(function (sum, event) {
+        const weight = Number(event.weight);
+        return sum + (Number.isFinite(weight) && weight > 0 ? weight : 1);
+    }, 0);
+    let cursor = Math.random() * Math.max(1, totalWeight);
+    for (const event of events) {
+        const weight = Number(event.weight);
+        cursor -= Number.isFinite(weight) && weight > 0 ? weight : 1;
+        if (cursor <= 0) {
+            return event;
+        }
+    }
+    return events[events.length - 1] || null;
+}
+
+function selectJournalEvent() {
+    const now = Date.now();
+    const location = getCurrentJournalLocation();
+    const currentTimeTag = getJournalTimeTag(new Date(now));
+    const catalog = Array.isArray(JOURNAL_EVENT_CATALOG) && JOURNAL_EVENT_CATALOG.length
+        ? JOURNAL_EVENT_CATALOG
+        : FINAL_JOURNAL_FALLBACK_EVENTS;
+    const lastEventId = Array.isArray(state.journal) && state.journal.length
+        ? state.journal[0].sourceEventId
+        : null;
+    let candidates = catalog.filter(function (event) {
+        return event
+            && event.id !== lastEventId
+            && event.location === location
+            && isJournalEventAllowedByTime(event, currentTimeTag)
+            && isJournalEventAllowedByHistory(event, now);
+    });
+    if (!candidates.length) {
+        candidates = catalog.filter(function (event) {
+            return event
+                && event.id !== lastEventId
+                && event.location === location
+                && isJournalEventAllowedByHistory(event, now);
+        });
+    }
+    if (!candidates.length) {
+        candidates = catalog.filter(function (event) {
+            return event && event.location === location;
+        });
+    }
+    if (!candidates.length) {
+        candidates = catalog.slice();
+    }
+    return pickWeightedJournalEvent(candidates);
+}
+
+function addJournal(text, meta) {
+    const details = meta && typeof meta === "object" ? meta : {};
+    state.journal = Array.isArray(state.journal) ? state.journal : [];
+    state.journal.unshift({
+        id: uid("journal"),
+        text: sanitizeVisibleText(text, "Запись дневника обновлена."),
+        createdAt: Date.now(),
+        sourceEventId: details.sourceEventId || null,
+        location: details.location || getCurrentJournalLocation(),
+        locationLabel: details.locationLabel || FINAL_JOURNAL_ZONE_LABELS[getCurrentJournalLocation()] || "Город"
+    });
+    state.journal = state.journal.slice(0, 20);
+}
+
+function triggerRandomJournalEvent() {
+    const event = selectJournalEvent();
+    if (!event) {
+        return false;
+    }
+    const now = Date.now();
+    addJournal(event.text, {
+        sourceEventId: event.id,
+        location: event.location,
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город"
+    });
+    getJournalHistory()[event.id] = now;
+    state.world.lastJournalEventAt = now;
+    saveState();
+    renderJournal();
+    return true;
+}
+
+function triggerScheduledJournalEvent() {
+    state.world = state.world && typeof state.world === "object" ? state.world : {};
+    const now = Date.now();
+    const lastEventAt = Number(state.world.lastJournalEventAt || 0);
+    if (!lastEventAt) {
+        state.world.lastJournalEventAt = now;
+        saveState();
+        return;
+    }
+    if (now - lastEventAt < JOURNAL_EVENT_MS) {
+        return;
+    }
+    triggerRandomJournalEvent();
+}
+
+function renderJournal() {
+    if (!elements.journalList) {
+        return;
+    }
+    state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
+    const location = getCurrentJournalLocation();
+    if (elements.journalZone) {
+        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Город";
+    }
+    if (!state.journal.length) {
+        elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><p>Записей пока нет.</p></article>';
+        return;
+    }
+    elements.journalList.innerHTML = state.journal.map(function (entry) {
+        const entryLocation = entry.location || location;
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Город");
+        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+    }).join("");
+}
+
+function triggerRandomJournalEvent() {
+    const event = selectJournalEvent();
+    if (!event) {
+        return false;
+    }
+    const now = Date.now();
+    addJournal(event.text, {
+        sourceEventId: event.id,
+        location: event.location,
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город"
+    });
+    getJournalHistory()[event.id] = now;
+    state.world.lastJournalEventAt = now;
+    saveState();
+    renderJournal();
+    return true;
+}
+
+function triggerScheduledJournalEvent() {
+    state.world = state.world && typeof state.world === "object" ? state.world : {};
+    const now = Date.now();
+    const lastEventAt = Number(state.world.lastJournalEventAt || 0);
+    if (!lastEventAt) {
+        state.world.lastJournalEventAt = now;
+        saveState();
+        return;
+    }
+    if (now - lastEventAt < JOURNAL_EVENT_MS) {
+        return;
+    }
+    triggerRandomJournalEvent();
+}
+
+function renderJournal() {
+    if (!elements.journalList) {
+        return;
+    }
+    state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
+    const location = getCurrentJournalLocation();
+    if (elements.journalZone) {
+        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Город";
+    }
+    if (!state.journal.length) {
+        elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><p>Записей пока нет.</p></article>';
+        return;
+    }
+    elements.journalList.innerHTML = state.journal.map(function (entry) {
+        const entryLocation = entry.location || location;
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Город");
+        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+    }).join("");
+}
+
 function renderRegistrationModal() {
     const auth = state.auth || {};
     const currentName = sanitizeVisibleText(state.player && state.player.name, "");
@@ -10928,6 +11173,60 @@ function renderAll() {
     renderDuelExitModal();
     renderDuelResultModal();
     bindStaticActionHandlers();
+}
+
+function triggerRandomJournalEvent() {
+    const event = selectJournalEvent();
+    if (!event) {
+        return false;
+    }
+    const now = Date.now();
+    addJournal(event.text, {
+        sourceEventId: event.id,
+        location: event.location,
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город"
+    });
+    getJournalHistory()[event.id] = now;
+    state.world.lastJournalEventAt = now;
+    saveState();
+    renderJournal();
+    return true;
+}
+
+function triggerScheduledJournalEvent() {
+    state.world = state.world && typeof state.world === "object" ? state.world : {};
+    const now = Date.now();
+    const lastEventAt = Number(state.world.lastJournalEventAt || 0);
+    if (!lastEventAt) {
+        state.world.lastJournalEventAt = now;
+        saveState();
+        return;
+    }
+    if (now - lastEventAt < JOURNAL_EVENT_MS) {
+        return;
+    }
+    triggerRandomJournalEvent();
+}
+
+function renderJournal() {
+    if (!elements.journalList) {
+        return;
+    }
+    state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
+    const location = getCurrentJournalLocation();
+    if (elements.journalZone) {
+        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Город";
+    }
+    if (!state.journal.length) {
+        elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><p>Записей пока нет.</p></article>';
+        return;
+    }
+    elements.journalList.innerHTML = state.journal.map(function (entry) {
+        const entryLocation = entry.location || location;
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Город");
+        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+    }).join("");
 }
 
 repairStateAfterLegacyLoad();
