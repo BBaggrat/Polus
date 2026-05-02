@@ -4,6 +4,7 @@
     const TICK_MS = 1000;
     const FRIEND_SYNC_MS = 15000;
     const JOURNAL_EVENT_MS = 60000;
+    const JOURNAL_OFFLINE_CATCH_UP_LIMIT = 20;
     const DUEL_ROUND_TIMEOUT_MS = 2 * 60 * 1000;
     const SHIELD_BLOCK_CHANCE = 0.30;
     const SHOTGUN_EDGE_GRAZE_CHANCE = 0.35;
@@ -312,6 +313,7 @@
             exposeGlobalActions();
             hydrateTelegram();
             await initializeSession();
+            triggerScheduledJournalEvent();
             renderAll();
             window.setInterval(onTick, TICK_MS);
         } catch (error) {
@@ -6248,6 +6250,11 @@ function getJournalTimeTag(date) {
     return "night";
 }
 
+function normalizeJournalTimestamp(timestamp) {
+    const numericTimestamp = Number(timestamp);
+    return Number.isFinite(numericTimestamp) && numericTimestamp > 0 ? numericTimestamp : Date.now();
+}
+
 function isJournalEventAllowedByTime(event, currentTag) {
     const tag = String(event.timeTag || "any").toLowerCase();
     return tag === "any" || tag === currentTag;
@@ -6298,8 +6305,8 @@ function pickWeightedJournalEvent(events) {
     return events[events.length - 1] || null;
 }
 
-function selectJournalEvent() {
-    const now = Date.now();
+function selectJournalEvent(timestamp) {
+    const now = normalizeJournalTimestamp(timestamp);
     const location = getCurrentJournalLocation();
     const currentTimeTag = getJournalTimeTag(new Date(now));
     const catalog = Array.isArray(JOURNAL_EVENT_CATALOG) && JOURNAL_EVENT_CATALOG.length
@@ -6336,11 +6343,12 @@ function selectJournalEvent() {
 
 function addJournal(text, meta) {
     const details = meta && typeof meta === "object" ? meta : {};
+    const createdAt = normalizeJournalTimestamp(details.createdAt);
     state.journal = Array.isArray(state.journal) ? state.journal : [];
     state.journal.unshift({
         id: uid("journal"),
         text: sanitizeVisibleText(text, "Запись дневника обновлена."),
-        createdAt: Date.now(),
+        createdAt: createdAt,
         sourceEventId: details.sourceEventId || null,
         location: details.location || getCurrentJournalLocation(),
         locationLabel: details.locationLabel || FINAL_JOURNAL_ZONE_LABELS[getCurrentJournalLocation()] || "Город"
@@ -6348,21 +6356,25 @@ function addJournal(text, meta) {
     state.journal = state.journal.slice(0, 20);
 }
 
-function triggerRandomJournalEvent() {
-    const event = selectJournalEvent();
+function triggerRandomJournalEvent(timestamp, options) {
+    const eventTimestamp = normalizeJournalTimestamp(timestamp);
+    const settings = options && typeof options === "object" ? options : {};
+    const event = selectJournalEvent(eventTimestamp);
     if (!event) {
         return false;
     }
-    const now = Date.now();
     addJournal(event.text, {
         sourceEventId: event.id,
         location: event.location,
-        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город"
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город",
+        createdAt: eventTimestamp
     });
-    getJournalHistory()[event.id] = now;
-    state.world.lastJournalEventAt = now;
-    saveState();
-    renderJournal();
+    getJournalHistory()[event.id] = eventTimestamp;
+    state.world.lastJournalEventAt = eventTimestamp;
+    if (!settings.deferRender) {
+        saveState();
+        renderJournal();
+    }
     return true;
 }
 
@@ -6375,10 +6387,21 @@ function triggerScheduledJournalEvent() {
         saveState();
         return;
     }
-    if (now - lastEventAt < JOURNAL_EVENT_MS) {
+    const elapsed = now - lastEventAt;
+    if (elapsed < JOURNAL_EVENT_MS) {
         return;
     }
-    triggerRandomJournalEvent();
+    const missedEvents = Math.min(
+        JOURNAL_OFFLINE_CATCH_UP_LIMIT,
+        Math.floor(elapsed / JOURNAL_EVENT_MS)
+    );
+    for (let index = missedEvents; index >= 1; index--) {
+        const eventTimestamp = now - (index - 1) * JOURNAL_EVENT_MS;
+        triggerRandomJournalEvent(eventTimestamp, { deferRender: true });
+    }
+    state.world.lastJournalEventAt = now;
+    saveState();
+    renderJournal();
 }
 
 function renderJournal() {
@@ -6402,21 +6425,25 @@ function renderJournal() {
     }).join("");
 }
 
-function triggerRandomJournalEvent() {
-    const event = selectJournalEvent();
+function triggerRandomJournalEvent(timestamp, options) {
+    const eventTimestamp = normalizeJournalTimestamp(timestamp);
+    const settings = options && typeof options === "object" ? options : {};
+    const event = selectJournalEvent(eventTimestamp);
     if (!event) {
         return false;
     }
-    const now = Date.now();
     addJournal(event.text, {
         sourceEventId: event.id,
         location: event.location,
-        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город"
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город",
+        createdAt: eventTimestamp
     });
-    getJournalHistory()[event.id] = now;
-    state.world.lastJournalEventAt = now;
-    saveState();
-    renderJournal();
+    getJournalHistory()[event.id] = eventTimestamp;
+    state.world.lastJournalEventAt = eventTimestamp;
+    if (!settings.deferRender) {
+        saveState();
+        renderJournal();
+    }
     return true;
 }
 
@@ -6429,10 +6456,21 @@ function triggerScheduledJournalEvent() {
         saveState();
         return;
     }
-    if (now - lastEventAt < JOURNAL_EVENT_MS) {
+    const elapsed = now - lastEventAt;
+    if (elapsed < JOURNAL_EVENT_MS) {
         return;
     }
-    triggerRandomJournalEvent();
+    const missedEvents = Math.min(
+        JOURNAL_OFFLINE_CATCH_UP_LIMIT,
+        Math.floor(elapsed / JOURNAL_EVENT_MS)
+    );
+    for (let index = missedEvents; index >= 1; index--) {
+        const eventTimestamp = now - (index - 1) * JOURNAL_EVENT_MS;
+        triggerRandomJournalEvent(eventTimestamp, { deferRender: true });
+    }
+    state.world.lastJournalEventAt = now;
+    saveState();
+    renderJournal();
 }
 
 function renderJournal() {
@@ -11227,6 +11265,54 @@ function renderJournal() {
         const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
+}
+
+function triggerRandomJournalEvent(timestamp, options) {
+    const eventTimestamp = normalizeJournalTimestamp(timestamp);
+    const settings = options && typeof options === "object" ? options : {};
+    const event = selectJournalEvent(eventTimestamp);
+    if (!event) {
+        return false;
+    }
+    addJournal(event.text, {
+        sourceEventId: event.id,
+        location: event.location,
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город",
+        createdAt: eventTimestamp
+    });
+    getJournalHistory()[event.id] = eventTimestamp;
+    state.world.lastJournalEventAt = eventTimestamp;
+    if (!settings.deferRender) {
+        saveState();
+        renderJournal();
+    }
+    return true;
+}
+
+function triggerScheduledJournalEvent() {
+    state.world = state.world && typeof state.world === "object" ? state.world : {};
+    const now = Date.now();
+    const lastEventAt = Number(state.world.lastJournalEventAt || 0);
+    if (!lastEventAt) {
+        state.world.lastJournalEventAt = now;
+        saveState();
+        return;
+    }
+    const elapsed = now - lastEventAt;
+    if (elapsed < JOURNAL_EVENT_MS) {
+        return;
+    }
+    const missedEvents = Math.min(
+        JOURNAL_OFFLINE_CATCH_UP_LIMIT,
+        Math.floor(elapsed / JOURNAL_EVENT_MS)
+    );
+    for (let index = missedEvents; index >= 1; index--) {
+        const eventTimestamp = now - (index - 1) * JOURNAL_EVENT_MS;
+        triggerRandomJournalEvent(eventTimestamp, { deferRender: true });
+    }
+    state.world.lastJournalEventAt = now;
+    saveState();
+    renderJournal();
 }
 
 repairStateAfterLegacyLoad();
