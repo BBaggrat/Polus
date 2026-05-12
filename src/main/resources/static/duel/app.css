@@ -2770,3 +2770,885 @@ body.social-open {
     background: linear-gradient(180deg, rgba(18, 24, 42, 0), rgba(18, 24, 42, 0.98) 22%) !important;
 }
 
+/* 2026-05-12 UI/UX cohesion pass */
+:root {
+    --ui-page: 16px;
+    --ui-panel: 16px;
+    --ui-card: 14px;
+    --ui-gap: 12px;
+    --ui-section: 16px;
+    --ui-radius-panel: 24px;
+    --ui-radius-card: 18px;
+    --ui-line: rgba(255, 255, 255, 0.09);
+    --ui-card-bg: linear-gradient(180deg, rgba(34, 42, 63, 0.94), rgba(22, 27, 43, 0.96));
+}
+
+.app-shell {
+    padding: var(--ui-page) var(--ui-page) calc(104px + env(safe-area-inset-bottom)) !important;
+}
+
+.screen:not(.is-active) {
+    display: none !important;
+}
+
+.screen.is-active {
+    display: block !important;
+}
+
+.panel,
+.modal-sheet,
+.duel-stage,
+.duel-form-card,
+.duel-log-panel {
+    padding: var(--ui-panel) !important;
+    border-radius: var(--ui-radius-panel) !important;
+}
+
+.panel,
+.duel-stage,
+.duel-form-card,
+.duel-log-panel {
+    margin-bottom: var(--ui-section) !important;
+}
+
+.panel-header,
+.duel-form-header,
+.duel-log-header,
+.social-chat-panel-header {
+    margin-bottom: 10px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid var(--ui-line);
+}
+
+.panel-header {
+    gap: var(--ui-gap) !important;
+}
+
+.panel-title {
+    line-height: 1.04 !important;
+    letter-spacing: -0.02em;
+}
+
+.panel-title-small {
+    font-size: clamp(1.28rem, 5.2vw, 1.72rem) !important;
+}
+
+.panel-copy,
+.panel-kicker,
+.shop-card-copy,
+.duel-log-line,
+.duel-chat-text,
+.social-chat-message-bubble p {
+    line-height: 1.38 !important;
+}
+
+.player-panel {
+    display: grid;
+    gap: var(--ui-gap);
+}
+
+.panel-cover {
+    height: 132px !important;
+    margin-bottom: 0 !important;
+    border-radius: 20px !important;
+    border-color: rgba(216, 176, 123, 0.3) !important;
+    background-image:
+        linear-gradient(90deg, rgba(5, 12, 24, 0.12), rgba(255, 255, 255, 0.08)),
+        url("/duel/assets/universal-cover.svg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.avatar-card {
+    width: 72px !important;
+    height: 72px !important;
+    left: 14px !important;
+    bottom: -8px !important;
+    border: 1px solid rgba(216, 176, 123, 0.34) !important;
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+.avatar-card::after {
+    content: "I";
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: #d8b07b;
+    font: 800 0.75rem/1 var(--font-head);
+    background: rgba(17, 22, 35, 0.94);
+    border: 1px solid rgba(216, 176, 123, 0.36);
+}
+
+.avatar-portrait {
+    background-image: url("/duel/assets/universal-avatar.svg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    color: transparent !important;
+}
+
+.player-panel > .panel-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: end !important;
+}
+
+.profile-side {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(72px, auto)) !important;
+    gap: 8px !important;
+}
+
+.stat-chip {
+    min-width: 72px !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+}
+
+.stat-chip span {
+    font-size: 0.72rem !important;
+}
+
+.stat-chip strong {
+    color: #d8b07b !important;
+    font-size: 1.35rem !important;
+}
+
+.action-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+}
+
+.primary-button,
+.secondary-button,
+.ghost-button,
+.shop-tab,
+.duel-toggle,
+.weapon-option {
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+.primary-button:active,
+.secondary-button:active,
+.ghost-button:active,
+.shop-tab:active,
+.duel-toggle:active,
+.weapon-option:active,
+.nav-button:active {
+    transform: translateY(1px) scale(0.99);
+}
+
+.journal-panel {
+    display: grid;
+    grid-template-rows: auto minmax(220px, 1fr);
+    min-height: min(42vh, 420px);
+}
+
+.journal-panel .panel-header {
+    margin-bottom: 8px !important;
+}
+
+.journal-header-copy {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100%;
+}
+
+.journal-zone-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.journal-zone-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.journal-list {
+    display: grid !important;
+    align-content: start;
+    gap: 10px !important;
+    min-height: 0;
+    max-height: calc(100vh - 540px);
+    overflow-y: auto;
+    padding: 2px 2px 4px !important;
+}
+
+.journal-entry {
+    display: grid !important;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px !important;
+    padding: var(--ui-card) !important;
+    border-radius: var(--ui-radius-card) !important;
+    background: var(--ui-card-bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.entry-icon,
+.duel-log-icon,
+.friend-avatar,
+.shop-card-icon,
+.thread-avatar,
+.card-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 14px;
+    color: #d8b07b;
+    background: linear-gradient(180deg, rgba(62, 91, 128, 0.52), rgba(17, 21, 34, 0.96));
+    border: 1px solid rgba(95, 187, 215, 0.2);
+}
+
+.entry-icon {
+    width: 34px;
+    height: 34px;
+    font-weight: 800;
+}
+
+.entry-body p,
+.journal-entry p,
+.journal-entry small {
+    margin: 0 !important;
+}
+
+.journal-entry small {
+    display: block;
+    margin-top: 8px !important;
+    color: var(--muted);
+}
+
+.friend-search-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 52px !important;
+    gap: 10px !important;
+    margin-bottom: var(--ui-section) !important;
+}
+
+.friend-search-form .primary-button {
+    min-width: 52px !important;
+    width: 52px !important;
+    padding: 0 !important;
+    font-size: 0 !important;
+}
+
+.friend-search-form .primary-button::before {
+    content: "⌕";
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.friend-list,
+.friend-request-stack,
+.shop-section {
+    display: grid !important;
+    gap: 10px !important;
+}
+
+.section-label {
+    color: var(--muted);
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.friend-card {
+    padding: var(--ui-card) !important;
+    border-radius: var(--ui-radius-card) !important;
+    background: var(--ui-card-bg) !important;
+}
+
+.friend-card-row {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    align-items: center !important;
+}
+
+.friend-avatar,
+.thread-avatar {
+    width: 44px;
+    height: 44px;
+    font: 800 1rem/1 var(--font-head);
+}
+
+.friend-main {
+    min-width: 0;
+}
+
+.friend-card h3 {
+    margin: 0 0 7px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.friend-status-row {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px !important;
+}
+
+.friend-actions-inline {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px !important;
+    margin-top: 0 !important;
+}
+
+.compact-button {
+    min-height: 38px !important;
+    padding: 0 12px !important;
+    border-radius: 14px !important;
+    font-size: 0.82rem !important;
+}
+
+.icon-button {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+    border-radius: 14px !important;
+}
+
+.status-chip {
+    position: relative;
+    padding-left: 22px !important;
+}
+
+.status-chip::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.36);
+}
+
+.status-chip.is-online::before {
+    background: #62d6aa;
+    box-shadow: 0 0 0 3px rgba(98, 214, 170, 0.14);
+}
+
+.status-chip.is-busy::before {
+    background: #d87385;
+}
+
+.status-chip.is-invited::before {
+    background: #d8b07b;
+}
+
+.shop-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-bottom: var(--ui-section) !important;
+}
+
+.shop-card-compact {
+    padding: var(--ui-card) !important;
+}
+
+.shop-card-head {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.shop-card-icon,
+.card-icon {
+    width: 38px;
+    height: 38px;
+    font-weight: 800;
+}
+
+.shop-card-head h3 {
+    margin: 0 !important;
+    min-width: 0;
+}
+
+.shop-card-head strong {
+    color: #d8b07b;
+    white-space: nowrap;
+}
+
+.inventory-slot {
+    display: grid;
+    gap: 10px;
+    padding: var(--ui-card);
+    border-radius: var(--ui-radius-card);
+    border: 1px dashed rgba(216, 176, 123, 0.28);
+}
+
+.inventory-slot h3,
+.inventory-card strong,
+.inventory-card p,
+.slot-empty {
+    margin: 0 !important;
+}
+
+.inventory-card {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 8px 10px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.inventory-card p {
+    grid-column: 2;
+    color: var(--muted);
+}
+
+.inventory-empty-visual {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 8px;
+    border-radius: 16px;
+    color: #d8b07b;
+    background: rgba(216, 176, 123, 0.08);
+    border: 1px solid rgba(216, 176, 123, 0.18);
+}
+
+.bottom-nav {
+    width: min(390px, calc(100% - 24px)) !important;
+    padding: 7px !important;
+    gap: 6px !important;
+    border-radius: 22px !important;
+}
+
+.nav-button {
+    min-height: 52px !important;
+    padding: 7px 6px !important;
+    border-radius: 16px !important;
+}
+
+.nav-title {
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    font-size: 0.75rem !important;
+}
+
+.nav-title::before {
+    content: "◆";
+    color: rgba(95, 187, 215, 0.76);
+    font-size: 0.74rem;
+}
+
+[data-nav-target="home"] .nav-title::before { content: "⌂"; }
+[data-nav-target="inventory"] .nav-title::before { content: "◇"; }
+[data-nav-target="friends"] .nav-title::before { content: "✦"; }
+[data-nav-target="shop"] .nav-title::before { content: "¤"; }
+
+.social-chat-fab {
+    right: 18px !important;
+    bottom: calc(102px + env(safe-area-inset-bottom)) !important;
+    padding: 12px 15px !important;
+    border-radius: 22px !important;
+}
+
+.social-chat-panel {
+    inset: max(54px, env(safe-area-inset-top) + 6px) 12px calc(86px + env(safe-area-inset-bottom)) 12px !important;
+    border-radius: 26px !important;
+    background: linear-gradient(180deg, rgba(18, 25, 42, 1), rgba(8, 14, 27, 1)) !important;
+}
+
+.social-chat-layout {
+    grid-template-rows: minmax(150px, 35%) minmax(0, 1fr) !important;
+    gap: 12px !important;
+}
+
+.social-chat-thread-list {
+    gap: 8px !important;
+}
+
+.social-chat-thread-card {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) 18px !important;
+    align-items: center !important;
+    gap: 10px !important;
+    min-height: 64px;
+}
+
+.social-chat-thread-card strong,
+.social-chat-thread-card span {
+    min-width: 0;
+}
+
+.thread-copy {
+    display: grid !important;
+}
+
+.thread-state {
+    color: var(--muted);
+}
+
+.social-chat-thread-card.is-active .thread-state {
+    color: #62d6aa;
+}
+
+.social-chat-form,
+.duel-chat-form {
+    grid-template-columns: minmax(0, 1fr) 82px !important;
+}
+
+.social-chat-send,
+.duel-chat-send {
+    width: 82px !important;
+    min-width: 82px !important;
+    max-width: 82px !important;
+}
+
+.duel-sheet {
+    padding: 14px !important;
+}
+
+.duel-topbar {
+    display: grid !important;
+    grid-template-columns: auto minmax(78px, 1fr) auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.duel-timer-box {
+    justify-self: center;
+    min-width: 82px;
+    text-align: center;
+}
+
+.duel-round-pill,
+.duel-topbar-close {
+    min-height: 44px !important;
+    border-radius: 16px !important;
+}
+
+.duel-roster {
+    display: grid !important;
+    gap: 10px !important;
+}
+
+.duelist-card {
+    padding: var(--ui-card) !important;
+    border-radius: var(--ui-radius-card) !important;
+}
+
+.duelist-head {
+    gap: 10px !important;
+    min-width: 0;
+}
+
+.duelist-head h3 {
+    font-size: clamp(1.15rem, 5vw, 1.62rem) !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.duelist-meta {
+    margin-top: 6px !important;
+}
+
+.duelist-hp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.hp-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #62d6aa;
+}
+
+.hp-dot-opponent {
+    background: #d87385;
+}
+
+.duel-hp-grid {
+    gap: 10px !important;
+    margin-top: 12px !important;
+}
+
+.hp-copy {
+    margin-top: 6px !important;
+}
+
+.weapon-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+.weapon-option {
+    min-height: 112px !important;
+    height: 112px !important;
+    padding: 12px 9px !important;
+    border-radius: 18px !important;
+    display: grid !important;
+    grid-template-rows: auto 1fr auto auto;
+    align-content: start;
+    text-align: left !important;
+}
+
+.weapon-option::before {
+    content: "⚙";
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    color: #d8b07b;
+    background: rgba(216, 176, 123, 0.08);
+    border: 1px solid rgba(216, 176, 123, 0.16);
+}
+
+.weapon-option[data-value="RIFLE"]::before { content: "⌁"; }
+.weapon-option[data-value="SHOTGUN"]::before { content: "✹"; }
+
+.weapon-option strong {
+    margin: 0 !important;
+    font-size: clamp(0.86rem, 3.8vw, 1rem) !important;
+    line-height: 1.08 !important;
+}
+
+.weapon-option span {
+    margin-top: 4px !important;
+    font-size: 0.74rem !important;
+    line-height: 1.18 !important;
+}
+
+.weapon-trait {
+    color: var(--muted) !important;
+}
+
+.duel-vector-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
+.vector-card {
+    padding: 12px !important;
+    border-radius: 18px !important;
+}
+
+.vector-card h4 {
+    margin: 0 0 9px !important;
+    text-align: center;
+}
+
+.toggle-row {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+}
+
+.duel-toggle {
+    min-width: 0 !important;
+    min-height: 44px !important;
+    padding: 0 4px !important;
+    border-radius: 14px !important;
+    font-size: clamp(0.72rem, 3.2vw, 0.9rem) !important;
+}
+
+.duel-submit-button,
+#duel-submit-button {
+    min-height: 56px !important;
+}
+
+#duel-submit-button.is-turn-submitted {
+    background: linear-gradient(135deg, rgba(44, 126, 111, 0.95), rgba(38, 82, 112, 0.95)) !important;
+}
+
+#duel-submit-button.is-turn-edit {
+    box-shadow: 0 0 0 2px rgba(216, 176, 123, 0.18), 0 12px 28px rgba(216, 176, 123, 0.14) !important;
+}
+
+.duel-log-panel {
+    display: grid;
+    gap: 10px;
+}
+
+.duel-log-tabs {
+    gap: 8px !important;
+}
+
+.duel-log-tab {
+    position: relative;
+    border-radius: 16px !important;
+}
+
+.duel-log-tab.has-new::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #d8b07b;
+    box-shadow: 0 0 0 4px rgba(216, 176, 123, 0.16);
+}
+
+.duel-log-track {
+    max-height: 300px !important;
+    padding: 8px !important;
+    border-radius: 18px !important;
+}
+
+.duel-log-list {
+    gap: 10px !important;
+}
+
+.duel-log-card {
+    display: grid !important;
+    gap: 8px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 18px !important;
+    background: rgba(9, 14, 27, 0.72) !important;
+}
+
+.duel-log-card.is-new {
+    border-color: rgba(216, 176, 123, 0.3) !important;
+}
+
+.duel-log-card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.duel-log-icon {
+    width: 30px;
+    height: 30px;
+    font-weight: 900;
+}
+
+.duel-log-card-hit .duel-log-icon,
+.duel-log-card-reward .duel-log-icon {
+    color: #d8b07b;
+}
+
+.duel-log-card-miss .duel-log-icon {
+    color: #d87385;
+}
+
+.duel-log-badge {
+    margin-left: auto;
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #d8b07b;
+    font-size: 0.68rem;
+    font-weight: 800;
+    background: rgba(216, 176, 123, 0.1);
+}
+
+.duel-log-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+
+.duel-log-side {
+    color: rgba(255, 255, 255, 0.48);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.duel-log-row p,
+.duel-log-empty {
+    margin: 0 !important;
+    line-height: 1.36 !important;
+}
+
+.duel-log-line-own p,
+.duel-log-line-own {
+    color: var(--icy) !important;
+}
+
+.duel-log-line-opponent p,
+.duel-log-line-opponent {
+    color: #d87385 !important;
+}
+
+.duel-log-result p {
+    color: var(--text) !important;
+}
+
+.text-direction {
+    color: #8fdaf0 !important;
+    font-weight: 800;
+}
+
+@media (max-width: 380px) {
+    .app-shell {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .panel,
+    .modal-sheet,
+    .duel-stage,
+    .duel-form-card,
+    .duel-log-panel {
+        padding: 14px !important;
+    }
+
+    .profile-side {
+        grid-template-columns: 1fr !important;
+    }
+
+    .weapon-grid {
+        gap: 8px !important;
+    }
+
+    .weapon-option {
+        min-height: 106px !important;
+        height: 106px !important;
+        padding: 10px 7px !important;
+    }
+
+    .duel-vector-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .friend-card-row {
+        grid-template-columns: 40px minmax(0, 1fr) !important;
+    }
+
+    .friend-actions-inline {
+        grid-column: 2;
+        justify-self: start;
+    }
+}
+
