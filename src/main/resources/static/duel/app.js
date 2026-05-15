@@ -320,7 +320,7 @@
             console.error("Polus init failed", error);
             const toast = document.getElementById("toast");
             if (toast) {
-                toast.textContent = "РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РёРЅС‚РµСЂС„РµР№СЃР°. РћР±РЅРѕРІРё Mini App.";
+                toast.textContent = "Ошибка инициализации интерфейса. Обнови Mini App.";
                 toast.classList.remove("hidden");
             }
         }
@@ -7785,6 +7785,46 @@ function openLiveDuelResult(payload) {
     });
 }
 
+function exposeGlobalActions() {
+    window.PolusApp = {
+        navigate: navigateTo,
+        startQueueDuel: startQueueDuel,
+        startBotDuel: startBotDuel,
+        cancelQueue: cancelQueue,
+        triggerJournalEvent: triggerRandomJournalEvent,
+        openQuest: openQuest,
+        delayQuest: delayQuest,
+        chooseQuestAction: chooseQuestAction,
+        useItem: useBackpackItem,
+        changeAugment: openAugmentPicker,
+        closeAugmentPicker: closeAugmentPicker,
+        selectAugment: selectAugment,
+        setShopSection: setShopSection,
+        viewFriendProfile: viewFriendProfile,
+        openFriendChat: openFriendChat,
+        openSocialInbox: openSocialInbox,
+        closeSocialInbox: closeSocialInbox,
+        selectDuelOption: updateDuelSelection,
+        submitDuelTurn: submitCurrentDuelTurn,
+        submitDuelChat: submitDuelChat,
+        setDuelPanel: setDuelPanel,
+        duelFriend: duelFriend,
+        buy: buyShopItem,
+        clearDuelLog: clearDuelLog,
+        closeDuel: closeDuel,
+        cancelDuelExit: cancelDuelExit,
+        confirmDuelExit: confirmDuelExit,
+        submitRegistration: submitRegistration,
+        allocateStat: allocateStat,
+        sendFriendRequest: submitFriendSearch,
+        acceptFriendRequest: acceptFriendRequest,
+        rejectFriendRequest: rejectFriendRequest,
+        cancelStartDuel: cancelStartDuel,
+        confirmStartDuel: confirmStartDuel,
+        closeDuelResult: closeDuelResult
+    };
+}
+
 function renderAll() {
     repairStateAfterLegacyLoad();
     refreshStaticCopy();
@@ -11318,7 +11358,7 @@ function triggerScheduledJournalEvent() {
 /* 2026-05-12 UI/UX runtime layer. Keep this block last inside the IIFE: the
    prototype has older duplicate functions above, and this layer owns what the
    browser actually calls after boot. */
-const UX_AUGMENT_COPY = {
+var UX_AUGMENT_COPY = {
     weaponBrassSights: {
         id: "weaponBrassSights",
         slot: "weapon",
@@ -11353,7 +11393,7 @@ const UX_AUGMENT_COPY = {
     }
 };
 
-const UX_ZONE_LABELS = {
+var UX_ZONE_LABELS = {
     street: "Улица",
     tavern: "Трактир",
     arena: "Арена",
@@ -11361,7 +11401,7 @@ const UX_ZONE_LABELS = {
     city: "Город"
 };
 
-const UX_WEAPON_HINTS = {
+var UX_WEAPON_HINTS = {
     PISTOLS: "Пистоль и щит: 18 урона. Щит блокирует каждый входящий выстрел с шансом 30%.",
     RIFLE: "Винтовка: 30 урона. Игнорирует блокирование щитом.",
     SHOTGUN: "Дробовик: 5 дробин по 5 урона. При промахе может зацепить на 5 урона с шансом 35%."
@@ -11371,10 +11411,9 @@ function looksLikeMojibake(text) {
     if (typeof text !== "string" || !text) {
         return false;
     }
-    const markers = text.match(/(?:Р[А-Яа-яЁё]|С[А-Яа-яЁё]|Ð.|Ñ.|В[«»·])/g);
-    return /[ЃЌЏЎЉЊџѕѓќўљњ‹›™“”ЄєҐґІЇ°±µ¤¬®¶№]/.test(text)
+    return /[ЃЌЏЎЉЊЂђџѕѓќўљњ‹›™“”ЄєҐґІЇ°±µ¤¬®¶№€]/.test(text)
         || /(?:Р |РЎ|Р|Р†|Р‰|Рџ|Рќ|Рњ|Р‘|Рђ|Р“|Р”|РЋ|РЊ)/.test(text)
-        || Boolean(markers && markers.length >= 3);
+        || /(?:В·|В«|В»|Ð.|Ñ.|вЂ|в„|в‚)/.test(text);
 }
 
 function sanitizeVisibleText(text, fallback) {
@@ -11401,7 +11440,7 @@ function isPlaceholderPlayerName(value) {
 }
 
 function getOverrideAugment(id) {
-    return UX_AUGMENT_COPY[id] || null;
+    return (UX_AUGMENT_COPY && UX_AUGMENT_COPY[id]) || null;
 }
 
 function getPlayerMaxHp() {
@@ -11585,7 +11624,7 @@ function refreshStaticCopy() {
     setText('.duel-toggle[data-duel-select="dodge"][data-value="LEFT"]', "Лево");
     setText('.duel-toggle[data-duel-select="dodge"][data-value="STAY"]', "Центр");
     setText('.duel-toggle[data-duel-select="dodge"][data-value="RIGHT"]', "Право");
-    Object.keys(UX_WEAPON_HINTS).forEach(function (code) {
+    Object.keys(UX_WEAPON_HINTS || {}).forEach(function (code) {
         document.querySelectorAll('.weapon-option[data-value="' + code + '"]').forEach(function (button) {
             button.setAttribute("title", UX_WEAPON_HINTS[code]);
             button.setAttribute("aria-label", UX_WEAPON_HINTS[code]);
@@ -11596,6 +11635,13 @@ function refreshStaticCopy() {
         friendSearchButton.setAttribute("aria-label", "Найти игрока");
         friendSearchButton.setAttribute("title", "Найти игрока");
     }
+    document.querySelectorAll("[data-nav-target]").forEach(function (button) {
+        const target = button.getAttribute("data-nav-target");
+        const labels = { home: "Хаб", inventory: "Инвентарь", friends: "Друзья", shop: "Магазин" };
+        const label = labels[target] || "Раздел";
+        button.setAttribute("aria-label", label);
+        button.setAttribute("title", label);
+    });
     const botButton = document.getElementById("bot-duel-button");
     if (botButton) {
         botButton.classList.add("hidden");
@@ -11608,7 +11654,8 @@ function refreshStaticCopy() {
     }
     if (elements.journalZone) {
         const location = typeof getCurrentJournalLocation === "function" ? getCurrentJournalLocation() : ((state.ui && state.ui.journalLocation) || "street");
-        elements.journalZone.textContent = UX_ZONE_LABELS[location] || "Город";
+        const zoneLabels = UX_ZONE_LABELS || {};
+        elements.journalZone.textContent = zoneLabels[location] || "Город";
     }
 }
 
@@ -11688,7 +11735,8 @@ function renderJournal() {
     state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
     const location = typeof getCurrentJournalLocation === "function" ? getCurrentJournalLocation() : ((state.ui && state.ui.journalLocation) || "street");
     if (elements.journalZone) {
-        elements.journalZone.textContent = UX_ZONE_LABELS[location] || "Город";
+        const zoneLabels = UX_ZONE_LABELS || {};
+        elements.journalZone.textContent = zoneLabels[location] || "Город";
     }
     if (!state.journal.length) {
         elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><span class="entry-icon" aria-hidden="true">·</span><div><p>Записей пока нет.</p></div></article>';
@@ -11696,7 +11744,8 @@ function renderJournal() {
     }
     elements.journalList.innerHTML = state.journal.map(function (entry) {
         const entryLocation = entry.location || location;
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, UX_ZONE_LABELS[entryLocation] || "Город");
+        const zoneLabels = UX_ZONE_LABELS || {};
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, zoneLabels[entryLocation] || "Город");
         const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
         return '<article class="journal-entry">'
             + '<span class="entry-icon" aria-hidden="true">' + escapeHtml(journalIcon(entry)) + '</span>'
@@ -12652,34 +12701,1034 @@ function renderAll() {
     renderDuelExitModal();
     renderDuelResultModal();
     bindStaticActionHandlers();
+    exposeGlobalActions();
+}
+
+function finalNoopAction() {}
+
+function finalAction(fn) {
+    return typeof fn === "function" ? fn : finalNoopAction;
+}
+
+function finalFriendDuel(friendId) {
+    const friend = typeof getFriendById === "function" ? getFriendById(friendId) : null;
+    if (!friend) {
+        showToast("Друг не найден.");
+        return;
+    }
+    requestStartDuel({
+        mode: "friend",
+        title: "Вызвать на дуэль?",
+        copy: "Соперник: " + sanitizeVisibleText(friend.name, "Игрок") + ".",
+        execute: function () {
+            startQueueDuel(true);
+        }
+    });
+}
+
+function exposeGlobalActions() {
+    window.PolusApp = {
+        navigate: finalAction(navigateTo),
+        startQueueDuel: finalAction(startQueueDuel),
+        startBotDuel: finalAction(startBotDuel),
+        cancelQueue: finalAction(cancelQueue),
+        triggerJournalEvent: finalAction(triggerRandomJournalEvent),
+        openQuest: finalAction(openQuest),
+        delayQuest: finalAction(delayQuest),
+        chooseQuestAction: finalAction(typeof executeQuestChoice === "function" ? executeQuestChoice : null),
+        useItem: finalAction(useBackpackItem),
+        changeAugment: finalAction(openAugmentPicker),
+        closeAugmentPicker: finalAction(closeAugmentPicker),
+        selectAugment: finalAction(selectAugment),
+        setShopSection: finalAction(setShopSection),
+        viewFriendProfile: finalAction(viewFriendProfile),
+        openFriendChat: finalAction(openFriendChat),
+        openSocialInbox: finalAction(openSocialInbox),
+        closeSocialInbox: finalAction(closeSocialInbox),
+        selectDuelOption: finalAction(updateDuelSelection),
+        submitDuelTurn: finalAction(submitCurrentDuelTurn),
+        submitDuelChat: finalAction(submitDuelChat),
+        setDuelPanel: finalAction(setDuelPanel),
+        duelFriend: finalFriendDuel,
+        buy: finalAction(buyShopItem),
+        clearDuelLog: finalAction(clearDuelLog),
+        closeDuel: finalAction(closeDuel),
+        cancelDuelExit: finalAction(cancelDuelExit),
+        confirmDuelExit: finalAction(confirmDuelExit),
+        submitRegistration: finalAction(submitRegistration),
+        sendFriendRequest: finalAction(submitFriendSearch),
+        acceptFriendRequest: finalAction(acceptFriendRequest),
+        rejectFriendRequest: finalAction(rejectFriendRequest),
+        cancelStartDuel: finalAction(cancelStartDuel),
+        confirmStartDuel: finalAction(confirmStartDuel),
+        closeDuelResult: finalAction(closeDuelResult)
+    };
+}
+
+function showToast(text) {
+    if (!elements.toast) {
+        return;
+    }
+    elements.toast.textContent = sanitizeVisibleText(text, "Действие обновлено.");
+    elements.toast.classList.remove("hidden");
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function () {
+        elements.toast.classList.add("hidden");
+    }, 2400);
+}
+
+async function readApiError(response) {
+    try {
+        const payload = await response.json();
+        return sanitizeVisibleText(payload && payload.message, "Ошибка запроса");
+    } catch (error) {
+        return "Ошибка запроса";
+    }
+}
+
+function renderProfile() {
+    const playerName = sanitizeVisibleText(state.player && state.player.name, sanitizeVisibleText(state.auth && state.auth.nickname, "Новый игрок")) || "Новый игрок";
+    const playerMoney = Number(state.player && state.player.money || 0);
+    const playerRating = Number(state.player && state.player.rating || 0);
+    if (elements.profileName) {
+        elements.profileName.textContent = playerName;
+    }
+    if (elements.profileMoney) {
+        elements.profileMoney.textContent = String(playerMoney);
+    }
+    if (elements.profileRating) {
+        elements.profileRating.textContent = String(playerRating);
+    }
+    if (elements.shopMoney) {
+        elements.shopMoney.textContent = playerMoney + " монет";
+    }
+    if (elements.profileAvatar) {
+        elements.profileAvatar.textContent = playerName.slice(0, 1).toUpperCase();
+    }
+}
+
+function renderQueueStatus() {
+    const queued = state.matchmaking && state.matchmaking.status === "QUEUED";
+    elements.queueStatusCard.classList.toggle("hidden", !queued);
+    if (!queued) {
+        return;
+    }
+    const queuedAt = state.matchmaking.queuedAt || Date.now();
+    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
+    elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueCancelButton.disabled = false;
+}
+
+function journalIcon(entry) {
+    const text = String((entry && entry.text) || "").toLowerCase();
+    if (/монет|награ|наш[её]л|получ/.test(text)) {
+        return "¤";
+    }
+    if (/дуэл|арен|бой|вызов/.test(text)) {
+        return "!";
+    }
+    if (/приглаш|друг|сообщ/.test(text)) {
+        return ">";
+    }
+    return "*";
+}
+
+function renderJournal() {
+    if (!elements.journalList) {
+        return;
+    }
+    state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
+    const location = typeof getCurrentJournalLocation === "function" ? getCurrentJournalLocation() : ((state.ui && state.ui.journalLocation) || "street");
+    if (elements.journalZone) {
+        const zoneLabels = UX_ZONE_LABELS || {};
+        elements.journalZone.textContent = zoneLabels[location] || "Город";
+    }
+    if (!state.journal.length) {
+        elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><span class="entry-icon" aria-hidden="true">.</span><div><p>Записей пока нет.</p></div></article>';
+        return;
+    }
+    elements.journalList.innerHTML = state.journal.map(function (entry) {
+        const entryLocation = entry.location || location;
+        const zoneLabels = UX_ZONE_LABELS || {};
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, zoneLabels[entryLocation] || "Город");
+        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        return '<article class="journal-entry">'
+            + '<span class="entry-icon" aria-hidden="true">' + escapeHtml(journalIcon(entry)) + '</span>'
+            + '<div class="entry-body"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></div>'
+            + '</article>';
+    }).join("");
+}
+
+function renderRegistrationModal() {
+    const auth = state.auth || {};
+    const currentName = sanitizeVisibleText(state.player && state.player.name, "");
+    const nickname = sanitizeVisibleText(auth.nickname, "");
+    const shouldOpen = !auth.registered || !state.player.id || isPlaceholderPlayerName(currentName) || isPlaceholderPlayerName(nickname || currentName);
+    elements.registrationModal.classList.toggle("hidden", !shouldOpen);
+    elements.registrationModal.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+    if (!shouldOpen) {
+        return;
+    }
+    elements.registrationCopy.textContent = auth.demoMode
+        ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
+        : "Ник будет привязан к твоему Telegram ID.";
+    if (!elements.registrationNickname.value && nickname) {
+        elements.registrationNickname.value = nickname;
+    }
+    if (auth.journalStyle) {
+        const savedOption = document.querySelector('input[name="registration-journal-style"][value="' + auth.journalStyle + '"]');
+        if (savedOption) {
+            savedOption.checked = true;
+        }
+    }
+    elements.registrationError.textContent = sanitizeVisibleText(auth.initError, "");
+    elements.registrationError.classList.toggle("hidden", !elements.registrationError.textContent);
+}
+
+async function submitRegistration() {
+    const nickname = (elements.registrationNickname.value || "").trim();
+    const checkedStyle = document.querySelector('input[name="registration-journal-style"]:checked');
+    const journalStyle = checkedStyle ? checkedStyle.value : "";
+    elements.registrationError.textContent = "";
+    elements.registrationError.classList.add("hidden");
+
+    if (!nickname) {
+        showRegistrationError("Введи никнейм.");
+        return;
+    }
+    if (nickname.length < 3 || nickname.length > 20) {
+        showRegistrationError("Ник должен быть длиной от 3 до 20 символов.");
+        return;
+    }
+    if (!/^[\p{L}\p{N}_-]+$/u.test(nickname)) {
+        showRegistrationError("Ник может содержать только буквы, цифры, _ и -.");
+        return;
+    }
+    if (!journalStyle) {
+        showRegistrationError("Выбери стиль дневника.");
+        return;
+    }
+
+    elements.registrationSubmit.disabled = true;
+    try {
+        if (state.auth && state.auth.demoMode) {
+            state.auth.nickname = nickname;
+            state.auth.journalStyle = journalStyle;
+            state.auth.registered = true;
+            state.player.id = state.player.id || "demo-player";
+            state.player.name = nickname;
+            state.player.money = Number(state.player.money || 0);
+            state.player.rating = Number(state.player.rating || 0);
+            saveState();
+            renderAll();
+            showToast("Аккаунт зарегистрирован.");
+            return;
+        }
+        if (!state.auth || !state.auth.sessionToken) {
+            throw new Error("Открой Mini App через Telegram, чтобы зарегистрировать ник.");
+        }
+        const response = await fetch("/api/player/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Session-Token": state.auth.sessionToken
+            },
+            body: JSON.stringify({ nickname: nickname, journalStyle: journalStyle })
+        });
+        if (!response.ok) {
+            throw new Error(await readApiError(response));
+        }
+        const player = await response.json();
+        state.auth.nickname = player.nickname || nickname;
+        state.auth.journalStyle = player.journalStyle || journalStyle;
+        state.auth.registered = Boolean(player.registered);
+        syncPlayerFromServer(player, true);
+        await loadFriendsOverview();
+        saveState();
+        renderAll();
+        showToast("Аккаунт зарегистрирован.");
+    } catch (error) {
+        showRegistrationError(error && error.message ? error.message : "Не удалось зарегистрировать аккаунт.");
+    } finally {
+        elements.registrationSubmit.disabled = false;
+    }
+}
+
+function renderInventory() {
+    if (!elements.inventoryPlaceholder) {
+        return;
+    }
+    const unlocked = (Array.isArray(state.inventory && state.inventory.unlockedAugments) ? state.inventory.unlockedAugments : []).filter(function (id) {
+        return Boolean(getOverrideAugment(id));
+    });
+    if (!unlocked.length) {
+        elements.inventoryPlaceholder.innerHTML = '<div class="inventory-empty-visual" aria-hidden="true">◇</div><h3>Пока аугментаций нет</h3><p>Купленные модули появятся здесь.</p>';
+        return;
+    }
+    const grouped = {
+        weapon: unlocked.filter(function (id) { return getOverrideAugment(id).slot === "weapon"; }),
+        defense: unlocked.filter(function (id) { return getOverrideAugment(id).slot === "defense"; })
+    };
+    elements.inventoryPlaceholder.innerHTML = [
+        '<section class="inventory-slot"><h3>Оружейная</h3>' + (grouped.weapon.length ? grouped.weapon.map(function (id) {
+            const item = getOverrideAugment(id);
+            return '<article class="inventory-card"><span class="card-icon" aria-hidden="true">!</span><strong>' + escapeHtml(item.name) + '</strong><p>' + escapeHtml(item.description) + '</p></article>';
+        }).join("") : '<p class="slot-empty">Пусто</p>') + '</section>',
+        '<section class="inventory-slot"><h3>Защитная</h3>' + (grouped.defense.length ? grouped.defense.map(function (id) {
+            const item = getOverrideAugment(id);
+            return '<article class="inventory-card"><span class="card-icon" aria-hidden="true">◇</span><strong>' + escapeHtml(item.name) + '</strong><p>' + escapeHtml(item.description) + '</p></article>';
+        }).join("") : '<p class="slot-empty">Пусто</p>') + '</section>'
+    ].join("");
+}
+
+function friendInitial(name) {
+    return sanitizeVisibleText(name, "И").slice(0, 1).toUpperCase();
+}
+
+function friendStatusLabel(status) {
+    if (status === "online") {
+        return "Онлайн";
+    }
+    if (status === "busy") {
+        return "В бою";
+    }
+    if (status === "invited") {
+        return "Приглашен";
+    }
+    return "Оффлайн";
+}
+
+function renderFriendRow(friend, mode) {
+    const friendName = sanitizeVisibleText(friend.name, "Игрок");
+    const status = friend.status || "offline";
+    const rating = Number(friend.rating || 0);
+    const id = escapeHtml(friend.id);
+    const statusClass = status === "online" ? "is-online" : status === "busy" ? "is-busy" : status === "invited" ? "is-invited" : "is-offline";
+    const actions = mode === "request"
+        ? '<div class="friend-actions friend-actions-inline"><button class="primary-button compact-button" type="button" data-request-accept-id="' + id + '">Принять</button><button class="secondary-button icon-button" type="button" data-request-reject-id="' + id + '" aria-label="Отклонить">×</button></div>'
+        : '<div class="friend-actions friend-actions-inline"><button class="secondary-button icon-button" data-friend-chat-id="' + id + '" type="button" aria-label="Чат">></button><button class="secondary-button compact-button" data-friend-profile-id="' + id + '" type="button">Профиль</button></div>';
+    return '<article class="friend-card friend-card-row">'
+        + '<div class="friend-avatar" aria-hidden="true">' + escapeHtml(friendInitial(friendName)) + '</div>'
+        + '<div class="friend-main"><h3>' + escapeHtml(friendName) + '</h3><div class="friend-status-row"><span class="status-chip ' + statusClass + '">' + escapeHtml(friendStatusLabel(status)) + '</span><span class="timer-chip">Рейтинг ' + escapeHtml(String(rating)) + '</span></div></div>'
+        + actions
+        + '</article>';
+}
+
+function renderFriends() {
+    const requests = Array.isArray(state.friendRequests) ? state.friendRequests : [];
+    const friends = typeof getDisplayFriends === "function" ? getDisplayFriends() : (Array.isArray(state.friends) ? state.friends : []);
+    elements.friendRequestBadge.textContent = String(Math.min(9, requests.length));
+    elements.friendRequestPanel.innerHTML = requests.length
+        ? '<section class="friend-request-stack"><div class="section-label">Приглашения</div>' + requests.map(function (request) {
+            return renderFriendRow(request, "request");
+        }).join("") + '</section>'
+        : "";
+    elements.friendList.innerHTML = friends.length
+        ? friends.map(function (friend) { return renderFriendRow(friend, "friend"); }).join("")
+        : '<article class="friend-card friend-card-empty"><span class="entry-icon" aria-hidden="true">?</span><p>Пока друзей нет. Найди игрока по никнейму.</p></article>';
+}
+
+function renderSocialInbox() {
+    if (!elements.socialChatPanel) {
+        return;
+    }
+    state.social = state.social || {};
+    state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
+    const threads = state.social.threads;
+    const activeThread = threads.find(function (thread) { return thread.id === state.social.activeThreadId; }) || null;
+    elements.socialChatFabBadge.textContent = String(Math.min(9, threads.length));
+    elements.socialChatFabBadge.classList.toggle("hidden", threads.length === 0);
+    elements.socialChatPanel.classList.toggle("hidden", !state.social.isOpen);
+    elements.socialChatPanel.setAttribute("aria-hidden", state.social.isOpen ? "false" : "true");
+    document.body.classList.toggle("social-open", Boolean(state.social.isOpen));
+
+    if (!threads.length) {
+        elements.socialChatThreadList.innerHTML = '<article class="social-chat-empty">Чаты появятся здесь после первого диалога с другом.</article>';
+        elements.socialChatThreadTitle.textContent = "Выбери чат";
+        elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
+        elements.socialChatInput.disabled = true;
+        elements.socialChatSend.disabled = true;
+        return;
+    }
+
+    elements.socialChatThreadList.innerHTML = threads.map(function (thread) {
+        const friendName = sanitizeVisibleText(thread.friendName, "Друг");
+        const statusText = friendStatusLabel(thread.status);
+        const active = activeThread && activeThread.id === thread.id;
+        return '<button class="social-chat-thread-card' + (active ? " is-active" : "") + '" type="button" data-social-thread-id="' + escapeHtml(thread.id) + '">'
+            + '<span class="thread-avatar" aria-hidden="true">' + escapeHtml(friendInitial(friendName)) + '</span>'
+            + '<span class="thread-copy"><strong>' + escapeHtml(friendName) + '</strong><span>' + escapeHtml(statusText + " · Рейтинг " + (thread.rating || 0)) + '</span></span>'
+            + '<span class="thread-state" aria-hidden="true">' + (active ? "✓" : ">") + '</span>'
+            + '</button>';
+    }).join("");
+
+    if (!activeThread) {
+        elements.socialChatThreadTitle.textContent = "Выбери чат";
+        elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
+        elements.socialChatInput.disabled = true;
+        elements.socialChatSend.disabled = true;
+        return;
+    }
+
+    elements.socialChatThreadTitle.textContent = sanitizeVisibleText(activeThread.friendName, "Друг");
+    elements.socialChatMessages.innerHTML = (activeThread.messages || []).length
+        ? (activeThread.messages || []).map(function (message) {
+            const own = message.author === "you";
+            const authorName = own ? sanitizeVisibleText(state.player.name, "Ты") : sanitizeVisibleText(activeThread.friendName, "Друг");
+            const messageText = sanitizeVisibleText(message.text, "Сообщение скрыто.");
+            return '<div class="social-chat-message' + (own ? " social-chat-message-own" : "") + '"><div class="social-chat-message-bubble"><strong>' + escapeHtml(authorName) + '</strong><p>' + escapeHtml(messageText) + '</p><small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small></div></div>';
+        }).join("")
+        : '<div class="social-chat-empty">Пока сообщений нет. Напиши первым.</div>';
+    elements.socialChatInput.disabled = false;
+    elements.socialChatSend.disabled = false;
+    elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+}
+
+function renderShop() {
+    const activeSection = state.ui.shopSection || "weapon";
+    elements.shopTabButtons.forEach(function (button) {
+        button.classList.toggle("is-active", button.getAttribute("data-shop-section") === activeSection);
+    });
+    const items = (Array.isArray(state.shop) ? state.shop : []).filter(function (item) {
+        return item.section === activeSection && getOverrideAugment(item.id);
+    });
+    elements.shopList.innerHTML = items.length ? '<section class="shop-section">' + items.map(function (item) {
+        const copy = getOverrideAugment(item.id);
+        const owned = item.kind === "augment" && hasAugment(item.augmentId);
+        const icon = copy.slot === "weapon" ? "!" : "◇";
+        return '<article class="shop-card shop-card-compact"><div class="shop-card-head"><span class="shop-card-icon" aria-hidden="true">' + icon + '</span><h3>' + escapeHtml(copy.name) + '</h3><strong>' + escapeHtml(String(copy.price) + " монет") + '</strong></div><p class="shop-card-copy">' + escapeHtml(copy.description) + '</p><div class="shop-actions"><button class="primary-button" data-shop-id="' + escapeHtml(item.id) + '" type="button"' + (owned ? " disabled" : "") + '>' + (owned ? "Куплено" : "Купить") + '</button></div></article>';
+    }).join("") + '</section>' : '<article class="shop-card"><p>Пока товаров в этом разделе нет.</p></article>';
+}
+
+function startBotDuel() {
+    showToast("Тренировочные бои временно отключены.");
+}
+
+async function startQueueDuel(skipConfirm) {
+    if (!state.auth.registered) {
+        showToast("Сначала зарегистрируй аккаунт.");
+        renderRegistrationModal();
+        return;
+    }
+    if (!skipConfirm) {
+        requestStartDuel({
+            mode: "queue",
+            title: "Начать бой?",
+            copy: "Подтверди вход в PvP-матч.",
+            execute: function () {
+                startQueueDuel(true);
+            }
+        });
+        return;
+    }
+    if (state.matchmaking.status === "QUEUED") {
+        showToast("Ты уже в очереди. Ищем соперника.");
+        return;
+    }
+    if (!state.auth.sessionToken || state.auth.demoMode) {
+        showToast("Поиск матча работает только внутри Telegram.");
+        return;
+    }
+    try {
+        const response = await apiFetch("/api/matchmaking/join", { method: "POST" });
+        const payload = await response.json();
+        applyMatchmakingStatus(payload);
+        if (payload.status === "IN_DUEL" && payload.duelId) {
+            await refreshLiveDuel(payload.duelId);
+            showToast("Соперник найден.");
+        } else {
+            showToast("Очередь запущена.");
+        }
+    } catch (error) {
+        showToast(error && error.message ? error.message : "Не удалось встать в очередь.");
+    }
+}
+
+async function submitFriendSearch() {
+    if (!state.auth.registered) {
+        showToast("Сначала зарегистрируй аккаунт.");
+        return;
+    }
+    const nickname = elements.friendSearchInput ? elements.friendSearchInput.value.trim() : "";
+    if (!nickname) {
+        showToast("Введи ник игрока.");
+        return;
+    }
+    if (!state.auth.sessionToken || state.auth.demoMode) {
+        showToast("Добавление друзей доступно только в Telegram-аккаунте.");
+        return;
+    }
+    try {
+        const response = await apiFetch("/api/friends/request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nickname: nickname })
+        });
+        applyFriendsOverview(await response.json());
+        if (elements.friendSearchInput) {
+            elements.friendSearchInput.value = "";
+        }
+        renderFriends();
+        bindStaticActionHandlers();
+        showToast("Запрос в друзья отправлен.");
+    } catch (error) {
+        showToast(error && error.message ? error.message : "Не удалось отправить запрос.");
+    }
+}
+
+async function acceptFriendRequest(requestId) {
+    if (!state.auth.sessionToken || state.auth.demoMode) {
+        return;
+    }
+    try {
+        const response = await apiFetch("/api/friends/request/" + encodeURIComponent(requestId) + "/accept", { method: "POST" });
+        applyFriendsOverview(await response.json());
+        renderFriends();
+        bindStaticActionHandlers();
+        showToast("Друг добавлен.");
+    } catch (error) {
+        showToast(error && error.message ? error.message : "Не удалось принять запрос.");
+    }
+}
+
+async function rejectFriendRequest(requestId) {
+    if (!state.auth.sessionToken || state.auth.demoMode) {
+        return;
+    }
+    try {
+        const response = await apiFetch("/api/friends/request/" + encodeURIComponent(requestId) + "/reject", { method: "POST" });
+        applyFriendsOverview(await response.json());
+        renderFriends();
+        bindStaticActionHandlers();
+        showToast("Запрос отклонен.");
+    } catch (error) {
+        showToast(error && error.message ? error.message : "Не удалось отклонить запрос.");
+    }
+}
+
+function buildDuelStatusText(duel) {
+    if (!duel) {
+        return "";
+    }
+    if (duel.finished) {
+        return sanitizeVisibleText(duel.resultText, "");
+    }
+    if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
+        return hasPendingDuelChanges(duel)
+            ? "Выбор изменен. Нажми «Изменить ход», чтобы отправить новый вариант."
+            : "Ход зафиксирован. Ждем соперника.";
+    }
+    if (duel.yourActionSubmitted && !hasPendingDuelChanges(duel)) {
+        return "Ход сделан.";
+    }
+    return "";
+}
+
+function weaponInstrumentLabel(code) {
+    return {
+        PISTOLS: "из пистоля и щита",
+        RIFLE: "из винтовки",
+        SHOTGUN: "из дробовика"
+    }[code] || "";
+}
+
+function directionLabel(code) {
+    return {
+        LEFT: "влево",
+        CENTER: "по центру",
+        RIGHT: "вправо"
+    }[code] || "по центру";
+}
+
+function dodgeLabel(code) {
+    return {
+        LEFT: "смещается влево",
+        STAY: "остается по центру",
+        RIGHT: "смещается вправо"
+    }[code] || "остается по центру";
+}
+
+function pelletWord(count) {
+    const remainderTen = count % 10;
+    const remainderHundred = count % 100;
+    if (remainderTen === 1 && remainderHundred !== 11) {
+        return " дробину";
+    }
+    if (remainderTen >= 2 && remainderTen <= 4 && (remainderHundred < 12 || remainderHundred > 14)) {
+        return " дробины";
+    }
+    return " дробин";
+}
+
+function buildDuelIntentLine(name, action) {
+    const actorName = sanitizeVisibleText(name, "Игрок");
+    return actorName + " стреляет " + directionLabel(action.shot) + " " + weaponInstrumentLabel(action.weapon) + " и " + dodgeLabel(action.dodge) + ".";
+}
+
+function resolveAttack(attackerName, defenderName, attackerAction, defenderAction, attackerSide) {
+    const defenderSide = attackerSide === "player" ? "opponent" : "player";
+    const defenderLine = defenderAction.dodge === "STAY" ? "CENTER" : defenderAction.dodge;
+    const lineMatched = attackerAction.shot === defenderLine;
+    const resultLines = [];
+    const gamble = rollWeaponGamble(attackerSide);
+
+    if (gamble.jammed) {
+        return { damage: 0, outcome: "jammed", summary: "осечка, выстрел не происходит", lines: resultLines };
+    }
+    if (!lineMatched && attackerAction.weapon !== "SHOTGUN") {
+        return { damage: 0, outcome: "miss", summary: "промах мимо линии", lines: resultLines };
+    }
+    if (lineMatched && typeof shouldSupportEvade === "function" && shouldSupportEvade(defenderSide)) {
+        return { damage: 0, outcome: "evaded", summary: "соперник уходит от урона", lines: resultLines };
+    }
+    if (attackerAction.weapon === "PISTOLS") {
+        if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon)) {
+            return { damage: 0, outcome: "blocked", summary: "выстрел заблокирован щитом", lines: resultLines };
+        }
+        let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+        if (gamble.doubled) {
+            damage *= 2;
+        }
+        damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+        return { damage: damage, outcome: "hit", summary: "попадание на " + damage + " урона", lines: resultLines };
+    }
+    if (attackerAction.weapon === "RIFLE") {
+        let damage = 30 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+        if (gamble.doubled) {
+            damage *= 2;
+        }
+        damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+        return { damage: damage, outcome: "piercing-hit", summary: "попадание на " + damage + " урона, блокирование проигнорировано", lines: resultLines };
+    }
+    if (!lineMatched) {
+        const grazeChanceBonus = typeof getWeaponGrazeBonus === "function" ? getWeaponGrazeBonus(attackerSide, attackerAction.weapon) : 0;
+        if (Math.random() < SHOTGUN_EDGE_GRAZE_CHANCE + grazeChanceBonus) {
+            let grazeDamage = SHOTGUN_EDGE_DAMAGE + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+            if (gamble.doubled) {
+                grazeDamage *= 2;
+            }
+            grazeDamage = applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines);
+            return { damage: grazeDamage, outcome: "graze", summary: "зацеп на " + grazeDamage + " урона", lines: resultLines };
+        }
+        return { damage: 0, outcome: "graze-miss", summary: "дробь ушла мимо цели", lines: resultLines };
+    }
+
+    let pelletsHit = 0;
+    let pelletsBlocked = 0;
+    for (let index = 0; index < 5; index += 1) {
+        if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon)) {
+            pelletsBlocked += 1;
+        } else {
+            pelletsHit += 1;
+        }
+    }
+    if (!pelletsHit) {
+        return { damage: 0, outcome: "shotgun-blocked", summary: "все дробины заблокированы щитом", lines: resultLines };
+    }
+    let damage = pelletsHit * 5 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+    if (gamble.doubled) {
+        damage *= 2;
+    }
+    damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+    let summary = "попадание на " + damage + " урона";
+    if (pelletsBlocked) {
+        summary += ", щит блокирует " + pelletsBlocked + pelletWord(pelletsBlocked);
+    }
+    return { damage: damage, outcome: "shotgun-hit", summary: summary, lines: resultLines };
+}
+
+function summarizeOpponentAttack(attack) {
+    switch (attack.outcome) {
+        case "hit":
+        case "piercing-hit":
+        case "shotgun-hit":
+            return "соперник попал на " + attack.damage + " урона";
+        case "graze":
+            return "соперник зацепил на " + attack.damage + " урона";
+        case "blocked":
+        case "shotgun-blocked":
+            return "соперник не пробил щит";
+        case "evaded":
+            return "соперник ушел от урона";
+        case "jammed":
+            return "у соперника осечка";
+        case "miss":
+        case "graze-miss":
+        default:
+            return "соперник промахнулся";
+    }
+}
+
+function buildRoundResultLine(ownAttack, opponentAttack) {
+    return "Итог: " + ownAttack.summary + ", " + summarizeOpponentAttack(opponentAttack) + ".";
+}
+
+function submitCurrentDuelTurn() {
+    if (!state.duel || state.duel.finished) {
+        return;
+    }
+    if (!isDuelSelectionComplete(state.duel)) {
+        showToast("Сначала выбери оружие, выстрел и уворот.");
+        return;
+    }
+    if (state.duel.mode === "pvp-live") {
+        submitLiveDuelAction();
+        return;
+    }
+    resolveDuelRound(getCurrentDuelAction(state.duel), buildOpponentAction());
+}
+
+async function submitLiveDuelAction() {
+    const duel = state.duel;
+    if (!duel || !duel.duelId || duel.finished) {
+        return;
+    }
+    const actionPayload = getCurrentDuelAction(duel);
+    elements.duelSubmitButton.disabled = true;
+    try {
+        const response = await apiFetch("/api/duel/" + encodeURIComponent(duel.duelId) + "/action", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                weapon: actionPayload.weapon,
+                shotDirection: actionPayload.shot,
+                dodgeDirection: actionPayload.dodge
+            })
+        });
+        const payload = await response.json();
+        state.matchmaking.status = payload.status === "FINISHED" ? "COMPLETED" : "IN_DUEL";
+        await refreshLiveDuel(payload.duelId);
+        if (state.duel) {
+            state.duel.activePanel = "logs";
+        }
+        showToast(state.duel && state.duel.yourActionSubmitted ? "Ход принят." : "Раунд обновлен.");
+        renderDuel();
+    } catch (error) {
+        showToast(error && error.message ? error.message : "Не удалось отправить ход.");
+    } finally {
+        elements.duelSubmitButton.disabled = false;
+    }
+}
+
+function resolveDuelRound(playerAction, opponentAction) {
+    const duel = state.duel;
+    if (!duel || duel.finished) {
+        return;
+    }
+    const roundNumber = duel.round;
+    const playerName = sanitizeVisibleText(duel.playerName, "Игрок");
+    const opponentName = sanitizeVisibleText(duel.opponentName, "Соперник");
+    const playerAttack = resolveAttack(playerName, opponentName, playerAction, opponentAction, "player");
+    const opponentAttack = resolveAttack(opponentName, playerName, opponentAction, playerAction, "opponent");
+
+    duel.opponentHp = Math.max(0, duel.opponentHp - playerAttack.damage);
+    duel.playerHp = Math.max(0, duel.playerHp - opponentAttack.damage);
+    duel.logs = Array.isArray(duel.logs) ? duel.logs : [];
+    duel.logs.push({
+        round: roundNumber,
+        kind: playerAttack.damage > 0 ? "hit" : "miss",
+        lines: [
+            buildDuelIntentLine(playerName, playerAction),
+            buildRoundResultLine(playerAttack, opponentAttack),
+            buildDuelIntentLine(opponentName, opponentAction),
+            buildRoundResultLine(opponentAttack, playerAttack)
+        ]
+    });
+    duel.activePanel = "logs";
+    duel.newLogCount = 1;
+
+    if (duel.playerHp <= 0 || duel.opponentHp <= 0) {
+        duel.finished = true;
+        const playerWon = duel.opponentHp <= 0 && duel.playerHp > 0;
+        const opponentWon = duel.playerHp <= 0 && duel.opponentHp > 0;
+        if (playerWon) {
+            duel.resultText = "Ты победил.";
+            state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
+            openDuelResultModal({ title: "Победа", copy: "Ты победил в дуэли.", rating: 0, money: BATTLE_VICTORY_COINS });
+        } else if (opponentWon) {
+            duel.resultText = "Ты проиграл.";
+            state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
+            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в дуэли.", rating: 0, money: BATTLE_DEFEAT_COINS });
+        } else {
+            duel.resultText = "Ничья.";
+            openDuelResultModal({ title: "Ничья", copy: "Оба бойца выбыли одновременно.", rating: 0, money: 0 });
+        }
+        saveState();
+        renderDuel();
+        if (typeof renderHome === "function") {
+            renderHome();
+        }
+        return;
+    }
+
+    duel.round += 1;
+    startLocalRound(duel);
+    saveState();
+    renderDuel();
+}
+
+function duelLogKind(lines) {
+    const joined = lines.join(" ").toLowerCase();
+    if (/побед|награ|\+\d+/.test(joined)) {
+        return "reward";
+    }
+    if (/попадание|попал|зацеп/.test(joined)) {
+        return "hit";
+    }
+    if (/промах|осечка|заблок/.test(joined)) {
+        return "miss";
+    }
+    return "system";
+}
+
+function duelLogIcon(kind) {
+    return {
+        hit: "!",
+        miss: "×",
+        reward: "¤",
+        invite: ">",
+        system: "i"
+    }[kind] || "i";
+}
+
+function renderDuelLogRow(label, line, extraClass) {
+    if (!line) {
+        return "";
+    }
+    return '<div class="duel-log-row ' + extraClass + '"><span class="duel-log-side">' + escapeHtml(label) + '</span><p>' + decorateText(line) + '</p></div>';
+}
+
+function renderDuelLogCard(entry, index) {
+    const roundNumber = typeof entry.round === "number" ? entry.round : (entry.roundNumber || "");
+    const lines = sanitizeLogLines(entry.lines);
+    const ownIntent = lines[0] || ("Раунд " + roundNumber);
+    const ownResult = lines[1] || "Итог: ход без результата.";
+    const opponentIntent = lines[2] || "";
+    const opponentResult = lines[3] || "";
+    const extraLines = lines.slice(4);
+    const kind = duelLogKind(lines);
+    return '<article class="duel-log-round duel-log-card duel-log-card-' + kind + (index === 0 ? " is-new" : "") + '">'
+        + '<div class="duel-log-card-head"><span class="duel-log-icon" aria-hidden="true">' + escapeHtml(duelLogIcon(kind)) + '</span><span class="duel-log-round-caption">Раунд ' + escapeHtml(String(roundNumber)) + '</span>' + (index === 0 ? '<span class="duel-log-badge">новое</span>' : '') + '</div>'
+        + renderDuelLogRow("Ты", ownIntent, "duel-log-line-own")
+        + renderDuelLogRow("Итог", ownResult, "duel-log-line-own duel-log-result")
+        + renderDuelLogRow("Враг", opponentIntent, "duel-log-line-opponent")
+        + renderDuelLogRow("Итог", opponentResult, "duel-log-line-opponent duel-log-result")
+        + extraLines.map(function (line) { return renderDuelLogRow("Сист.", line, "duel-log-line-system"); }).join("")
+        + '</article>';
+}
+
+function renderDuelChat(duel) {
+    const isLiveChat = duel.mode === "pvp-live";
+    const canWrite = isLiveChat && !duel.finished;
+    const messages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
+    if (!messages.length) {
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче.") + '</p></div>';
+    } else {
+        elements.duelChatList.innerHTML = messages.map(function (message) {
+            const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
+            const systemMessage = Boolean(message.systemMessage);
+            const extraClass = systemMessage ? " duel-chat-entry-system" : (own ? " duel-chat-entry-own" : "");
+            const displayName = sanitizeVisibleText(message.displayName, systemMessage ? "Система" : "Игрок");
+            const messageText = sanitizeVisibleText(message.text, systemMessage ? "Системное сообщение обновлено." : "Сообщение скрыто.");
+            return '<div class="duel-chat-entry' + extraClass + '"><p class="duel-chat-meta">' + escapeHtml(displayName) + ' · ' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</p><p class="duel-chat-text">' + escapeHtml(messageText) + '</p></div>';
+        }).join("");
+    }
+    elements.duelChatInput.disabled = !canWrite;
+    elements.duelChatSendButton.disabled = !canWrite;
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
+    elements.duelChatError.classList.toggle("hidden", !duel.chatError);
+    elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
+}
+
+async function submitDuelChat() {
+    const duel = state.duel;
+    if (!duel || duel.mode !== "pvp-live" || duel.finished) {
+        return;
+    }
+    const input = elements.duelChatInput;
+    const text = input ? input.value.trim() : "";
+    duel.chatError = "";
+    if (!text) {
+        renderDuel();
+        return;
+    }
+    if (CHAT_LINK_PATTERN.test(text)) {
+        duel.chatError = "Ссылки запрещены.";
+        renderDuel();
+        return;
+    }
+    if (!state.auth.sessionToken) {
+        duel.chatError = "Чат доступен только внутри Telegram.";
+        renderDuel();
+        return;
+    }
+    elements.duelChatSendButton.disabled = true;
+    try {
+        const response = await apiFetch("/api/duel/" + encodeURIComponent(duel.duelId) + "/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text })
+        });
+        const payload = await response.json();
+        state.duel.chatMessages = Array.isArray(payload.messages) ? payload.messages : state.duel.chatMessages;
+        state.duel.chatError = "";
+        if (input) {
+            input.value = "";
+            input.blur();
+        }
+        renderDuel();
+    } catch (error) {
+        duel.chatError = error && error.message ? sanitizeVisibleText(error.message, "Не удалось отправить сообщение.") : "Не удалось отправить сообщение.";
+        renderDuel();
+    } finally {
+        elements.duelChatSendButton.disabled = false;
+    }
+}
+
+function renderDuel() {
+    refreshStaticCopy();
+    const duel = state.duel;
+    if (!duel) {
+        closeDuelSilently();
+        return;
+    }
+
+    duel.activePanel = duel.activePanel || "logs";
+    duel.autoBattleEnabled = false;
+    duel.autoBattlePendingEnabled = null;
+    duel.chatMessages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
+    duel.chatError = sanitizeVisibleText(duel.chatError, "");
+    duel.resultText = sanitizeVisibleText(duel.resultText, "");
+    duel.logs = (Array.isArray(duel.logs) ? duel.logs : []).map(function (entry) {
+        return Object.assign({}, entry, { lines: sanitizeLogLines(entry.lines) });
+    }).filter(function (entry) {
+        return entry.lines.length > 0;
+    });
+
+    syncDuelInputs(duel);
+    renderDuelControls();
+    hideAutoBattleUi();
+    if (elements.duelAutoToggle) {
+        const autoRow = elements.duelAutoToggle.closest(".duel-auto-row");
+        if (autoRow) {
+            autoRow.classList.add("hidden");
+            autoRow.style.display = "none";
+        }
+    }
+    if (elements.duelAutoNote) {
+        elements.duelAutoNote.classList.add("hidden");
+        elements.duelAutoNote.style.display = "none";
+    }
+    if (elements.duelAutoCover) {
+        elements.duelAutoCover.classList.add("hidden");
+        elements.duelAutoCover.style.display = "none";
+    }
+
+    elements.duelTitle.textContent = duel.mode === "pvp-live" ? "Матч" : "Дуэль";
+    elements.duelRoundPill.textContent = "Раунд " + duel.round;
+    elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
+    const youName = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
+    const opponentName = sanitizeVisibleText(duel.opponentName, "Соперник");
+    elements.duelYouName.textContent = youName;
+    elements.duelYouMeta.innerHTML = '<span class="duelist-hp-chip"><span class="hp-dot hp-dot-you"></span>' + escapeHtml(String(duel.playerHp)) + ' HP</span>';
+    elements.duelYouAvatar.textContent = youName.slice(0, 1).toUpperCase();
+    elements.duelOpponentName.textContent = opponentName;
+    elements.duelOpponentMeta.innerHTML = '<span class="duelist-hp-chip"><span class="hp-dot hp-dot-opponent"></span>' + escapeHtml(String(duel.opponentHp)) + ' HP</span>';
+    elements.duelOpponentAvatar.textContent = opponentName.slice(0, 1).toUpperCase();
+    elements.duelYouHp.textContent = duel.playerHp + " HP";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    const playerMaxHp = Math.max(1, Number(duel.playerMaxHp || getPlayerMaxHp()));
+    const opponentMaxHp = Math.max(1, Number(duel.opponentMaxHp || 100));
+    elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / playerMaxHp) * 100))) + "%";
+    elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / opponentMaxHp) * 100))) + "%";
+
+    const duelStatus = buildDuelStatusText(duel);
+    elements.duelRoundStatus.innerHTML = duelStatus ? decorateText(duelStatus) : "";
+    elements.duelRoundStatus.classList.toggle("hidden", !duelStatus);
+
+    const duelSelectionComplete = isDuelSelectionComplete(duel);
+    const duelHasPendingChanges = hasPendingDuelChanges(duel);
+    elements.duelSubmitButton.textContent = duel.finished
+        ? "Бой завершен"
+        : duel.yourActionSubmitted
+            ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
+            : "Сделать ход";
+    elements.duelSubmitButton.disabled = duel.finished || !duelSelectionComplete || (duel.yourActionSubmitted && !duelHasPendingChanges);
+    elements.duelSubmitButton.classList.toggle("is-turn-submitted", Boolean(duel.yourActionSubmitted && !duelHasPendingChanges && !duel.finished));
+    elements.duelSubmitButton.classList.toggle("is-turn-edit", Boolean(duelHasPendingChanges && !duel.finished));
+
+    if (!duel.logs.length) {
+        elements.duelLogList.innerHTML = '<article class="duel-log-round duel-log-card duel-log-card-system"><div class="duel-log-card-head"><span class="duel-log-icon" aria-hidden="true">i</span><span class="duel-log-round-caption">Логи</span></div><p class="duel-log-empty">Логов пока нет. Первый обмен ходами появится здесь.</p></article>';
+    } else {
+        elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(renderDuelLogCard).join("");
+    }
+
+    renderDuelChat(duel);
+    const hasNewLogs = duel.activePanel !== "logs" && duel.logs.length > Number(duel.seenLogCount || 0);
+    if (duel.activePanel === "logs") {
+        duel.seenLogCount = duel.logs.length;
+    }
+    elements.duelTabLogs.classList.toggle("is-active", duel.activePanel === "logs");
+    elements.duelTabLogs.classList.toggle("has-new", hasNewLogs);
+    elements.duelTabLogs.setAttribute("aria-selected", duel.activePanel === "logs" ? "true" : "false");
+    elements.duelTabChat.classList.toggle("is-active", duel.activePanel === "chat");
+    elements.duelTabChat.setAttribute("aria-selected", duel.activePanel === "chat" ? "true" : "false");
+    elements.duelLogsPane.classList.toggle("hidden", duel.activePanel !== "logs");
+    elements.duelChatPane.classList.toggle("hidden", duel.activePanel !== "chat");
+    elements.duelClearLogButton.classList.toggle("hidden", duel.activePanel !== "logs");
+    elements.duelOverlay.classList.remove("hidden");
+    elements.duelOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("duel-open");
+}
+
+function openDuelResultModal(config) {
+    const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
+    const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
+    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    state.ui.duelExitConfirmOpen = false;
+    state.ui.duelResult = {
+        title: sanitizeVisibleText(config.title, fallbackTitle),
+        copy: sanitizeVisibleText(config.copy, fallbackCopy),
+        rating: Number(config.rating ?? config.experience) || 0,
+        money: Number(config.money) || 0
+    };
+    saveState();
+    renderDuelResultModal();
+}
+
+function renderDuelResultModal() {
+    const result = state.ui.duelResult;
+    const shouldOpen = Boolean(result);
+    if (!elements.duelResultModal) {
+        return;
+    }
+    elements.duelResultModal.classList.toggle("hidden", !shouldOpen);
+    elements.duelResultModal.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+    if (!shouldOpen) {
+        return;
+    }
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
+    elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
+    elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
+}
+
+function openLiveDuelResult(payload) {
+    const isVictory = payload.resultLabel === "VICTORY";
+    const isDefeat = payload.resultLabel === "DEFEAT";
+    openDuelResultModal({
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
+        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
+        money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
+    });
 }
 
 repairStateAfterLegacyLoad();
 refreshStaticCopy();
 bindStaticActionHandlers();
-if (window.PolusApp) {
-    window.PolusApp.navigate = navigateTo;
-    window.PolusApp.startQueueDuel = startQueueDuel;
-    window.PolusApp.startBotDuel = startBotDuel;
-    window.PolusApp.cancelQueue = cancelQueue;
-    window.PolusApp.openSocialInbox = openSocialInbox;
-    window.PolusApp.closeSocialInbox = closeSocialInbox;
-    window.PolusApp.submitRegistration = submitRegistration;
-    window.PolusApp.submitDuelTurn = submitCurrentDuelTurn;
-    window.PolusApp.setShopSection = setShopSection;
-    window.PolusApp.selectDuelOption = updateDuelSelection;
-    window.PolusApp.setDuelPanel = setDuelPanel;
-    window.PolusApp.submitDuelChat = submitDuelChat;
-    window.PolusApp.clearDuelLog = clearDuelLog;
-    window.PolusApp.closeDuel = closeDuel;
-    window.PolusApp.cancelStartDuel = cancelStartDuel;
-    window.PolusApp.confirmStartDuel = confirmStartDuel;
-    window.PolusApp.cancelDuelExit = cancelDuelExit;
-    window.PolusApp.confirmDuelExit = confirmDuelExit;
-    window.PolusApp.buy = buyShopItem;
-    window.PolusApp.openFriendChat = openFriendChat;
-    window.PolusApp.sendFriendRequest = submitFriendSearch;
-    window.PolusApp.closeDuelResult = closeDuelResult;
-    delete window.PolusApp.toggleAutoBattle;
-}
+exposeGlobalActions();
 })();

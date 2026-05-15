@@ -3246,21 +3246,43 @@ body.social-open {
 
 .nav-title {
     display: grid;
-    justify-items: center;
-    gap: 3px;
-    font-size: 0.75rem !important;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0 !important;
+    line-height: 0 !important;
 }
 
 .nav-title::before {
     content: "◆";
-    color: rgba(95, 187, 215, 0.76);
-    font-size: 0.74rem;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    color: rgba(143, 218, 240, 0.86);
+    font-size: 1.08rem;
+    line-height: 1;
+    background: radial-gradient(circle at 34% 24%, rgba(143, 218, 240, 0.22), rgba(17, 27, 44, 0.12) 58%);
+    border: 1px solid rgba(143, 218, 240, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 [data-nav-target="home"] .nav-title::before { content: "⌂"; }
 [data-nav-target="inventory"] .nav-title::before { content: "◇"; }
 [data-nav-target="friends"] .nav-title::before { content: "✦"; }
 [data-nav-target="shop"] .nav-title::before { content: "¤"; }
+
+.nav-button.is-active .nav-title::before {
+    color: #d8b07b;
+    background: radial-gradient(circle at 34% 24%, rgba(216, 176, 123, 0.3), rgba(54, 31, 42, 0.25) 60%);
+    border-color: rgba(216, 176, 123, 0.34);
+    box-shadow: 0 0 18px rgba(216, 176, 123, 0.13), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.toast {
+    pointer-events: none;
+}
 
 .social-chat-fab {
     right: 18px !important;
