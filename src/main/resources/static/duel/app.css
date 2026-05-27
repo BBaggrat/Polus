@@ -2848,51 +2848,74 @@ body.social-open {
 }
 
 .panel-cover {
-    height: 132px !important;
+    display: grid !important;
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    min-height: 124px !important;
+    height: 124px !important;
     margin-bottom: 0 !important;
-    padding: 12px !important;
-    border-radius: 18px !important;
-    border-color: rgba(216, 176, 123, 0.3) !important;
+    padding: 15px 16px !important;
+    border-radius: 20px !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    overflow: hidden;
     background-image:
-        linear-gradient(90deg, rgba(6, 10, 20, 0.88) 0%, rgba(8, 13, 25, 0.62) 44%, rgba(5, 12, 24, 0.14) 100%),
-        linear-gradient(90deg, rgba(5, 12, 24, 0.12), rgba(255, 255, 255, 0.08)),
+        linear-gradient(90deg, rgba(5, 9, 18, 0.9) 0%, rgba(7, 12, 23, 0.74) 46%, rgba(7, 12, 23, 0.34) 100%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2)),
         url("/duel/assets/universal-cover.svg") !important;
     background-size: cover !important;
     background-position: center !important;
-    height: auto !important;
-    min-height: 124px !important;
-    display: block !important;
 }
 
 .avatar-card {
+    position: relative !important;
     width: 64px !important;
     height: 64px !important;
-    left: 12px !important;
-    top: 12px !important;
+    left: auto !important;
+    top: auto !important;
     bottom: auto !important;
-    border: 1px solid rgba(216, 176, 123, 0.34) !important;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32), inset 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(8, 14, 28, 0.64) !important;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.26), inset 0 0 18px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 
 .avatar-card::after {
-    content: "I";
+    content: none !important;
+    display: none !important;
+}
+
+.avatar-level-badge {
     position: absolute;
-    right: -7px;
-    bottom: -7px;
-    width: 22px;
-    height: 22px;
-    display: grid;
-    place-items: center;
+    right: -5px;
+    bottom: -5px;
+    z-index: 3;
+    min-width: 34px;
+    height: 20px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
     border-radius: 999px;
-    color: #d8b07b;
-    font: 800 0.75rem/1 var(--font-head);
-    background: rgba(17, 22, 35, 0.94);
-    border: 1px solid rgba(216, 176, 123, 0.36);
+    color: #f2d49b;
+    font: 800 0.62rem/1 var(--font-head);
+    background: rgba(14, 19, 32, 0.96);
+    border: 1px solid rgba(216, 176, 123, 0.34);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.avatar-level-label {
+    color: rgba(255, 246, 226, 0.74);
+}
+
+.profile-level-progress {
+    display: none;
 }
 
 .avatar-portrait {
     background-image: url("/duel/assets/universal-avatar.svg") !important;
-    background-size: cover !important;
+    background-size: 112% !important;
     background-position: center !important;
     color: transparent !important;
 }
@@ -2905,20 +2928,24 @@ body.social-open {
 }
 
 .panel-cover .panel-header {
-    position: absolute;
-    inset: 12px 12px auto 12px;
+    position: relative !important;
+    inset: auto !important;
     z-index: 2;
-    gap: 6px !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start !important;
+    justify-content: center;
+    gap: 8px !important;
     margin: 0 !important;
-    min-height: 64px;
-    padding: 0 0 0 76px !important;
+    min-height: 0;
+    padding: 0 !important;
     border-bottom: 0 !important;
-    grid-template-columns: minmax(0, 1fr) !important;
-    align-items: center !important;
+    grid-column: 2;
 }
 
 .profile-identity {
     min-width: 0;
+    max-width: 100%;
     padding-left: 0;
 }
 
@@ -2932,34 +2959,37 @@ body.social-open {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.46);
-    font-size: clamp(1.45rem, 6vw, 1.82rem) !important;
-    line-height: 1.02 !important;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+    font-size: 1.38rem !important;
+    font-weight: 800;
+    line-height: 1.05 !important;
 }
 
 .profile-side {
     display: flex !important;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 6px !important;
+    gap: 8px !important;
+    max-width: 100%;
     margin-top: 0;
-    line-height: 0;
+    line-height: 1;
 }
 
 .stat-chip {
-    min-width: 54px !important;
-    height: 26px !important;
-    min-height: 26px !important;
-    padding: 3px 8px 3px 6px !important;
+    min-width: 0 !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 6px 10px !important;
     border-radius: 999px !important;
-    background: linear-gradient(180deg, rgba(17, 23, 42, 0.86), rgba(10, 15, 29, 0.78)) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    background: linear-gradient(180deg, rgba(17, 23, 42, 0.78), rgba(9, 14, 28, 0.7)) !important;
     backdrop-filter: blur(12px);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 12px 26px rgba(0, 0, 0, 0.24);
+    gap: 7px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 10px 22px rgba(0, 0, 0, 0.22);
 }
 
 .stat-icon {
@@ -3004,7 +3034,14 @@ body.social-open {
 .stat-chip strong {
     color: #d8b07b !important;
     font-size: 0.98rem !important;
+    font-weight: 800 !important;
     line-height: 1 !important;
+    margin-top: 0 !important;
+}
+
+.stat-chip-accent {
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    background: linear-gradient(180deg, rgba(17, 23, 42, 0.78), rgba(9, 14, 28, 0.7)) !important;
 }
 
 .action-row {
@@ -3740,32 +3777,44 @@ body.social-open {
     }
 
     .panel-cover {
-        min-height: 116px !important;
-        padding: 12px !important;
+        grid-template-columns: 60px minmax(0, 1fr);
+        gap: 12px;
+        min-height: 112px !important;
+        height: 112px !important;
+        padding: 14px !important;
     }
 
     .panel-cover .panel-header {
-        grid-template-columns: minmax(0, 1fr) !important;
-        inset: 12px 12px auto 12px;
+        inset: auto !important;
         gap: 6px !important;
-        min-height: 64px;
-        padding-left: 76px !important;
+        min-height: 0;
+        padding-left: 0 !important;
+    }
+
+    .panel-cover .avatar-card {
+        width: 60px !important;
+        height: 60px !important;
     }
 
     .panel-cover .profile-side {
-        gap: 5px !important;
+        gap: 6px !important;
     }
 
     .panel-cover .stat-chip {
-        min-width: 50px !important;
+        min-width: 0 !important;
         height: 26px !important;
         min-height: 26px !important;
-        padding: 3px 8px 3px 6px !important;
+        padding: 5px 8px !important;
+    }
+
+    .panel-cover .stat-icon {
+        width: 16px;
+        height: 16px;
     }
 
     .profile-cover-header .panel-title {
         max-width: 100%;
-        font-size: 1.42rem !important;
+        font-size: 1.28rem !important;
     }
 
     .weapon-grid {
