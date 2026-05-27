@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DuelEngine {
-    private static final double SHIELD_BLOCK_CHANCE = 0.30d;
+    private static final double SHIELD_DAMAGE_REDUCTION = 0.30d;
     private static final double SHOTGUN_EDGE_GRAZE_CHANCE = 0.35d;
     private static final int SHOTGUN_EDGE_DAMAGE = 5;
     private static final int PISTOL_DAMAGE = 18;
@@ -68,7 +68,7 @@ public class DuelEngine {
         boolean lineMatched = attackerAction.shotDirection() == defenderAction.dodgeDirection().toShotLine();
         return switch (attackerAction.weapon()) {
             case PISTOLS -> resolvePistolShield(lineMatched, defenderAction.weapon());
-            case RIFLE -> resolveRifle(lineMatched);
+            case RIFLE -> resolveRifle(lineMatched, defenderAction.weapon());
             case SHOTGUN -> resolveShotgun(lineMatched, defenderAction.weapon());
         };
     }
@@ -77,17 +77,14 @@ public class DuelEngine {
         if (!lineMatched) {
             return new AttackResolution(0, Outcome.MISS_LINE, 0, 0);
         }
-        if (isBlocked(defenderWeapon)) {
-            return new AttackResolution(0, Outcome.BLOCKED, 0, 0);
-        }
-        return new AttackResolution(PISTOL_DAMAGE, Outcome.HIT, 0, 0);
+        return new AttackResolution(applyShieldDamageReduction(PISTOL_DAMAGE, defenderWeapon), Outcome.HIT, 0, 0);
     }
 
-    private AttackResolution resolveRifle(boolean lineMatched) {
+    private AttackResolution resolveRifle(boolean lineMatched, WeaponType defenderWeapon) {
         if (!lineMatched) {
             return new AttackResolution(0, Outcome.MISS_LINE, 0, 0);
         }
-        return new AttackResolution(RIFLE_DAMAGE, Outcome.IGNORE_BLOCK_HIT, 0, 0);
+        return new AttackResolution(applyShieldDamageReduction(RIFLE_DAMAGE, defenderWeapon), Outcome.HIT, 0, 0);
     }
 
     private AttackResolution resolveShotgun(boolean lineMatched, WeaponType defenderWeapon) {
@@ -98,30 +95,19 @@ public class DuelEngine {
             return new AttackResolution(0, Outcome.GRAZE_MISS, 0, 0);
         }
 
-        int pelletsHit = 0;
-        int pelletsBlocked = 0;
-        for (int index = 0; index < SHOTGUN_PELLET_COUNT; index++) {
-            if (isBlocked(defenderWeapon)) {
-                pelletsBlocked++;
-            } else {
-                pelletsHit++;
-            }
-        }
-
-        if (pelletsHit == 0) {
-            return new AttackResolution(0, Outcome.SHOTGUN_BLOCKED, pelletsBlocked, 0);
-        }
-
         return new AttackResolution(
-                pelletsHit * SHOTGUN_PELLET_DAMAGE,
+                applyShieldDamageReduction(SHOTGUN_PELLET_COUNT * SHOTGUN_PELLET_DAMAGE, defenderWeapon),
                 Outcome.SHOTGUN_HIT,
-                pelletsBlocked,
-                pelletsHit
+                0,
+                SHOTGUN_PELLET_COUNT
         );
     }
 
-    private boolean isBlocked(WeaponType defenderWeapon) {
-        return defenderWeapon == WeaponType.PISTOLS && nextRandom() < SHIELD_BLOCK_CHANCE;
+    private int applyShieldDamageReduction(int damage, WeaponType defenderWeapon) {
+        if (defenderWeapon != WeaponType.PISTOLS || damage <= 0) {
+            return Math.max(0, damage);
+        }
+        return Math.max(0, (int) Math.round(damage * (1d - SHIELD_DAMAGE_REDUCTION)));
     }
 
     private String buildIntentLine(String playerName, DuelRoundAction action) {
@@ -200,7 +186,7 @@ public class DuelEngine {
         public String summary() {
             return switch (outcome) {
                 case HIT -> "попадание на " + damage + " урона";
-                case IGNORE_BLOCK_HIT -> "попадание на " + damage + " урона, блокирование проигнорировано";
+                case IGNORE_BLOCK_HIT -> "попадание на " + damage + " урона";
                 case BLOCKED -> "выстрел заблокирован щитом";
                 case MISS_LINE -> "промах мимо линии";
                 case GRAZE -> "зацеп на " + damage + " урона";

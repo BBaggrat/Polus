@@ -6,7 +6,7 @@
     const JOURNAL_EVENT_MS = 60000;
     const JOURNAL_OFFLINE_CATCH_UP_LIMIT = 20;
     const DUEL_ROUND_TIMEOUT_MS = 2 * 60 * 1000;
-    const SHIELD_BLOCK_CHANCE = 0.30;
+    const SHIELD_DAMAGE_REDUCTION = 0.30;
     const SHOTGUN_EDGE_GRAZE_CHANCE = 0.35;
     const SHOTGUN_EDGE_DAMAGE = 5;
     const BATTLE_VICTORY_COINS = 100;
@@ -1930,11 +1930,14 @@
     }
 
     function projectileBlocked(attackerSide, defenderWeapon, weaponCode, shotCode) {
-        if (weaponCode === "RIFLE" || defenderWeapon !== "PISTOLS" || ignoresBlocking(attackerSide)) {
-            return false;
+        return false;
+    }
+
+    function applyPistolShieldReduction(defenderWeapon, damage) {
+        if (defenderWeapon !== "PISTOLS" || damage <= 0) {
+            return Math.max(0, damage);
         }
-        const blockChance = Math.max(0, SHIELD_BLOCK_CHANCE - getWeaponHitBonus(attackerSide, weaponCode, shotCode));
-        return Math.random() < blockChance;
+        return Math.max(0, Math.round(damage * (1 - SHIELD_DAMAGE_REDUCTION)));
     }
 
     function ignoresBlocking(side) {
@@ -4436,10 +4439,10 @@ function refreshStaticCopy() {
     safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
     safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
-    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
     safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
     safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
@@ -4571,7 +4574,7 @@ function shouldSupportEvade(side) {
 }
 
 function projectileBlocked(attackerSide, defenderWeapon) {
-    return defenderWeapon === "PISTOLS" && Math.random() < SHIELD_BLOCK_CHANCE;
+    return false;
 }
 
 function getWeaponGrazeBonus(side, weaponCode) {
@@ -5163,10 +5166,10 @@ function refreshStaticCopy() {
     safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
     safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
-    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
     safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
     safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
@@ -5634,10 +5637,10 @@ function refreshStaticCopy() {
     safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
     safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
-    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
     safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
     safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
@@ -6903,10 +6906,14 @@ function pluralizeHits(count) {
 }
 
 function projectileBlocked(attackerSide, defenderWeapon, weaponCode) {
-    if (weaponCode === "RIFLE" || defenderWeapon !== "PISTOLS") {
-        return false;
+    return false;
+}
+
+function applyPistolShieldReduction(defenderWeapon, damage) {
+    if (defenderWeapon !== "PISTOLS" || damage <= 0) {
+        return Math.max(0, damage);
     }
-    return Math.random() < SHIELD_BLOCK_CHANCE;
+    return Math.max(0, Math.round(damage * (1 - SHIELD_DAMAGE_REDUCTION)));
 }
 
 function rollWeaponGamble(side) {
@@ -6974,7 +6981,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
             damage *= 2;
         }
         damage = applyDefenseReduction(attackerSide === "player" ? "opponent" : "player", damage, false, lines, defenderName);
-        lines.push("Итог: попадание на " + damage + " урона, блокирование проигнорировано.");
+        lines.push("Итог: попадание на " + damage + " урона.");
         return { damage: damage, lines: lines };
     }
 
@@ -7334,10 +7341,10 @@ function refreshStaticCopy() {
     safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
     safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
-    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
     safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
     safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
@@ -7926,10 +7933,10 @@ function refreshStaticCopy() {
     safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
     safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
-    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
     safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
     safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
@@ -8428,10 +8435,10 @@ function refreshStaticCopy() {
     safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
     safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
-    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "Шанс блокировать выстрел 30%");
+    safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
     safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Игнорирует блокирование");
+    safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
     safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
@@ -10458,10 +10465,7 @@ function buildDuelIntentLine(name, action) {
 }
 
 function projectileBlocked(attackerSide, defenderWeapon, weaponCode) {
-    if (weaponCode === "RIFLE" || defenderWeapon !== "PISTOLS") {
-        return false;
-    }
-    return Math.random() < SHIELD_BLOCK_CHANCE;
+    return false;
 }
 
 function rollWeaponGamble(side) {
@@ -10554,7 +10558,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         return {
             damage: damage,
             outcome: "piercing-hit",
-            summary: "попадание на " + damage + " урона, блокирование проигнорировано",
+            summary: "попадание на " + damage + " урона",
             lines: resultLines
         };
     }
@@ -10568,7 +10572,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
             if (gamble.doubled) {
                 grazeDamage *= 2;
             }
-            grazeDamage = applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines);
+            grazeDamage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines));
             return {
                 damage: grazeDamage,
                 outcome: "graze",
@@ -10607,11 +10611,8 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
     if (gamble.doubled) {
         damage *= 2;
     }
-    damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+    damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
     let summary = "попадание на " + damage + " урона";
-    if (pelletsBlocked) {
-        summary += ", щит блокирует " + pelletsBlocked + pelletWord(pelletsBlocked);
-    }
     return {
         damage: damage,
         outcome: "shotgun-hit",
@@ -10760,10 +10761,10 @@ function refreshStaticCopy() {
     safeSetText(document.querySelector(".vector-card:nth-of-type(2) h4"), "Уворот");
     safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] strong'), "Пистоль и щит");
     safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] .weapon-stat'), "18 урона");
-    safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] .weapon-trait'), "Шанс блокировать выстрел 30%");
+    safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] .weapon-trait'), "-30% входящего урона");
     safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] strong'), "Винтовка");
     safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] .weapon-stat'), "30 урона");
-    safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] .weapon-trait'), "Игнорирует блокирование");
+    safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] .weapon-trait'), "Точный выстрел");
     safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] strong'), "Дробовик");
     safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] .weapon-stat'), "5-25 урона");
     safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] .weapon-trait'), "Вероятность зацепа 35%");
@@ -11402,8 +11403,8 @@ var UX_ZONE_LABELS = {
 };
 
 var UX_WEAPON_HINTS = {
-    PISTOLS: "Пистоль и щит: 18 урона. Щит блокирует каждый входящий выстрел с шансом 30%.",
-    RIFLE: "Винтовка: 30 урона. Игнорирует блокирование щитом.",
+    PISTOLS: "Пистоль и щит: 18 урона. Щит всегда снижает входящий урон на 30%.",
+    RIFLE: "Винтовка: 30 урона. Точный выстрел по выбранной линии.",
     SHOTGUN: "Дробовик: 5 дробин по 5 урона. При промахе может зацепить на 5 урона с шансом 35%."
 };
 
@@ -11611,10 +11612,10 @@ function refreshStaticCopy() {
     setText(".vector-card:nth-of-type(2) h4", "Уворот");
     setText('.weapon-option[data-value="PISTOLS"] strong', "Пистоль и щит");
     setText('.weapon-option[data-value="PISTOLS"] .weapon-stat', "18 урона");
-    setText('.weapon-option[data-value="PISTOLS"] .weapon-trait', "Блок 30%");
+    setText('.weapon-option[data-value="PISTOLS"] .weapon-trait', "-30% входящего урона");
     setText('.weapon-option[data-value="RIFLE"] strong', "Винтовка");
     setText('.weapon-option[data-value="RIFLE"] .weapon-stat', "30 урона");
-    setText('.weapon-option[data-value="RIFLE"] .weapon-trait', "Игнор блока");
+    setText('.weapon-option[data-value="RIFLE"] .weapon-trait', "Точный выстрел");
     setText('.weapon-option[data-value="SHOTGUN"] strong', "Дробовик");
     setText('.weapon-option[data-value="SHOTGUN"] .weapon-stat', "5-25 урона");
     setText('.weapon-option[data-value="SHOTGUN"] .weapon-trait', "Зацеп 35%");
@@ -12190,10 +12191,7 @@ function buildDuelIntentLine(name, action) {
 }
 
 function projectileBlocked(attackerSide, defenderWeapon, weaponCode) {
-    if (weaponCode === "RIFLE" || defenderWeapon !== "PISTOLS") {
-        return false;
-    }
-    return Math.random() < SHIELD_BLOCK_CHANCE;
+    return false;
 }
 
 function rollWeaponGamble(side) {
@@ -12238,14 +12236,11 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         return { damage: 0, outcome: "evaded", summary: "соперник уходит от урона", lines: resultLines };
     }
     if (attackerAction.weapon === "PISTOLS") {
-        if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon)) {
-            return { damage: 0, outcome: "blocked", summary: "выстрел заблокирован щитом", lines: resultLines };
-        }
         let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
         if (gamble.doubled) {
             damage *= 2;
         }
-        damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+        damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
         return { damage: damage, outcome: "hit", summary: "попадание на " + damage + " урона", lines: resultLines };
     }
     if (attackerAction.weapon === "RIFLE") {
@@ -12253,8 +12248,8 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         if (gamble.doubled) {
             damage *= 2;
         }
-        damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
-        return { damage: damage, outcome: "piercing-hit", summary: "попадание на " + damage + " урона, блокирование проигнорировано", lines: resultLines };
+        damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
+        return { damage: damage, outcome: "piercing-hit", summary: "попадание на " + damage + " урона", lines: resultLines };
     }
     if (!lineMatched) {
         const grazeChanceBonus = typeof getWeaponGrazeBonus === "function" ? getWeaponGrazeBonus(attackerSide, attackerAction.weapon) : 0;
@@ -12263,33 +12258,18 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
             if (gamble.doubled) {
                 grazeDamage *= 2;
             }
-            grazeDamage = applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines);
+            grazeDamage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines));
             return { damage: grazeDamage, outcome: "graze", summary: "зацеп на " + grazeDamage + " урона", lines: resultLines };
         }
         return { damage: 0, outcome: "graze-miss", summary: "дробь ушла мимо цели", lines: resultLines };
     }
 
-    let pelletsHit = 0;
-    let pelletsBlocked = 0;
-    for (let index = 0; index < 5; index += 1) {
-        if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon)) {
-            pelletsBlocked += 1;
-        } else {
-            pelletsHit += 1;
-        }
-    }
-    if (!pelletsHit) {
-        return { damage: 0, outcome: "shotgun-blocked", summary: "все дробины заблокированы щитом", lines: resultLines };
-    }
-    let damage = pelletsHit * 5 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+    let damage = 25 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
     if (gamble.doubled) {
         damage *= 2;
     }
-    damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+    damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
     let summary = "попадание на " + damage + " урона";
-    if (pelletsBlocked) {
-        summary += ", щит блокирует " + pelletsBlocked + pelletWord(pelletsBlocked);
-    }
     return { damage: damage, outcome: "shotgun-hit", summary: summary, lines: resultLines };
 }
 
@@ -13283,14 +13263,11 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         return { damage: 0, outcome: "evaded", summary: "соперник уходит от урона", lines: resultLines };
     }
     if (attackerAction.weapon === "PISTOLS") {
-        if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon)) {
-            return { damage: 0, outcome: "blocked", summary: "выстрел заблокирован щитом", lines: resultLines };
-        }
         let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
         if (gamble.doubled) {
             damage *= 2;
         }
-        damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+        damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
         return { damage: damage, outcome: "hit", summary: "попадание на " + damage + " урона", lines: resultLines };
     }
     if (attackerAction.weapon === "RIFLE") {
@@ -13298,8 +13275,8 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         if (gamble.doubled) {
             damage *= 2;
         }
-        damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
-        return { damage: damage, outcome: "piercing-hit", summary: "попадание на " + damage + " урона, блокирование проигнорировано", lines: resultLines };
+        damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
+        return { damage: damage, outcome: "piercing-hit", summary: "попадание на " + damage + " урона", lines: resultLines };
     }
     if (!lineMatched) {
         const grazeChanceBonus = typeof getWeaponGrazeBonus === "function" ? getWeaponGrazeBonus(attackerSide, attackerAction.weapon) : 0;
@@ -13308,33 +13285,18 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
             if (gamble.doubled) {
                 grazeDamage *= 2;
             }
-            grazeDamage = applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines);
+            grazeDamage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, grazeDamage, defenderName, resultLines));
             return { damage: grazeDamage, outcome: "graze", summary: "зацеп на " + grazeDamage + " урона", lines: resultLines };
         }
         return { damage: 0, outcome: "graze-miss", summary: "дробь ушла мимо цели", lines: resultLines };
     }
 
-    let pelletsHit = 0;
-    let pelletsBlocked = 0;
-    for (let index = 0; index < 5; index += 1) {
-        if (projectileBlocked(attackerSide, defenderAction.weapon, attackerAction.weapon)) {
-            pelletsBlocked += 1;
-        } else {
-            pelletsHit += 1;
-        }
-    }
-    if (!pelletsHit) {
-        return { damage: 0, outcome: "shotgun-blocked", summary: "все дробины заблокированы щитом", lines: resultLines };
-    }
-    let damage = pelletsHit * 5 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
+    let damage = 25 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
     if (gamble.doubled) {
         damage *= 2;
     }
-    damage = applyDefenseReduction(defenderSide, damage, defenderName, resultLines);
+    damage = applyPistolShieldReduction(defenderAction.weapon, applyDefenseReduction(defenderSide, damage, defenderName, resultLines));
     let summary = "попадание на " + damage + " урона";
-    if (pelletsBlocked) {
-        summary += ", щит блокирует " + pelletsBlocked + pelletWord(pelletsBlocked);
-    }
     return { damage: damage, outcome: "shotgun-hit", summary: summary, lines: resultLines };
 }
 

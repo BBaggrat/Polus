@@ -73,7 +73,7 @@ class DuelEngineTest {
     }
 
     @Test
-    void rifleIgnoresShieldAndStillDealsDamage() {
+    void pistolShieldAlwaysReducesIncomingDamageByThirtyPercent() {
         DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC));
         Duel duel = new Duel("duel-3", "p1", "Player", "p2", "Opponent", NOW);
 
@@ -99,7 +99,7 @@ class DuelEngineTest {
         DuelEngine.RoundResolution result = engine.resolveRound(duel, playerOneAction, playerTwoAction);
 
         assertEquals(100, result.playerOneHpAfter());
-        assertEquals(70, result.playerTwoHpAfter());
+        assertEquals(79, result.playerTwoHpAfter());
     }
 
     @Test
@@ -138,7 +138,7 @@ class DuelEngineTest {
     }
 
     @Test
-    void shotgunPelletsCanAllBeBlockedByShield() {
+    void pistolShieldAlwaysReducesShotgunDamageByThirtyPercent() {
         DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC)) {
             @Override
             protected double nextRandom() {
@@ -169,6 +169,6 @@ class DuelEngineTest {
         DuelEngine.RoundResolution result = engine.resolveRound(duel, playerOneAction, playerTwoAction);
 
         assertEquals(100, result.playerOneHpAfter());
-        assertEquals(100, result.playerTwoHpAfter());
+        assertEquals(82, result.playerTwoHpAfter());
     }
 }

@@ -33,12 +33,11 @@ If the attack line matches the target dodge line, the selected weapon resolves a
   - 10% chance to deal 2 bullets
   - otherwise 0
 
-### PISTOL
+### PISTOLS
 
-- 1 bullet
-- 25 damage
-- On correct line:
-  - target has 25% chance to dodge
+- 18 damage
+- Shield effect:
+  - incoming damage is always reduced by 30%
 - On wrong line:
   - 0 damage
 
@@ -47,8 +46,7 @@ If the attack line matches the target dodge line, the selected weapon resolves a
 - 1 bullet
 - 30 damage
 - On correct line:
-  - target has base 25% chance to dodge
-  - if target used `PISTOL` this round, dodge chance drops by 20 percentage points to 5%
+  - deals damage on matched line
 - On wrong line:
   - 0 damage
 
