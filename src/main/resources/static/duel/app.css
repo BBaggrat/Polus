@@ -3841,3 +3841,824 @@ body.social-open {
     }
 }
 
+/* Duel mobile UX refresh */
+.duel-overlay {
+    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) !important;
+    overflow: hidden !important;
+}
+
+.duel-sheet {
+    width: min(100%, 430px) !important;
+    max-width: 430px !important;
+    height: calc(100dvh - 16px) !important;
+    max-height: 844px !important;
+    display: grid !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+    padding: 10px !important;
+    border-radius: 22px !important;
+}
+
+.duel-stage,
+.duel-form-card,
+.duel-log-panel {
+    min-width: 0 !important;
+    margin: 0 !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-sizing: border-box !important;
+}
+
+.duel-stage {
+    position: relative !important;
+    overflow: hidden !important;
+    min-height: 128px !important;
+    padding: 10px !important;
+    background:
+        linear-gradient(90deg, rgba(7, 10, 19, 0.88) 0%, rgba(9, 13, 24, 0.72) 48%, rgba(23, 22, 34, 0.55) 100%),
+        radial-gradient(circle at 18% 16%, rgba(143, 218, 240, 0.16), transparent 28%),
+        radial-gradient(circle at 78% 18%, rgba(216, 176, 123, 0.12), transparent 30%),
+        linear-gradient(180deg, rgba(25, 32, 52, 0.96), rgba(14, 18, 31, 0.98)) !important;
+}
+
+.duel-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 38%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.24));
+}
+
+.duel-stage > * {
+    position: relative;
+    z-index: 1;
+}
+
+.duel-topbar {
+    display: grid !important;
+    grid-template-columns: auto auto auto !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 0 8px !important;
+}
+
+.duel-round-pill,
+.duel-timer-box,
+.duel-topbar-close {
+    min-height: 30px !important;
+    height: 30px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.13) !important;
+    background: rgba(7, 11, 22, 0.56) !important;
+    box-shadow: none !important;
+}
+
+.duel-round-pill {
+    min-width: 78px !important;
+    padding: 0 10px !important;
+    color: #f2d49c !important;
+    font-size: 0.76rem !important;
+}
+
+.duel-timer-box {
+    min-width: 66px !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 10px !important;
+}
+
+.duel-timer-label {
+    display: none !important;
+}
+
+.duel-round-timer {
+    color: #8fdaf0 !important;
+    font-size: 0.78rem !important;
+    line-height: 1 !important;
+}
+
+.duel-topbar-close {
+    min-width: 58px !important;
+    padding: 0 10px !important;
+    font-size: 0.76rem !important;
+}
+
+.duel-roster {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 0 !important;
+}
+
+.duelist-card {
+    min-height: 82px !important;
+    height: 82px !important;
+    display: grid !important;
+    align-content: center !important;
+    overflow: hidden !important;
+    padding: 10px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(7, 11, 22, 0.62) !important;
+}
+
+.duelist-head {
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr) !important;
+    gap: 9px !important;
+    align-items: center !important;
+    min-width: 0 !important;
+}
+
+.duelist-main,
+.duelist-name-row,
+.duelist-hp-wrap {
+    min-width: 0 !important;
+}
+
+.duelist-name-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+}
+
+.duelist-head h3,
+.duelist-card h3 {
+    min-width: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    color: rgba(255, 255, 255, 0.96) !important;
+    font-size: 0.98rem !important;
+    font-weight: 800 !important;
+    line-height: 1.08 !important;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.32);
+}
+
+.duelist-avatar {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 16px !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: inset 0 -12px 22px rgba(3, 6, 14, 0.34), 0 8px 18px rgba(0, 0, 0, 0.2) !important;
+}
+
+.duelist-hp-wrap {
+    display: grid !important;
+    gap: 5px !important;
+    margin-top: 7px !important;
+}
+
+.duelist-meta:empty {
+    display: none !important;
+}
+
+.hp-track {
+    width: 100% !important;
+    height: 8px !important;
+    overflow: hidden !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.hp-fill {
+    height: 100% !important;
+    border-radius: inherit !important;
+    background: linear-gradient(90deg, #57d39a, #f2d49c) !important;
+    box-shadow: 0 0 12px rgba(98, 214, 170, 0.28) !important;
+}
+
+.hp-fill-opponent {
+    background: linear-gradient(90deg, #d87385, #f2a97c) !important;
+    box-shadow: 0 0 12px rgba(216, 115, 133, 0.24) !important;
+}
+
+.hp-copy {
+    margin: 0 !important;
+    white-space: nowrap !important;
+    color: #f2d49c !important;
+    font-size: 0.74rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+.duel-hp-grid {
+    display: none !important;
+}
+
+.duel-form-card {
+    padding: 10px !important;
+    background: rgba(13, 18, 33, 0.86) !important;
+}
+
+.duel-form-header {
+    margin: 0 0 7px !important;
+    padding: 0 !important;
+    border-bottom: 0 !important;
+}
+
+.duel-block-title {
+    font-size: 0.88rem !important;
+    line-height: 1.1 !important;
+}
+
+.duel-control-stack {
+    gap: 8px !important;
+}
+
+.weapon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+}
+
+.weapon-option {
+    position: relative !important;
+    min-width: 0 !important;
+    min-height: 78px !important;
+    height: 78px !important;
+    display: grid !important;
+    grid-template-rows: auto 1fr !important;
+    gap: 6px !important;
+    align-content: start !important;
+    padding: 8px 7px !important;
+    overflow: visible !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: linear-gradient(180deg, rgba(28, 36, 58, 0.92), rgba(12, 17, 31, 0.94)) !important;
+    text-align: left !important;
+}
+
+.weapon-option::before {
+    content: none !important;
+    display: none !important;
+}
+
+.weapon-option::after {
+    content: attr(data-help);
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 6px);
+    z-index: 20;
+    width: min(230px, calc(100vw - 28px));
+    padding: 9px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(6, 9, 18, 0.96);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.72rem;
+    line-height: 1.28;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -4px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.weapon-option:hover::after,
+.weapon-option:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.weapon-face,
+.weapon-stats {
+    min-width: 0 !important;
+}
+
+.weapon-face {
+    display: grid !important;
+    grid-template-columns: 10px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 3px !important;
+    padding-right: 12px !important;
+}
+
+.weapon-option strong {
+    min-width: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    color: rgba(255, 255, 255, 0.94) !important;
+    font-size: 0.64rem !important;
+    font-weight: 800 !important;
+    line-height: 1.05 !important;
+}
+
+.weapon-option span {
+    margin-top: 0 !important;
+}
+
+.weapon-mark,
+.stat-glyph {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+}
+
+.weapon-mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(216, 176, 123, 0.12);
+    border: 1px solid rgba(216, 176, 123, 0.18);
+}
+
+.weapon-mark::before {
+    content: "";
+    width: 6px;
+    height: 2px;
+    border-radius: 999px;
+    background: #f2d49c;
+    transform: rotate(-24deg);
+    box-shadow: 0 0 8px rgba(216, 176, 123, 0.36);
+}
+
+.weapon-mark-rifle::before {
+    width: 7px;
+}
+
+.weapon-mark-shotgun::before {
+    width: 4px;
+    height: 4px;
+    box-shadow: -5px 3px 0 #f2d49c, 5px 3px 0 #f2d49c;
+    transform: none;
+}
+
+.weapon-help {
+    position: absolute !important;
+    right: 5px !important;
+    top: 7px !important;
+    width: 13px !important;
+    height: 13px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 999px !important;
+    color: #f2d49c !important;
+    background: rgba(216, 176, 123, 0.1) !important;
+    border: 1px solid rgba(216, 176, 123, 0.16) !important;
+    font-size: 0.56rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+.weapon-stats {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+    align-content: start !important;
+}
+
+.weapon-stat-chip {
+    min-width: 0 !important;
+    min-height: 22px !important;
+    height: 22px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 0 6px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.66rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+.stat-glyph {
+    width: 14px;
+    height: 14px;
+}
+
+.stat-glyph-ammo::before {
+    content: "";
+    width: 10px;
+    height: 5px;
+    border-radius: 999px 3px 3px 999px;
+    background: linear-gradient(90deg, #f2d49c, #b9783f);
+    transform: rotate(-18deg);
+}
+
+.stat-glyph-shield,
+.stat-glyph-break {
+    background: linear-gradient(180deg, rgba(143, 218, 240, 0.95), rgba(76, 126, 152, 0.92));
+    clip-path: polygon(50% 5%, 90% 20%, 82% 68%, 50% 94%, 18% 68%, 10% 20%);
+}
+
+.stat-glyph-break::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    border-radius: 999px;
+    background: #1b2235;
+    transform: rotate(28deg);
+}
+
+.stat-glyph-spread::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: #f2d49c;
+    box-shadow: -5px 5px 0 #f2d49c, 5px 5px 0 #f2d49c;
+}
+
+.weapon-option.is-active {
+    border-color: rgba(216, 176, 123, 0.58) !important;
+    background: linear-gradient(180deg, rgba(69, 56, 36, 0.95), rgba(25, 22, 28, 0.96)) !important;
+    box-shadow: 0 0 0 2px rgba(216, 176, 123, 0.14), 0 0 22px rgba(216, 176, 123, 0.14) !important;
+}
+
+.duel-vector-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+}
+
+.vector-card {
+    padding: 8px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+}
+
+.vector-card h4 {
+    margin: 0 0 6px !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-transform: uppercase;
+}
+
+.toggle-row {
+    gap: 5px !important;
+}
+
+.duel-toggle {
+    min-width: 0 !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    display: grid !important;
+    place-items: center !important;
+    gap: 1px !important;
+    padding: 4px 2px !important;
+    border-radius: 13px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(10, 14, 25, 0.74) !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+.direction-symbol {
+    color: #8fdaf0 !important;
+    font-size: 1.02rem !important;
+    line-height: 1 !important;
+}
+
+.direction-label {
+    font-size: 0.62rem !important;
+    line-height: 1 !important;
+}
+
+.duel-toggle.is-active {
+    border-color: rgba(143, 218, 240, 0.64) !important;
+    background: rgba(43, 90, 113, 0.42) !important;
+    color: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 0 0 2px rgba(143, 218, 240, 0.13), 0 0 18px rgba(143, 218, 240, 0.16) !important;
+}
+
+.duel-action-row {
+    margin-top: 0 !important;
+}
+
+#duel-submit-button {
+    min-height: 46px !important;
+    height: 46px !important;
+    border-radius: 16px !important;
+}
+
+#duel-submit-button.is-sending,
+#duel-submit-button.is-waiting,
+#duel-submit-button.is-turn-submitted {
+    background: linear-gradient(135deg, rgba(44, 126, 111, 0.96), rgba(31, 63, 89, 0.96)) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+#duel-submit-button.is-sending {
+    opacity: 0.82;
+}
+
+.duel-rule-note {
+    margin: 7px 0 0 !important;
+    font-size: 0.76rem !important;
+}
+
+.duel-log-panel {
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    background: rgba(10, 14, 25, 0.84) !important;
+}
+
+.duel-log-header {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-bottom: 0 !important;
+}
+
+.duel-log-tabs {
+    min-width: 0 !important;
+}
+
+.duel-log-tab,
+.duel-clear-button {
+    min-height: 30px !important;
+    height: 30px !important;
+    border-radius: 999px !important;
+    padding: 0 10px !important;
+    font-size: 0.74rem !important;
+}
+
+.duel-log-tab.has-new::after {
+    right: 7px !important;
+    top: 6px !important;
+}
+
+.duel-log-pane,
+.duel-chat-pane {
+    min-height: 0 !important;
+}
+
+.duel-chat-pane {
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto auto !important;
+    gap: 8px !important;
+}
+
+.duel-chat-pane.hidden,
+.duel-log-pane.hidden {
+    display: none !important;
+}
+
+.duel-log-track {
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    padding: 7px !important;
+    border-radius: 16px !important;
+}
+
+.duel-log-list {
+    display: grid !important;
+    gap: 8px !important;
+}
+
+.duel-log-card {
+    position: relative !important;
+    display: grid !important;
+    gap: 7px !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    background: rgba(8, 12, 23, 0.76) !important;
+}
+
+.duel-log-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: 16px 0 0 16px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.duel-log-card.is-new {
+    border-color: rgba(216, 176, 123, 0.34) !important;
+    box-shadow: 0 0 0 1px rgba(216, 176, 123, 0.08), 0 12px 28px rgba(0, 0, 0, 0.18) !important;
+}
+
+.duel-log-card-hit::before,
+.duel-log-card-graze::before,
+.duel-log-card-reward::before {
+    background: #d8b07b;
+}
+
+.duel-log-card-miss::before {
+    background: #8f3447;
+}
+
+.duel-log-card-evade::before,
+.duel-log-card-round::before {
+    background: #8fdaf0;
+}
+
+.duel-log-card-head {
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.duel-log-icon {
+    width: 24px !important;
+    height: 24px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 9px !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    font-size: 0.88rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+.duel-log-card-hit .duel-log-icon,
+.duel-log-card-graze .duel-log-icon,
+.duel-log-card-reward .duel-log-icon {
+    color: #d8b07b !important;
+}
+
+.duel-log-card-miss .duel-log-icon {
+    color: #d87385 !important;
+}
+
+.duel-log-card-evade .duel-log-icon,
+.duel-log-card-round .duel-log-icon {
+    color: #8fdaf0 !important;
+}
+
+.duel-log-round-caption {
+    min-width: 0 !important;
+    color: rgba(255, 255, 255, 0.84) !important;
+    font-size: 0.78rem !important;
+    font-weight: 900 !important;
+}
+
+.duel-log-badge {
+    margin-left: auto !important;
+    padding: 3px 7px !important;
+    border-radius: 999px !important;
+    color: #d8b07b !important;
+    font-size: 0.62rem !important;
+    font-weight: 900 !important;
+    background: rgba(216, 176, 123, 0.1) !important;
+}
+
+.duel-log-row {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    gap: 8px !important;
+    align-items: start !important;
+}
+
+.duel-log-side {
+    width: 38px !important;
+    min-width: 0 !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    padding: 3px 0 !important;
+    border-radius: 999px !important;
+    color: rgba(255, 255, 255, 0.58) !important;
+    background: rgba(255, 255, 255, 0.055) !important;
+    font-size: 0.58rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-transform: uppercase !important;
+}
+
+.duel-log-copy {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 2px !important;
+}
+
+.duel-log-copy p,
+.duel-log-empty {
+    margin: 0 !important;
+    color: rgba(255, 255, 255, 0.84) !important;
+    font-size: 0.78rem !important;
+    line-height: 1.28 !important;
+}
+
+.duel-log-copy small {
+    color: rgba(255, 255, 255, 0.42) !important;
+    font-size: 0.62rem !important;
+    line-height: 1.1 !important;
+}
+
+.duel-log-line-own .duel-log-side,
+.duel-log-line-own .text-direction {
+    color: #8fdaf0 !important;
+}
+
+.duel-log-line-opponent .duel-log-side {
+    color: #d87385 !important;
+}
+
+.duel-log-card-hit .duel-log-result .duel-log-copy p,
+.duel-log-card-graze .duel-log-result .duel-log-copy p,
+.duel-log-card-reward .duel-log-copy p {
+    color: #f2d49c !important;
+}
+
+.duel-log-card-miss .duel-log-result .duel-log-copy p {
+    color: #d87385 !important;
+}
+
+.text-direction {
+    color: #8fdaf0 !important;
+    font-weight: 900 !important;
+}
+
+.duel-chat-form {
+    grid-template-columns: minmax(0, 1fr) 78px !important;
+}
+
+.duel-chat-send {
+    width: 78px !important;
+    min-width: 78px !important;
+    max-width: 78px !important;
+}
+
+@media (max-width: 380px) {
+    .duel-sheet {
+        gap: 7px !important;
+        padding: 8px !important;
+    }
+
+    .duel-stage,
+    .duel-form-card,
+    .duel-log-panel {
+        padding: 8px !important;
+    }
+
+    .duelist-card {
+        min-height: 76px !important;
+        height: 76px !important;
+        padding: 8px !important;
+    }
+
+    .duelist-head {
+        grid-template-columns: 46px minmax(0, 1fr) !important;
+        gap: 7px !important;
+    }
+
+    .duelist-avatar {
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 14px !important;
+    }
+
+    .duelist-head h3,
+    .duelist-card h3 {
+        font-size: 0.9rem !important;
+    }
+
+    .hp-copy {
+        font-size: 0.68rem !important;
+    }
+
+    .weapon-option {
+        min-height: 74px !important;
+        height: 74px !important;
+        padding: 7px 6px !important;
+    }
+
+    .weapon-option strong {
+        font-size: 0.58rem !important;
+    }
+
+    .weapon-stat-chip {
+        height: 20px !important;
+        min-height: 20px !important;
+        padding: 0 5px !important;
+        font-size: 0.6rem !important;
+    }
+
+    .duel-toggle {
+        min-height: 38px !important;
+        height: 38px !important;
+    }
+
+    .direction-symbol {
+        font-size: 0.96rem !important;
+    }
+
+    .direction-label {
+        font-size: 0.58rem !important;
+    }
+}
+

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260527-3">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260601-7">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -255,9 +255,17 @@
                 <article class="duelist-card duel-roster-card">
                     <div class="duelist-head">
                         <div class="duelist-avatar" id="duel-you-avatar">И</div>
-                        <div>
-                            <h3 id="duel-you-name">Игрок</h3>
-                            <p class="duelist-meta" id="duel-you-meta"></p>
+                        <div class="duelist-main">
+                            <div class="duelist-name-row">
+                                <h3 id="duel-you-name">Игрок</h3>
+                                <p class="hp-copy" id="duel-you-hp">100 HP</p>
+                            </div>
+                            <div class="duelist-hp-wrap">
+                                <div class="hp-track">
+                                    <div class="hp-fill" id="duel-you-fill"></div>
+                                </div>
+                                <p class="duelist-meta" id="duel-you-meta"></p>
+                            </div>
                         </div>
                     </div>
                 </article>
@@ -265,27 +273,20 @@
                 <article class="duelist-card duel-roster-card duel-roster-card-opponent">
                     <div class="duelist-head">
                         <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">С</div>
-                        <div>
-                            <h3 id="duel-opponent-name">Соперник</h3>
-                            <p class="duelist-meta" id="duel-opponent-meta"></p>
+                        <div class="duelist-main">
+                            <div class="duelist-name-row">
+                                <h3 id="duel-opponent-name">Соперник</h3>
+                                <p class="hp-copy" id="duel-opponent-hp">100 HP</p>
+                            </div>
+                            <div class="duelist-hp-wrap">
+                                <div class="hp-track">
+                                    <div class="hp-fill hp-fill-opponent" id="duel-opponent-fill"></div>
+                                </div>
+                                <p class="duelist-meta" id="duel-opponent-meta"></p>
+                            </div>
                         </div>
                     </div>
                 </article>
-            </div>
-
-            <div class="duel-hp-grid">
-                <div class="duel-hp-column">
-                    <div class="hp-track">
-                        <div class="hp-fill" id="duel-you-fill"></div>
-                    </div>
-                    <p class="hp-copy" id="duel-you-hp">100 HP</p>
-                </div>
-                <div class="duel-hp-column">
-                    <div class="hp-track">
-                        <div class="hp-fill hp-fill-opponent" id="duel-opponent-fill"></div>
-                    </div>
-                    <p class="hp-copy" id="duel-opponent-hp">100 HP</p>
-                </div>
             </div>
         </section>
 
@@ -300,20 +301,38 @@
 
             <div class="duel-control-stack" id="duel-control-stack">
                 <div class="weapon-grid">
-                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
-                        <strong>Пистоль и щит</strong>
-                        <span class="weapon-stat">18 урона</span>
-                        <span class="weapon-trait">-30% входящего урона</span>
+                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" data-help="18 урона. Щит всегда снижает входящий урон на 30%." title="18 урона. Щит всегда снижает входящий урон на 30%." aria-label="Пистоль: 18 урона, щит снижает входящий урон на 30%" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
+                        <span class="weapon-face">
+                            <span class="weapon-mark weapon-mark-pistol" aria-hidden="true"></span>
+                            <strong>Пистоль</strong>
+                            <span class="weapon-help" aria-hidden="true">i</span>
+                        </span>
+                        <span class="weapon-stats">
+                            <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-ammo" aria-hidden="true"></span>18</span>
+                            <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-shield" aria-hidden="true"></span>-30%</span>
+                        </span>
                     </button>
-                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="RIFLE" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'RIFLE')">
-                        <strong>Винтовка</strong>
-                        <span class="weapon-stat">30 урона</span>
-                        <span class="weapon-trait">Точный выстрел</span>
+                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="RIFLE" data-help="30 урона. Выстрел пробивает защиту цели." title="30 урона. Выстрел пробивает защиту цели." aria-label="Винтовка: 30 урона, пробитие защиты" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'RIFLE')">
+                        <span class="weapon-face">
+                            <span class="weapon-mark weapon-mark-rifle" aria-hidden="true"></span>
+                            <strong>Винтовка</strong>
+                            <span class="weapon-help" aria-hidden="true">i</span>
+                        </span>
+                        <span class="weapon-stats">
+                            <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-ammo" aria-hidden="true"></span>30</span>
+                            <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-break" aria-hidden="true"></span>пробитие</span>
+                        </span>
                     </button>
-                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="SHOTGUN" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'SHOTGUN')">
-                        <strong>Дробовик</strong>
-                        <span class="weapon-stat">5-25 урона</span>
-                        <span class="weapon-trait">Вероятность зацепа 35%</span>
+                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="SHOTGUN" data-help="5-25 урона. Есть шанс зацепить цель рядом с выбранной линией." title="5-25 урона. Есть шанс зацепить цель рядом с выбранной линией." aria-label="Дробовик: 5-25 урона, шанс зацепа" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'SHOTGUN')">
+                        <span class="weapon-face">
+                            <span class="weapon-mark weapon-mark-shotgun" aria-hidden="true"></span>
+                            <strong>Дробовик</strong>
+                            <span class="weapon-help" aria-hidden="true">i</span>
+                        </span>
+                        <span class="weapon-stats">
+                            <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-ammo" aria-hidden="true"></span>5-25</span>
+                            <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-spread" aria-hidden="true"></span>зацеп</span>
+                        </span>
                     </button>
                 </div>
 
@@ -321,18 +340,18 @@
                     <section class="vector-card">
                         <h4>Выстрел</h4>
                         <div class="toggle-row">
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')">Лево</button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')">Центр</button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')">Право</button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Лево</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Центр</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')"><span class="direction-symbol" aria-hidden="true">→</span><span class="direction-label">Право</span></button>
                         </div>
                     </section>
 
                     <section class="vector-card">
                         <h4>Уворот</h4>
                         <div class="toggle-row">
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')">Лево</button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')">Центр</button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')">Право</button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Лево</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Стоять</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')"><span class="direction-symbol" aria-hidden="true">→</span><span class="direction-label">Право</span></button>
                         </div>
                     </section>
                 </div>
@@ -404,7 +423,7 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260601-3"></script>
+<script src="/duel/app.js?v=polus-20260601-7"></script>
 </body>
 </html>
 

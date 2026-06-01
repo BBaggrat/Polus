@@ -11612,6 +11612,99 @@ function setText(selector, value) {
     });
 }
 
+function renderStaticWeaponOptions() {
+    const weapons = {
+        PISTOLS: {
+            title: "Пистоль",
+            mark: "pistol",
+            help: "18 урона. Щит всегда снижает входящий урон на 30%.",
+            stats: [
+                { icon: "ammo", label: "18" },
+                { icon: "shield", label: "-30%" }
+            ]
+        },
+        RIFLE: {
+            title: "Винтовка",
+            mark: "rifle",
+            help: "30 урона. Выстрел пробивает защиту цели.",
+            stats: [
+                { icon: "ammo", label: "30" },
+                { icon: "break", label: "пробитие" }
+            ]
+        },
+        SHOTGUN: {
+            title: "Дробовик",
+            mark: "shotgun",
+            help: "5-25 урона. Есть шанс зацепить цель рядом с выбранной линией.",
+            stats: [
+                { icon: "ammo", label: "5-25" },
+                { icon: "spread", label: "зацеп" }
+            ]
+        }
+    };
+
+    Object.keys(weapons).forEach(function (code) {
+        const weapon = weapons[code];
+        document.querySelectorAll('.weapon-option[data-value="' + code + '"]').forEach(function (button) {
+            button.innerHTML = '<span class="weapon-face">'
+                + '<span class="weapon-mark weapon-mark-' + weapon.mark + '" aria-hidden="true"></span>'
+                + '<strong>' + escapeHtml(weapon.title) + '</strong>'
+                + '<span class="weapon-help" aria-hidden="true">i</span>'
+                + '</span>'
+                + '<span class="weapon-stats">'
+                + weapon.stats.map(function (stat) {
+                    return '<span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-' + stat.icon + '" aria-hidden="true"></span>' + escapeHtml(stat.label) + '</span>';
+                }).join("")
+                + '</span>';
+            button.setAttribute("data-help", weapon.help);
+            button.setAttribute("title", weapon.help);
+            button.setAttribute("aria-label", weapon.title + ": " + weapon.help);
+        });
+    });
+}
+
+function renderStaticDirectionButtons() {
+    const groups = {
+        shot: {
+            prefix: "Выстрел",
+            values: {
+                LEFT: { symbol: "←", label: "Лево" },
+                CENTER: { symbol: "•", label: "Центр" },
+                RIGHT: { symbol: "→", label: "Право" }
+            }
+        },
+        dodge: {
+            prefix: "Уворот",
+            values: {
+                LEFT: { symbol: "←", label: "Лево" },
+                STAY: { symbol: "•", label: "Стоять" },
+                RIGHT: { symbol: "→", label: "Право" }
+            }
+        }
+    };
+
+    Object.keys(groups).forEach(function (groupName) {
+        const group = groups[groupName];
+        Object.keys(group.values).forEach(function (value) {
+            const config = group.values[value];
+            document.querySelectorAll('.duel-toggle[data-duel-select="' + groupName + '"][data-value="' + value + '"]').forEach(function (button) {
+                button.innerHTML = '<span class="direction-symbol" aria-hidden="true">' + escapeHtml(config.symbol) + '</span><span class="direction-label">' + escapeHtml(config.label) + '</span>';
+                button.setAttribute("aria-label", group.prefix + ": " + config.label);
+                button.setAttribute("title", group.prefix + ": " + config.label);
+            });
+        });
+    });
+}
+
+function scrollDuelLogsToLatest() {
+    if (!elements.duelLogList) {
+        return;
+    }
+    window.requestAnimationFrame(function () {
+        elements.duelLogList.scrollTop = elements.duelLogList.scrollHeight;
+    });
+}
+
 function refreshStaticCopy() {
     document.title = "Полюс";
     setText(".panel-kicker", "Профиль");
@@ -11654,25 +11747,15 @@ function refreshStaticCopy() {
     setText(".duel-block-title", "Оружие");
     setText(".vector-card:nth-of-type(1) h4", "Выстрел");
     setText(".vector-card:nth-of-type(2) h4", "Уворот");
-    setText('.weapon-option[data-value="PISTOLS"] strong', "Пистоль и щит");
-    setText('.weapon-option[data-value="PISTOLS"] .weapon-stat', "18 урона");
-    setText('.weapon-option[data-value="PISTOLS"] .weapon-trait', "-30% входящего урона");
-    setText('.weapon-option[data-value="RIFLE"] strong', "Винтовка");
-    setText('.weapon-option[data-value="RIFLE"] .weapon-stat', "30 урона");
-    setText('.weapon-option[data-value="RIFLE"] .weapon-trait', "Точный выстрел");
-    setText('.weapon-option[data-value="SHOTGUN"] strong', "Дробовик");
-    setText('.weapon-option[data-value="SHOTGUN"] .weapon-stat', "5-25 урона");
-    setText('.weapon-option[data-value="SHOTGUN"] .weapon-trait', "Зацеп 35%");
-    setText('.duel-toggle[data-duel-select="shot"][data-value="LEFT"]', "Лево");
-    setText('.duel-toggle[data-duel-select="shot"][data-value="CENTER"]', "Центр");
-    setText('.duel-toggle[data-duel-select="shot"][data-value="RIGHT"]', "Право");
-    setText('.duel-toggle[data-duel-select="dodge"][data-value="LEFT"]', "Лево");
-    setText('.duel-toggle[data-duel-select="dodge"][data-value="STAY"]', "Центр");
-    setText('.duel-toggle[data-duel-select="dodge"][data-value="RIGHT"]', "Право");
+    renderStaticWeaponOptions();
+    renderStaticDirectionButtons();
     Object.keys(UX_WEAPON_HINTS || {}).forEach(function (code) {
         document.querySelectorAll('.weapon-option[data-value="' + code + '"]').forEach(function (button) {
-            button.setAttribute("title", UX_WEAPON_HINTS[code]);
-            button.setAttribute("aria-label", UX_WEAPON_HINTS[code]);
+            const help = button.getAttribute("data-help") || UX_WEAPON_HINTS[code];
+            button.setAttribute("title", help);
+            if (!button.getAttribute("aria-label")) {
+                button.setAttribute("aria-label", help);
+            }
         });
     });
     const friendSearchButton = document.querySelector("#friend-search-form button[type='submit']");
@@ -12365,6 +12448,8 @@ async function submitLiveDuelAction() {
     }
     const actionPayload = getCurrentDuelAction(duel);
     elements.duelSubmitButton.disabled = true;
+    elements.duelSubmitButton.classList.add("is-sending");
+    elements.duelSubmitButton.textContent = "Отправляем...";
     try {
         const response = await apiFetch("/api/duel/" + encodeURIComponent(duel.duelId) + "/action", {
             method: "POST",
@@ -12381,12 +12466,15 @@ async function submitLiveDuelAction() {
         if (state.duel) {
             state.duel.activePanel = "logs";
         }
-        showToast(state.duel && state.duel.yourActionSubmitted ? "Ход принят." : "Раунд обновлен.");
-        renderDuel();
+        showToast("Ход отправлен.");
     } catch (error) {
         showToast(error && error.message ? error.message : "Не удалось отправить ход.");
     } finally {
-        elements.duelSubmitButton.disabled = false;
+        elements.duelSubmitButton.classList.remove("is-sending");
+        renderDuel();
+        if (state.duel && state.duel.activePanel === "logs") {
+            scrollDuelLogsToLatest();
+        }
     }
 }
 
@@ -12416,6 +12504,7 @@ function resolveDuelRound(playerAction, opponentAction) {
     });
     duel.activePanel = "logs";
     duel.newLogCount = 1;
+    showToast("Ход отправлен.");
 
     if (duel.playerHp <= 0 || duel.opponentHp <= 0) {
         duel.finished = true;
@@ -12435,6 +12524,7 @@ function resolveDuelRound(playerAction, opponentAction) {
         }
         saveState();
         renderDuel();
+        scrollDuelLogsToLatest();
         if (typeof renderHome === "function") {
             renderHome();
         }
@@ -12445,6 +12535,7 @@ function resolveDuelRound(playerAction, opponentAction) {
     startLocalRound(duel);
     saveState();
     renderDuel();
+    scrollDuelLogsToLatest();
 }
 
 function duelLogKind(lines) {
@@ -12611,10 +12702,10 @@ function renderDuel() {
     const youName = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
     const opponentName = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelYouName.textContent = youName;
-    elements.duelYouMeta.innerHTML = '<span class="duelist-hp-chip"><span class="hp-dot hp-dot-you"></span>' + escapeHtml(String(duel.playerHp)) + ' HP</span>';
+    elements.duelYouMeta.textContent = "";
     elements.duelYouAvatar.textContent = youName.slice(0, 1).toUpperCase();
     elements.duelOpponentName.textContent = opponentName;
-    elements.duelOpponentMeta.innerHTML = '<span class="duelist-hp-chip"><span class="hp-dot hp-dot-opponent"></span>' + escapeHtml(String(duel.opponentHp)) + ' HP</span>';
+    elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = opponentName.slice(0, 1).toUpperCase();
     elements.duelYouHp.textContent = duel.playerHp + " HP";
     elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
@@ -13401,6 +13492,8 @@ async function submitLiveDuelAction() {
     }
     const actionPayload = getCurrentDuelAction(duel);
     elements.duelSubmitButton.disabled = true;
+    elements.duelSubmitButton.classList.add("is-sending");
+    elements.duelSubmitButton.textContent = "Отправляем...";
     try {
         const response = await apiFetch("/api/duel/" + encodeURIComponent(duel.duelId) + "/action", {
             method: "POST",
@@ -13417,12 +13510,15 @@ async function submitLiveDuelAction() {
         if (state.duel) {
             state.duel.activePanel = "logs";
         }
-        showToast(state.duel && state.duel.yourActionSubmitted ? "Ход принят." : "Раунд обновлен.");
-        renderDuel();
+        showToast("Ход отправлен.");
     } catch (error) {
         showToast(error && error.message ? error.message : "Не удалось отправить ход.");
     } finally {
-        elements.duelSubmitButton.disabled = false;
+        elements.duelSubmitButton.classList.remove("is-sending");
+        renderDuel();
+        if (state.duel && state.duel.activePanel === "logs") {
+            scrollDuelLogsToLatest();
+        }
     }
 }
 
@@ -13452,6 +13548,7 @@ function resolveDuelRound(playerAction, opponentAction) {
     });
     duel.activePanel = "logs";
     duel.newLogCount = 1;
+    showToast("Ход отправлен.");
 
     if (duel.playerHp <= 0 || duel.opponentHp <= 0) {
         duel.finished = true;
@@ -13471,6 +13568,7 @@ function resolveDuelRound(playerAction, opponentAction) {
         }
         saveState();
         renderDuel();
+        scrollDuelLogsToLatest();
         if (typeof renderHome === "function") {
             renderHome();
         }
@@ -13481,6 +13579,7 @@ function resolveDuelRound(playerAction, opponentAction) {
     startLocalRound(duel);
     saveState();
     renderDuel();
+    scrollDuelLogsToLatest();
 }
 
 function duelLogKind(lines) {
@@ -13488,33 +13587,62 @@ function duelLogKind(lines) {
     if (/побед|награ|\+\d+/.test(joined)) {
         return "reward";
     }
-    if (/попадание|попал|зацеп/.test(joined)) {
+    if (/зацеп/.test(joined)) {
+        return "graze";
+    }
+    if (/уворот|уклон|уш[её]л|ушла|ушли|стоит/.test(joined)) {
+        return "evade";
+    }
+    if (/попадание|попал|попала|урон/.test(joined)) {
         return "hit";
     }
-    if (/промах|осечка|заблок/.test(joined)) {
+    if (/промах|осечка|заблок|мимо/.test(joined)) {
         return "miss";
+    }
+    if (/раунд|ход/.test(joined)) {
+        return "round";
     }
     return "system";
 }
 
 function duelLogIcon(kind) {
     return {
-        hit: "!",
+        hit: "◆",
         miss: "×",
+        graze: "∴",
+        evade: "↗",
+        round: "↻",
         reward: "¤",
         invite: ">",
         system: "i"
     }[kind] || "i";
 }
 
+function duelLogMeta(line) {
+    const text = String(line || "").toLowerCase();
+    if (/лев|центр|прав|стоит|уворот|уклон/.test(text)) {
+        return "направление";
+    }
+    if (/зацеп/.test(text)) {
+        return "зацеп";
+    }
+    if (/попад|урон/.test(text)) {
+        return "попадание";
+    }
+    if (/промах|осеч|мимо|заблок/.test(text)) {
+        return "промах";
+    }
+    return "событие";
+}
+
 function renderDuelLogRow(label, line, extraClass) {
     if (!line) {
         return "";
     }
-    return '<div class="duel-log-row ' + extraClass + '"><span class="duel-log-side">' + escapeHtml(label) + '</span><p>' + decorateText(line) + '</p></div>';
+    return '<div class="duel-log-row ' + extraClass + '"><span class="duel-log-side">' + escapeHtml(label) + '</span><div class="duel-log-copy"><p>' + decorateText(line) + '</p><small>' + escapeHtml(duelLogMeta(line)) + '</small></div></div>';
 }
 
-function renderDuelLogCard(entry, index) {
+function renderDuelLogCard(entry, index, total) {
     const roundNumber = typeof entry.round === "number" ? entry.round : (entry.roundNumber || "");
     const lines = sanitizeLogLines(entry.lines);
     const ownIntent = lines[0] || ("Раунд " + roundNumber);
@@ -13523,8 +13651,9 @@ function renderDuelLogCard(entry, index) {
     const opponentResult = lines[3] || "";
     const extraLines = lines.slice(4);
     const kind = duelLogKind(lines);
-    return '<article class="duel-log-round duel-log-card duel-log-card-' + kind + (index === 0 ? " is-new" : "") + '">'
-        + '<div class="duel-log-card-head"><span class="duel-log-icon" aria-hidden="true">' + escapeHtml(duelLogIcon(kind)) + '</span><span class="duel-log-round-caption">Раунд ' + escapeHtml(String(roundNumber)) + '</span>' + (index === 0 ? '<span class="duel-log-badge">новое</span>' : '') + '</div>'
+    const isLatest = index === total - 1;
+    return '<article class="duel-log-round duel-log-card duel-log-card-' + kind + (isLatest ? " is-new" : "") + '">'
+        + '<div class="duel-log-card-head"><span class="duel-log-icon" aria-hidden="true">' + escapeHtml(duelLogIcon(kind)) + '</span><span class="duel-log-round-caption">Раунд ' + escapeHtml(String(roundNumber)) + '</span>' + (isLatest ? '<span class="duel-log-badge">последнее</span>' : '') + '</div>'
         + renderDuelLogRow("Ты", ownIntent, "duel-log-line-own")
         + renderDuelLogRow("Итог", ownResult, "duel-log-line-own duel-log-result")
         + renderDuelLogRow("Враг", opponentIntent, "duel-log-line-opponent")
@@ -13647,10 +13776,10 @@ function renderDuel() {
     const youName = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
     const opponentName = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelYouName.textContent = youName;
-    elements.duelYouMeta.innerHTML = '<span class="duelist-hp-chip"><span class="hp-dot hp-dot-you"></span>' + escapeHtml(String(duel.playerHp)) + ' HP</span>';
+    elements.duelYouMeta.textContent = "";
     elements.duelYouAvatar.textContent = youName.slice(0, 1).toUpperCase();
     elements.duelOpponentName.textContent = opponentName;
-    elements.duelOpponentMeta.innerHTML = '<span class="duelist-hp-chip"><span class="hp-dot hp-dot-opponent"></span>' + escapeHtml(String(duel.opponentHp)) + ' HP</span>';
+    elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = opponentName.slice(0, 1).toUpperCase();
     elements.duelYouHp.textContent = duel.playerHp + " HP";
     elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
@@ -13668,16 +13797,20 @@ function renderDuel() {
     elements.duelSubmitButton.textContent = duel.finished
         ? "Бой завершен"
         : duel.yourActionSubmitted
-            ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
+            ? (duelHasPendingChanges ? "Изменить ход" : "Ожидаем соперника")
             : "Сделать ход";
     elements.duelSubmitButton.disabled = duel.finished || !duelSelectionComplete || (duel.yourActionSubmitted && !duelHasPendingChanges);
     elements.duelSubmitButton.classList.toggle("is-turn-submitted", Boolean(duel.yourActionSubmitted && !duelHasPendingChanges && !duel.finished));
     elements.duelSubmitButton.classList.toggle("is-turn-edit", Boolean(duelHasPendingChanges && !duel.finished));
+    elements.duelSubmitButton.classList.toggle("is-waiting", Boolean(duel.yourActionSubmitted && !duelHasPendingChanges && !duel.finished));
 
     if (!duel.logs.length) {
         elements.duelLogList.innerHTML = '<article class="duel-log-round duel-log-card duel-log-card-system"><div class="duel-log-card-head"><span class="duel-log-icon" aria-hidden="true">i</span><span class="duel-log-round-caption">Логи</span></div><p class="duel-log-empty">Логов пока нет. Первый обмен ходами появится здесь.</p></article>';
     } else {
-        elements.duelLogList.innerHTML = duel.logs.slice().reverse().map(renderDuelLogCard).join("");
+        const visibleLogs = duel.logs.slice();
+        elements.duelLogList.innerHTML = visibleLogs.map(function (entry, index) {
+            return renderDuelLogCard(entry, index, visibleLogs.length);
+        }).join("");
     }
 
     renderDuelChat(duel);
@@ -13696,6 +13829,9 @@ function renderDuel() {
     elements.duelOverlay.classList.remove("hidden");
     elements.duelOverlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("duel-open");
+    if (duel.activePanel === "logs") {
+        scrollDuelLogsToLatest();
+    }
 }
 
 function openDuelResultModal(config) {
