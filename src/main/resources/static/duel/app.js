@@ -521,7 +521,22 @@
         const webApp = getTelegramWebApp();
         const hasTelegramIdentity = Boolean(webApp && webApp.initData);
         if (!hasTelegramIdentity) {
-            fallbackToDemoSession();
+            try {
+                const response = await fetch("/api/player/browser-demo-session", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(buildSessionRequest())
+                });
+                if (!response.ok) {
+                    throw new Error(await readApiError(response));
+                }
+                applySession(await response.json(), { browserDemo: true });
+            } catch (error) {
+                console.error("Polus browser demo session init failed", error);
+                fallbackToDemoSession(error);
+            }
             return;
         }
         try {
@@ -568,7 +583,7 @@
         return {
             fallbackUser: {
                 guestId: getBrowserGuestId(),
-                firstName: "Р вЂњР С•РЎРѓРЎвЂљРЎРЉ",
+                firstName: "Новый игрок",
                 lastName: null,
                 username: null,
                 languageCode: navigator.language || "ru",
@@ -591,11 +606,12 @@
         }
     }
 
-    function applySession(session) {
+    function applySession(session, options) {
         const player = session && session.player ? session.player : null;
         if (!player) {
             throw new Error("Р СџРЎС“РЎРѓРЎвЂљР С•Р в„– Р С•РЎвЂљР Р†Р ВµРЎвЂљ РЎРѓР ВµРЎРѓРЎРѓР С‘Р С‘");
         }
+        const isBrowserDemo = Boolean(options && options.browserDemo);
         const previousPlayerId = state.auth && state.auth.playerId ? state.auth.playerId : null;
         const accountChanged = previousPlayerId !== player.id;
         if (accountChanged) {
@@ -611,6 +627,7 @@
             journalStyle: player.journalStyle || "",
             registered: Boolean(player.registered),
             demoMode: false,
+            browserDemo: isBrowserDemo,
             initError: ""
         });
         syncPlayerFromServer(player, accountChanged || !player.registered);
@@ -668,7 +685,7 @@
     }
 
     async function loadFriendsOverview() {
-        if (!state.auth || !state.auth.sessionToken || state.auth.demoMode || !state.auth.registered) {
+        if (!state.auth || !state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo || !state.auth.registered) {
             state.friends = [];
             state.friendRequests = [];
             return;
@@ -714,6 +731,7 @@
             nickname: existingNickname,
             registered: demoRegistered,
             demoMode: true,
+            browserDemo: false,
             initError: error && error.message ? error.message : ""
         });
         state.player.id = state.player.id || "demo-player";
@@ -852,7 +870,7 @@
     }
 
     async function syncFriendsIfNeeded() {
-        const shouldSync = state.auth && state.auth.sessionToken && !state.auth.demoMode && state.auth.registered;
+        const shouldSync = state.auth && state.auth.sessionToken && !state.auth.demoMode && !state.auth.browserDemo && state.auth.registered;
         if (!shouldSync || friendSyncPending) {
             return;
         }
@@ -5235,6 +5253,8 @@ function renderRegistrationModal() {
     }
     elements.registrationCopy.textContent = auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
+        : (auth.browserDemo || !(getTelegramWebApp() && getTelegramWebApp().initData))
+            ? "Введи никнейм для сетевого демо. Профиль живет только до перезапуска сервера."
         : "Ник будет привязан к твоему Telegram ID.";
     if (!elements.registrationNickname.value) {
         elements.registrationNickname.value = auth.nickname || "";
@@ -5699,6 +5719,8 @@ function renderRegistrationModal() {
     }
     elements.registrationCopy.textContent = auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
+        : (auth.browserDemo || !(getTelegramWebApp() && getTelegramWebApp().initData))
+            ? "Введи никнейм для сетевого демо. Профиль живет только до перезапуска сервера."
         : "Ник будет привязан к твоему Telegram ID.";
     if (!elements.registrationNickname.value) {
         elements.registrationNickname.value = auth.nickname || "";
@@ -12072,7 +12094,7 @@ async function submitFriendSearch() {
         showToast("Введи ник игрока.");
         return;
     }
-    if (!state.auth.sessionToken || state.auth.demoMode) {
+    if (!state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo) {
         showToast("Добавление друзей доступно только в Telegram-аккаунте.");
         return;
     }
@@ -12095,7 +12117,7 @@ async function submitFriendSearch() {
 }
 
 async function acceptFriendRequest(requestId) {
-    if (!state.auth.sessionToken || state.auth.demoMode) {
+    if (!state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo) {
         return;
     }
     try {
@@ -12110,7 +12132,7 @@ async function acceptFriendRequest(requestId) {
 }
 
 async function rejectFriendRequest(requestId) {
-    if (!state.auth.sessionToken || state.auth.demoMode) {
+    if (!state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo) {
         return;
     }
     try {
@@ -12874,6 +12896,8 @@ function renderRegistrationModal() {
     }
     elements.registrationCopy.textContent = auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
+        : (auth.browserDemo || !(getTelegramWebApp() && getTelegramWebApp().initData))
+            ? "Введи никнейм для сетевого демо. Профиль живет только до перезапуска сервера."
         : "Ник будет привязан к твоему Telegram ID.";
     if (!elements.registrationNickname.value && nickname) {
         elements.registrationNickname.value = nickname;
@@ -13164,7 +13188,7 @@ async function submitFriendSearch() {
         showToast("Введи ник игрока.");
         return;
     }
-    if (!state.auth.sessionToken || state.auth.demoMode) {
+    if (!state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo) {
         showToast("Добавление друзей доступно только в Telegram-аккаунте.");
         return;
     }
@@ -13187,7 +13211,7 @@ async function submitFriendSearch() {
 }
 
 async function acceptFriendRequest(requestId) {
-    if (!state.auth.sessionToken || state.auth.demoMode) {
+    if (!state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo) {
         return;
     }
     try {
@@ -13202,7 +13226,7 @@ async function acceptFriendRequest(requestId) {
 }
 
 async function rejectFriendRequest(requestId) {
-    if (!state.auth.sessionToken || state.auth.demoMode) {
+    if (!state.auth.sessionToken || state.auth.demoMode || state.auth.browserDemo) {
         return;
     }
     try {

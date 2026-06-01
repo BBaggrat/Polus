@@ -47,6 +47,15 @@ public class SessionService {
 
     public SessionResponse createSession(SessionRequest request) {
         AuthenticatedUser authenticatedUser = resolveUser(request);
+        return createSessionFor(authenticatedUser);
+    }
+
+    public SessionResponse createBrowserDemoSession(SessionRequest request) {
+        AuthenticatedUser authenticatedUser = resolveBrowserDemoUser(request);
+        return createSessionFor(authenticatedUser);
+    }
+
+    private SessionResponse createSessionFor(AuthenticatedUser authenticatedUser) {
         PlayerProfile playerProfile = playerService.createOrUpdate(authenticatedUser);
         Instant now = clock.instant();
         PlayerSession session = new PlayerSession(
@@ -117,6 +126,32 @@ public class SessionService {
         return new AuthenticatedUser(
                 "guest:" + guestId,
                 fallbackUser != null ? fallbackUser.telegramUserId() : null,
+                username,
+                firstName,
+                lastName,
+                languageCode,
+                false,
+                false
+        );
+    }
+
+    private AuthenticatedUser resolveBrowserDemoUser(SessionRequest request) {
+        if (!applicationProperties.isAllowDevSessions()) {
+            throw new UnauthorizedException("Browser demo sessions are disabled");
+        }
+        AuthUserPayload fallbackUser = request != null ? request.fallbackUser() : null;
+        String guestId = fallbackUser != null && fallbackUser.guestId() != null && !fallbackUser.guestId().isBlank()
+                ? fallbackUser.guestId()
+                : UUID.randomUUID().toString();
+        String username = fallbackUser != null ? fallbackUser.username() : null;
+        String firstName = fallbackUser != null && fallbackUser.firstName() != null && !fallbackUser.firstName().isBlank()
+                ? fallbackUser.firstName()
+                : "Browser demo";
+        String lastName = fallbackUser != null ? fallbackUser.lastName() : null;
+        String languageCode = fallbackUser != null ? fallbackUser.languageCode() : null;
+        return new AuthenticatedUser(
+                "browser-demo:" + guestId,
+                null,
                 username,
                 firstName,
                 lastName,

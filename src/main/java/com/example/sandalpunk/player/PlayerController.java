@@ -27,6 +27,11 @@ public class PlayerController {
         return sessionService.createSession(request);
     }
 
+    @PostMapping("/browser-demo-session")
+    public SessionResponse createBrowserDemoSession(@RequestBody SessionRequest request) {
+        return sessionService.createBrowserDemoSession(request);
+    }
+
     @PostMapping("/register")
     public PlayerResponse register(@RequestHeader("X-Session-Token") String sessionToken,
                                    @RequestBody RegisterPlayerRequest request) {
