@@ -520,6 +520,10 @@
     async function initializeSession() {
         const webApp = getTelegramWebApp();
         const hasTelegramIdentity = Boolean(webApp && webApp.initData);
+        if (!hasTelegramIdentity) {
+            fallbackToDemoSession();
+            return;
+        }
         try {
             const response = await fetch("/api/player/session", {
                 method: "POST",
@@ -700,17 +704,21 @@
     }
 
     function fallbackToDemoSession(error) {
+        const existingNickname = sanitizeVisibleText(state.auth && state.auth.nickname, "")
+            || sanitizeVisibleText(state.player && state.player.name, "");
+        const demoRegistered = Boolean(existingNickname && state.auth && state.auth.registered && !isPlaceholderPlayerName(existingNickname));
         state.auth = Object.assign({}, state.auth, {
             sessionToken: null,
             playerId: "demo-player",
             telegramUserId: null,
-            nickname: "",
-            registered: false,
+            nickname: existingNickname,
+            registered: demoRegistered,
             demoMode: true,
-            initError: error && error.message ? error.message : "Р СњР Вµ РЎС“Р Т‘Р В°Р В»Р С•РЎРѓРЎРЉ РЎРѓР С•Р В·Р Т‘Р В°РЎвЂљРЎРЉ РЎРѓР ВµРЎРѓРЎРѓР С‘РЎР‹"
+            initError: error && error.message ? error.message : ""
         });
-        state.player.name = "Р СњР С•Р Р†РЎвЂ№Р в„– Р С‘Р С–РЎР‚Р С•Р С”";
-        state.player.money = 0;
+        state.player.id = state.player.id || "demo-player";
+        state.player.name = existingNickname || sanitizeVisibleText(state.player.name, "Новый игрок") || "Новый игрок";
+        state.player.money = Number(state.player.money || 0);
         state.friends = [];
         state.friendRequests = [];
         saveState();
@@ -6067,7 +6075,14 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("Поиск матча работает только внутри Telegram.");
+        showToast("В браузере доступна локальная демо-дуэль.");
+        openDuel({
+            mode: "pvp",
+            title: "Дуэль",
+            modeLabel: "PvP",
+            opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
+            opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
+        });
         return;
     }
     try {
@@ -10360,7 +10375,14 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("Поиск матча работает только внутри Telegram.");
+        showToast("В браузере доступна локальная демо-дуэль.");
+        openDuel({
+            mode: "pvp",
+            title: "Дуэль",
+            modeLabel: "PvP",
+            opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
+            opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
+        });
         return;
     }
     try {
@@ -13107,7 +13129,14 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("Поиск матча работает только внутри Telegram.");
+        showToast("В браузере доступна локальная демо-дуэль.");
+        openDuel({
+            mode: "pvp",
+            title: "Дуэль",
+            modeLabel: "PvP",
+            opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
+            opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
+        });
         return;
     }
     try {
