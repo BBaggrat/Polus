@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260602-1">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260602-2">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -15,7 +15,8 @@
                 <div class="cover-glow cover-glow-left"></div>
                 <div class="cover-glow cover-glow-right"></div>
                 <div class="cover-ridges"></div>
-                <div class="avatar-card">
+                <button class="avatar-card profile-level-action" id="profile-level-action" type="button" aria-label="Показать прогресс уровня" title="Прогресс уровня">
+                    <span class="profile-frame-ring" aria-hidden="true"></span>
                     <div class="avatar-portrait" id="profile-avatar">И</div>
                     <span class="avatar-level-badge" aria-label="Уровень">
                         <span class="avatar-level-label">LVL</span>
@@ -25,22 +26,26 @@
                         <span id="profile-level-progress-fill"></span>
                         <span id="profile-level-progress-text">0 / 100</span>
                     </span>
-                </div>
+                </button>
 
                 <div class="panel-header profile-cover-header">
                     <div class="profile-identity">
                         <p class="panel-kicker">Профиль</p>
                         <h1 class="panel-title" id="profile-name">Новый игрок</h1>
+                        <div class="profile-badge-row" aria-label="Персонализация профиля">
+                            <span class="profile-badge-chip" id="profile-badge-chip">Новичок</span>
+                            <span class="profile-frame-chip">Рамка</span>
+                        </div>
                     </div>
                     <div class="profile-side">
-                        <div class="stat-chip stat-chip-accent">
+                        <button class="stat-chip stat-chip-accent profile-stat-button" id="profile-money-action" type="button" aria-label="Открыть магазин" title="Монеты тратятся в магазине">
                             <span class="stat-icon stat-icon-coins" aria-label="Монеты" title="Монеты"></span>
                             <strong id="profile-money">0</strong>
-                        </div>
-                        <div class="stat-chip">
+                        </button>
+                        <button class="stat-chip profile-stat-button" id="profile-rating-action" type="button" aria-label="Открыть рейтинг" title="Открыть рейтинг">
                             <span class="stat-icon stat-icon-rating" aria-label="Рейтинг" title="Рейтинг"></span>
                             <strong id="profile-rating">0</strong>
-                        </div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -198,6 +203,18 @@
                 <button class="primary-button social-chat-send" id="social-chat-send" type="submit">Отправить</button>
             </form>
         </section>
+    </div>
+</section>
+<section class="modal-overlay modal-overlay-centered hidden" id="leaderboard-modal" aria-hidden="true">
+    <div class="modal-sheet leaderboard-sheet">
+        <div class="modal-header">
+            <div>
+                <p class="modal-kicker">Сезон</p>
+                <h3 class="panel-title panel-title-small">Рейтинг</h3>
+            </div>
+            <button class="ghost-button leaderboard-close" id="leaderboard-close" type="button" aria-label="Закрыть рейтинг" title="Закрыть">×</button>
+        </div>
+        <div class="leaderboard-list" id="leaderboard-list"></div>
     </div>
 </section>
 <section class="modal-overlay modal-overlay-centered hidden" id="registration-modal" aria-hidden="true">
@@ -445,7 +462,7 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260602-1"></script>
+<script src="/duel/app.js?v=polus-20260602-2"></script>
 </body>
 </html>
 

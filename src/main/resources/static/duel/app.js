@@ -331,10 +331,14 @@
         elements.profileAvatar = document.getElementById("profile-avatar");
         elements.profileName = document.getElementById("profile-name");
         elements.profileLevel = document.getElementById("profile-level");
+        elements.profileLevelAction = document.getElementById("profile-level-action");
         elements.profileLevelProgressFill = document.getElementById("profile-level-progress-fill");
         elements.profileLevelProgressText = document.getElementById("profile-level-progress-text");
         elements.profileMoney = document.getElementById("profile-money");
+        elements.profileMoneyAction = document.getElementById("profile-money-action");
         elements.profileRating = document.getElementById("profile-rating");
+        elements.profileRatingAction = document.getElementById("profile-rating-action");
+        elements.profileBadgeChip = document.getElementById("profile-badge-chip");
         elements.statPointsBadge = document.getElementById("stat-points-badge");
         elements.heroStats = document.getElementById("hero-stats");
         elements.queueStatusCard = document.getElementById("queue-status-card");
@@ -350,6 +354,9 @@
         elements.registrationNickname = document.getElementById("registration-nickname");
         elements.registrationError = document.getElementById("registration-error");
         elements.registrationSubmit = document.getElementById("registration-submit");
+        elements.leaderboardModal = document.getElementById("leaderboard-modal");
+        elements.leaderboardList = document.getElementById("leaderboard-list");
+        elements.leaderboardClose = document.getElementById("leaderboard-close");
         elements.journalList = document.getElementById("journal-list");
         elements.journalZone = document.getElementById("journal-zone");
         elements.questList = document.getElementById("quest-list");
@@ -9695,6 +9702,18 @@ function bindStaticActionHandlers() {
     setButtonHandler(document.getElementById("social-chat-close"), function () {
         closeSocialInbox();
     });
+    setButtonHandler(document.getElementById("profile-rating-action"), function () {
+        openLeaderboard();
+    });
+    setButtonHandler(document.getElementById("profile-money-action"), function () {
+        openMoneyDestination();
+    });
+    setButtonHandler(document.getElementById("profile-level-action"), function () {
+        showLevelProgressHint();
+    });
+    setButtonHandler(document.getElementById("leaderboard-close"), function () {
+        closeLeaderboard();
+    });
     setButtonHandler(document.getElementById("start-duel-cancel"), function () {
         cancelStartDuel();
     });
@@ -11616,7 +11635,7 @@ function decorateText(text) {
 
 function syncPlayerFromServer(player, resetEconomy) {
     player = player || {};
-    state.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0 }, state.player || {});
+    state.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, level: 1, levelProgressCurrent: 0, levelProgressTarget: 100 }, state.player || {});
     state.auth = Object.assign({ nickname: "", registered: false, journalStyle: "" }, state.auth || {});
     state.player.id = player.id || state.player.id || null;
     state.player.name = sanitizeVisibleText(player.nickname, "")
@@ -11626,6 +11645,17 @@ function syncPlayerFromServer(player, resetEconomy) {
         || "Новый игрок";
     state.player.telegramUserId = player.telegramUserId || state.player.telegramUserId || null;
     state.player.rating = typeof player.rating === "number" ? player.rating : Number(state.player.rating || 0);
+    state.player.level = Number(player.level || state.player.level || 1);
+    state.player.levelProgressCurrent = Number(
+        typeof player.levelProgressCurrent === "number" ? player.levelProgressCurrent
+            : typeof player.experience === "number" ? player.experience
+                : state.player.levelProgressCurrent || 0
+    );
+    state.player.levelProgressTarget = Math.max(1, Number(
+        typeof player.levelProgressTarget === "number" ? player.levelProgressTarget
+            : typeof player.nextLevelExperience === "number" ? player.nextLevelExperience
+                : state.player.levelProgressTarget || 100
+    ));
     if (resetEconomy || typeof state.player.money !== "number" || typeof player.coins === "number") {
         state.player.money = typeof player.coins === "number" ? player.coins : Number(state.player.money || 0);
     }
@@ -11635,7 +11665,7 @@ function syncPlayerFromServer(player, resetEconomy) {
 }
 
 function repairStateAfterLegacyLoad() {
-    state.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0 }, state.player || {});
+    state.player = Object.assign({ id: null, name: "Новый игрок", money: 0, rating: 0, level: 1, levelProgressCurrent: 0, levelProgressTarget: 100 }, state.player || {});
     state.auth = Object.assign({
         sessionToken: null,
         telegramUserId: null,
@@ -11645,7 +11675,7 @@ function repairStateAfterLegacyLoad() {
         demoMode: true,
         journalStyle: ""
     }, state.auth || {});
-    state.ui = Object.assign({ screen: "home", shopSection: "weapon", journalLocation: "street" }, state.ui || {});
+    state.ui = Object.assign({ screen: "home", shopSection: "weapon", journalLocation: "street", leaderboardOpen: false }, state.ui || {});
     state.matchmaking = Object.assign({ status: "IDLE", duelId: null, queuedAt: null, message: "" }, state.matchmaking || {});
     state.inventory = Object.assign({ unlockedAugments: [] }, state.inventory || {});
     state.social = Object.assign({ isOpen: false, threads: [], activeThreadId: null, selectedMessageKey: null, replyDraft: null }, state.social || {});
@@ -11666,6 +11696,9 @@ function repairStateAfterLegacyLoad() {
     state.player.name = sanitizeVisibleText(state.player.name, sanitizeVisibleText(state.auth.nickname, "Новый игрок")) || "Новый игрок";
     state.player.money = Number(state.player.money || 0);
     state.player.rating = Number(state.player.rating || 0);
+    state.player.level = Math.max(1, Number(state.player.level || 1));
+    state.player.levelProgressTarget = Math.max(1, Number(state.player.levelProgressTarget || 100));
+    state.player.levelProgressCurrent = Math.max(0, Math.min(state.player.levelProgressTarget, Number(state.player.levelProgressCurrent || 0)));
     state.auth.nickname = sanitizeVisibleText(state.auth.nickname, "");
     state.auth.registered = Boolean(state.auth.registered) && Boolean(state.player.id) && !isPlaceholderPlayerName(state.player.name);
     if (state.duel) {
@@ -11895,12 +11928,132 @@ async function readApiError(response) {
     }
 }
 
+function getProfileProgressSnapshot() {
+    const target = Math.max(1, Number(state.player && state.player.levelProgressTarget || 100));
+    const current = Math.max(0, Math.min(target, Number(state.player && state.player.levelProgressCurrent || 0)));
+    return {
+        current: current,
+        target: target,
+        remaining: Math.max(0, target - current),
+        percent: Math.max(0, Math.min(100, Math.round((current / target) * 100)))
+    };
+}
+
+function getProfileBadgeLabel() {
+    const level = Math.max(1, Number(state.player && state.player.level || 1));
+    const rating = Math.max(0, Number(state.player && state.player.rating || 0));
+    if (rating >= 50 || level >= 5) {
+        return "Ветеран";
+    }
+    if (rating >= 20 || level >= 3) {
+        return "Дуэлянт";
+    }
+    return "Новичок";
+}
+
+function openMoneyDestination() {
+    if (!state.ui.shopSection) {
+        state.ui.shopSection = "weapon";
+    }
+    navigateTo("shop");
+    showToast("Монеты тратятся в магазине.");
+}
+
+function showLevelProgressHint() {
+    const progress = getProfileProgressSnapshot();
+    showToast("До следующего уровня: " + progress.remaining);
+}
+
+function openLeaderboard() {
+    state.ui.leaderboardOpen = true;
+    renderLeaderboardModal();
+}
+
+function closeLeaderboard() {
+    state.ui.leaderboardOpen = false;
+    renderLeaderboardModal();
+}
+
+function buildLeaderboardEntries() {
+    const playerName = sanitizeVisibleText(state.player && state.player.name, sanitizeVisibleText(state.auth && state.auth.nickname, "Новый игрок")) || "Новый игрок";
+    const currentId = String((state.player && state.player.id) || (state.auth && state.auth.playerId) || "current-player");
+    const entries = [{
+        id: currentId,
+        name: playerName,
+        rating: Number(state.player && state.player.rating || 0),
+        badge: getProfileBadgeLabel(),
+        current: true
+    }];
+    const seen = {};
+    seen[currentId] = true;
+    const friends = typeof getDisplayFriends === "function" ? getDisplayFriends() : (Array.isArray(state.friends) ? state.friends : []);
+    friends.forEach(function (friend) {
+        const friendId = String(friend && (friend.id || friend.playerId || friend.telegramUserId || friend.name) || "");
+        if (!friendId || seen[friendId]) {
+            return;
+        }
+        seen[friendId] = true;
+        entries.push({
+            id: friendId,
+            name: sanitizeVisibleText(friend.name, "Игрок"),
+            rating: Number(friend.rating || 0),
+            badge: friend.status === "online" ? "online" : "rank",
+            current: false
+        });
+    });
+    return entries.sort(function (left, right) {
+        return Number(right.rating || 0) - Number(left.rating || 0);
+    }).map(function (entry, index) {
+        return Object.assign({}, entry, { rank: index + 1 });
+    });
+}
+
+function renderLeaderboardModal() {
+    if (!elements.leaderboardModal || !elements.leaderboardList) {
+        return;
+    }
+    const isOpen = Boolean(state.ui && state.ui.leaderboardOpen);
+    elements.leaderboardModal.classList.toggle("hidden", !isOpen);
+    elements.leaderboardModal.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    if (!isOpen) {
+        return;
+    }
+    const entries = buildLeaderboardEntries();
+    if (!entries.length) {
+        elements.leaderboardList.innerHTML = '<article class="leaderboard-empty"><strong>Рейтинг пуст</strong><span>Сыграй дуэль, чтобы появиться в таблице.</span></article>';
+        return;
+    }
+    elements.leaderboardList.innerHTML = entries.map(function (entry) {
+        const name = sanitizeVisibleText(entry.name, "Игрок");
+        const initial = typeof friendInitial === "function" ? friendInitial(name) : name.slice(0, 1).toUpperCase();
+        const badgeLabel = entry.current ? "Ты" : sanitizeVisibleText(entry.badge, "rank");
+        return '<article class="leaderboard-row' + (entry.current ? ' is-current' : '') + '">'
+            + '<span class="leaderboard-rank">' + entry.rank + '</span>'
+            + '<span class="leaderboard-avatar" aria-hidden="true">' + escapeHtml(initial) + '</span>'
+            + '<span class="leaderboard-player"><strong>' + escapeHtml(name) + '</strong><small>' + escapeHtml(badgeLabel) + '</small></span>'
+            + '<span class="leaderboard-score"><span class="leaderboard-badge" aria-hidden="true">★</span>' + Number(entry.rating || 0) + '</span>'
+            + '</article>';
+    }).join("");
+}
+
 function renderProfile() {
     const playerName = sanitizeVisibleText(state.player && state.player.name, sanitizeVisibleText(state.auth && state.auth.nickname, "Новый игрок")) || "Новый игрок";
     const playerMoney = Number(state.player && state.player.money || 0);
     const playerRating = Number(state.player && state.player.rating || 0);
+    const playerLevel = Math.max(1, Number(state.player && state.player.level || 1));
+    const progress = getProfileProgressSnapshot();
+    const progressTitle = "До следующего уровня: " + progress.remaining;
     if (elements.profileName) {
         elements.profileName.textContent = playerName;
+    }
+    if (elements.profileLevel) {
+        elements.profileLevel.textContent = String(playerLevel);
+    }
+    if (elements.profileLevelProgressFill) {
+        elements.profileLevelProgressFill.style.width = progress.percent + "%";
+    }
+    if (elements.profileLevelProgressText) {
+        elements.profileLevelProgressText.textContent = progress.current + " / " + progress.target;
     }
     if (elements.profileMoney) {
         elements.profileMoney.textContent = String(playerMoney);
@@ -11913,6 +12066,21 @@ function renderProfile() {
     }
     if (elements.profileAvatar) {
         elements.profileAvatar.textContent = playerName.slice(0, 1).toUpperCase();
+    }
+    if (elements.profileBadgeChip) {
+        elements.profileBadgeChip.textContent = getProfileBadgeLabel();
+    }
+    if (elements.profileLevelAction) {
+        elements.profileLevelAction.setAttribute("title", progressTitle);
+        elements.profileLevelAction.setAttribute("aria-label", progressTitle);
+    }
+    if (elements.profileMoneyAction) {
+        elements.profileMoneyAction.setAttribute("title", "Открыть магазин");
+        elements.profileMoneyAction.setAttribute("aria-label", "Открыть магазин. Монет: " + playerMoney);
+    }
+    if (elements.profileRatingAction) {
+        elements.profileRatingAction.setAttribute("title", "Открыть рейтинг");
+        elements.profileRatingAction.setAttribute("aria-label", "Открыть рейтинг. Рейтинг: " + playerRating);
     }
 }
 
@@ -12902,6 +13070,7 @@ function renderAll() {
     renderStartDuelModal();
     renderDuelExitModal();
     renderDuelResultModal();
+    renderLeaderboardModal();
     bindStaticActionHandlers();
     exposeGlobalActions();
 }
@@ -12943,6 +13112,10 @@ function exposeGlobalActions() {
         closeAugmentPicker: finalAction(closeAugmentPicker),
         selectAugment: finalAction(selectAugment),
         setShopSection: finalAction(setShopSection),
+        openLeaderboard: finalAction(openLeaderboard),
+        closeLeaderboard: finalAction(closeLeaderboard),
+        openMoneyDestination: finalAction(openMoneyDestination),
+        showLevelProgressHint: finalAction(showLevelProgressHint),
         viewFriendProfile: finalAction(viewFriendProfile),
         openFriendChat: finalAction(openFriendChat),
         openSocialInbox: finalAction(openSocialInbox),
@@ -12992,8 +13165,20 @@ function renderProfile() {
     const playerName = sanitizeVisibleText(state.player && state.player.name, sanitizeVisibleText(state.auth && state.auth.nickname, "Новый игрок")) || "Новый игрок";
     const playerMoney = Number(state.player && state.player.money || 0);
     const playerRating = Number(state.player && state.player.rating || 0);
+    const playerLevel = Math.max(1, Number(state.player && state.player.level || 1));
+    const progress = getProfileProgressSnapshot();
+    const progressTitle = "До следующего уровня: " + progress.remaining;
     if (elements.profileName) {
         elements.profileName.textContent = playerName;
+    }
+    if (elements.profileLevel) {
+        elements.profileLevel.textContent = String(playerLevel);
+    }
+    if (elements.profileLevelProgressFill) {
+        elements.profileLevelProgressFill.style.width = progress.percent + "%";
+    }
+    if (elements.profileLevelProgressText) {
+        elements.profileLevelProgressText.textContent = progress.current + " / " + progress.target;
     }
     if (elements.profileMoney) {
         elements.profileMoney.textContent = String(playerMoney);
@@ -13006,6 +13191,21 @@ function renderProfile() {
     }
     if (elements.profileAvatar) {
         elements.profileAvatar.textContent = playerName.slice(0, 1).toUpperCase();
+    }
+    if (elements.profileBadgeChip) {
+        elements.profileBadgeChip.textContent = getProfileBadgeLabel();
+    }
+    if (elements.profileLevelAction) {
+        elements.profileLevelAction.setAttribute("title", progressTitle);
+        elements.profileLevelAction.setAttribute("aria-label", progressTitle);
+    }
+    if (elements.profileMoneyAction) {
+        elements.profileMoneyAction.setAttribute("title", "Открыть магазин");
+        elements.profileMoneyAction.setAttribute("aria-label", "Открыть магазин. Монет: " + playerMoney);
+    }
+    if (elements.profileRatingAction) {
+        elements.profileRatingAction.setAttribute("title", "Открыть рейтинг");
+        elements.profileRatingAction.setAttribute("aria-label", "Открыть рейтинг. Рейтинг: " + playerRating);
     }
 }
 

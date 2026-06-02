@@ -4990,3 +4990,394 @@ body.social-open {
     }
 }
 
+/* Progression and profile polish */
+.profile-level-action,
+.profile-stat-button {
+    appearance: none;
+    -webkit-appearance: none;
+    border-style: solid;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+.profile-level-action:focus-visible,
+.profile-stat-button:focus-visible,
+.leaderboard-close:focus-visible {
+    outline: 2px solid rgba(143, 218, 240, 0.72);
+    outline-offset: 3px;
+}
+
+.panel-cover {
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+    gap: 14px !important;
+    height: 126px !important;
+    min-height: 126px !important;
+    padding: 15px 16px !important;
+    background-image:
+        linear-gradient(90deg, rgba(4, 7, 14, 0.94) 0%, rgba(8, 13, 25, 0.78) 45%, rgba(8, 13, 25, 0.36) 100%),
+        radial-gradient(circle at 80% 20%, rgba(216, 176, 123, 0.14), transparent 38%),
+        url("/duel/assets/universal-cover.svg") !important;
+}
+
+.avatar-card.profile-level-action {
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.profile-frame-ring {
+    position: absolute;
+    inset: 3px;
+    z-index: 1;
+    border-radius: 19px;
+    border: 1px solid rgba(216, 176, 123, 0.45);
+    box-shadow: inset 0 0 18px rgba(216, 176, 123, 0.16), 0 0 18px rgba(216, 176, 123, 0.08);
+    pointer-events: none;
+}
+
+.avatar-portrait {
+    position: relative !important;
+    z-index: 2;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 17px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.28) !important;
+}
+
+.profile-level-progress {
+    display: block !important;
+    position: absolute;
+    left: 8px;
+    right: 28px;
+    bottom: 7px;
+    z-index: 4;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+
+#profile-level-progress-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #8fdaf0, #d8b07b);
+    transition: width 180ms ease;
+}
+
+#profile-level-progress-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+}
+
+.profile-identity {
+    display: grid;
+    gap: 4px;
+}
+
+.profile-cover-header .panel-title {
+    font-size: 1.32rem !important;
+    letter-spacing: 0 !important;
+}
+
+.profile-badge-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.profile-badge-chip,
+.profile-frame-chip {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    max-width: 100%;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-badge-chip {
+    color: #f2d49b;
+    border: 1px solid rgba(216, 176, 123, 0.28);
+    background: rgba(216, 176, 123, 0.11);
+}
+
+.profile-frame-chip {
+    color: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(143, 218, 240, 0.18);
+    background: rgba(143, 218, 240, 0.08);
+}
+
+.profile-stat-button:hover,
+.profile-stat-button:active {
+    border-color: rgba(216, 176, 123, 0.42) !important;
+    box-shadow: 0 0 0 1px rgba(216, 176, 123, 0.12), 0 10px 22px rgba(0, 0, 0, 0.24) !important;
+}
+
+.profile-stat-button .stat-icon {
+    flex: 0 0 18px;
+}
+
+.leaderboard-sheet {
+    width: min(360px, calc(100vw - 24px));
+    max-height: min(620px, calc(100vh - 56px));
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(21, 29, 48, 0.98), rgba(8, 13, 24, 0.98)),
+        radial-gradient(circle at 80% 0%, rgba(216, 176, 123, 0.16), transparent 36%) !important;
+}
+
+.modal-kicker {
+    margin: 0 0 4px;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.leaderboard-close {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+    border-radius: 14px !important;
+    font-size: 1.05rem !important;
+}
+
+.leaderboard-list {
+    display: grid;
+    gap: 8px;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 30px 38px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 9px 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.leaderboard-row.is-current {
+    border-color: rgba(216, 176, 123, 0.38);
+    background: linear-gradient(180deg, rgba(216, 176, 123, 0.16), rgba(34, 25, 22, 0.72));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.leaderboard-rank {
+    color: #d8b07b;
+    font-size: 0.86rem;
+    font-weight: 900;
+    text-align: center;
+}
+
+.leaderboard-avatar {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    color: #f7e1b2;
+    font-weight: 900;
+    background: linear-gradient(145deg, rgba(33, 49, 73, 0.9), rgba(13, 18, 31, 0.96));
+    border: 1px solid rgba(216, 176, 123, 0.24);
+}
+
+.leaderboard-player {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+.leaderboard-player strong,
+.leaderboard-player small {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leaderboard-player strong {
+    color: #fff7ec;
+    font-size: 0.88rem;
+}
+
+.leaderboard-player small {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.68rem;
+    font-weight: 800;
+}
+
+.leaderboard-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #f2d49b;
+    font-size: 0.9rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.leaderboard-badge {
+    color: #d8b07b;
+    font-size: 0.82rem;
+}
+
+.leaderboard-empty {
+    display: grid;
+    gap: 6px;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.leaderboard-empty strong {
+    color: #fff7ec;
+}
+
+.leaderboard-empty span {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.shop-preview,
+.shop-card-visual,
+.inventory-empty-visual {
+    border: 1px solid rgba(216, 176, 123, 0.22) !important;
+    box-shadow: inset 0 0 18px rgba(216, 176, 123, 0.08), 0 10px 24px rgba(0, 0, 0, 0.14) !important;
+}
+
+.bottom-nav {
+    width: min(400px, calc(100% - 16px)) !important;
+    padding: 6px !important;
+    gap: 4px !important;
+    border-radius: 20px !important;
+}
+
+.nav-button {
+    min-height: 48px !important;
+    padding: 5px 4px !important;
+    border-radius: 14px !important;
+}
+
+.nav-title {
+    display: grid !important;
+    grid-template-rows: 24px auto;
+    place-items: center;
+    gap: 3px;
+    width: 100%;
+    height: auto;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.64rem !important;
+    font-weight: 800;
+    line-height: 1.08 !important;
+    letter-spacing: 0 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-title::before {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 10px !important;
+    font-size: 0.86rem !important;
+}
+
+[data-nav-target="home"] .nav-title::before { content: "⌂" !important; }
+[data-nav-target="inventory"] .nav-title::before { content: "▣" !important; }
+[data-nav-target="friends"] .nav-title::before { content: "∷" !important; }
+[data-nav-target="shop"] .nav-title::before { content: "¤" !important; }
+
+.nav-button.is-active {
+    border-color: rgba(216, 176, 123, 0.38) !important;
+    background: linear-gradient(180deg, rgba(216, 176, 123, 0.14), rgba(21, 26, 42, 0.78)) !important;
+}
+
+.nav-button.is-active .nav-title {
+    color: #f2d49b;
+}
+
+@media (max-width: 380px) {
+    .panel-cover {
+        grid-template-columns: 60px minmax(0, 1fr) !important;
+        gap: 12px !important;
+        height: 120px !important;
+        min-height: 120px !important;
+        padding: 14px !important;
+    }
+
+    .avatar-card {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .avatar-portrait {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    .profile-cover-header .panel-title {
+        font-size: 1.2rem !important;
+    }
+
+    .profile-side {
+        gap: 6px !important;
+    }
+
+    .stat-chip {
+        height: 27px !important;
+        min-height: 27px !important;
+        padding: 5px 8px !important;
+        gap: 6px !important;
+    }
+
+    .profile-frame-chip {
+        display: none;
+    }
+
+    .leaderboard-row {
+        grid-template-columns: 26px 36px minmax(0, 1fr) auto;
+        gap: 7px;
+        padding: 8px;
+    }
+
+    .nav-title {
+        font-size: 0.6rem !important;
+    }
+}
+
