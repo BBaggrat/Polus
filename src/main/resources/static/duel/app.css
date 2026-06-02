@@ -5381,3 +5381,541 @@ body.social-open {
     }
 }
 
+/* Main screen cohesion pass */
+:root {
+    --ui-screen-pad: 16px;
+    --ui-block-gap: 14px;
+    --ui-card-pad: 16px;
+    --ui-card-radius: 20px;
+    --ui-chip-radius: 999px;
+    --ui-text-main: #fff7ec;
+    --ui-text-muted: #94a3ba;
+    --ui-panel-line: rgba(255, 255, 255, 0.14);
+    --ui-panel-fill: rgba(15, 22, 38, 0.88);
+    --ui-brass-soft: rgba(216, 176, 123, 0.14);
+    --ui-ruby-soft: rgba(116, 43, 55, 0.54);
+}
+
+.app-shell {
+    padding: var(--ui-screen-pad) var(--ui-screen-pad) calc(112px + env(safe-area-inset-bottom)) !important;
+}
+
+#screen-home.is-active {
+    gap: var(--ui-block-gap) !important;
+}
+
+#screen-home > .panel,
+.bottom-nav {
+    width: 100% !important;
+}
+
+.player-panel {
+    gap: 12px !important;
+    padding: 14px !important;
+    border-radius: 22px !important;
+    background:
+        linear-gradient(180deg, rgba(31, 40, 62, 0.82), rgba(14, 20, 34, 0.9)),
+        rgba(9, 14, 27, 0.92) !important;
+}
+
+.panel-cover {
+    position: relative !important;
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 14px !important;
+    height: auto !important;
+    min-height: 146px !important;
+    padding: var(--ui-card-pad) !important;
+    border-radius: var(--ui-card-radius) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    overflow: hidden !important;
+    background-image:
+        linear-gradient(90deg, rgba(5, 9, 18, 0.92) 0%, rgba(10, 16, 29, 0.82) 54%, rgba(12, 18, 31, 0.62) 100%),
+        radial-gradient(circle at 82% 24%, rgba(216, 176, 123, 0.12), transparent 38%),
+        url("/duel/assets/universal-cover.svg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 32px rgba(0, 0, 0, 0.18) !important;
+}
+
+.panel-cover::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    display: block !important;
+    background:
+        linear-gradient(90deg, rgba(2, 5, 11, 0.52), rgba(2, 5, 11, 0.18) 54%, rgba(2, 5, 11, 0.06)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.16)) !important;
+    pointer-events: none !important;
+}
+
+.cover-glow,
+.cover-ridges {
+    opacity: 0.38 !important;
+}
+
+.avatar-card.profile-level-action {
+    width: 72px !important;
+    height: 72px !important;
+    align-self: center !important;
+    justify-self: start !important;
+    overflow: hidden !important;
+    border-radius: 20px !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    background:
+        linear-gradient(180deg, rgba(22, 34, 53, 0.78), rgba(7, 11, 20, 0.72)) !important;
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.24), 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.profile-frame-ring {
+    inset: 4px !important;
+    border-radius: 17px !important;
+    border-color: rgba(216, 176, 123, 0.38) !important;
+    box-shadow: inset 0 0 14px rgba(216, 176, 123, 0.12) !important;
+}
+
+.avatar-portrait {
+    width: 62px !important;
+    height: 62px !important;
+    border-radius: 17px !important;
+}
+
+.panel-cover .panel-header,
+.profile-cover-header {
+    grid-column: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    align-self: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+}
+
+.profile-identity {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 7px !important;
+    align-items: start !important;
+}
+
+.profile-cover-header .panel-kicker {
+    display: none !important;
+}
+
+.profile-cover-header .panel-title {
+    color: var(--ui-text-main) !important;
+    font-size: clamp(1.28rem, 5.2vw, 1.48rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.05 !important;
+    letter-spacing: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+.profile-status-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+}
+
+.profile-level-pill {
+    position: static !important;
+    min-width: 52px !important;
+    height: 24px !important;
+    padding: 0 9px !important;
+    border-radius: var(--ui-chip-radius) !important;
+    background: rgba(216, 176, 123, 0.12) !important;
+    border: 1px solid rgba(216, 176, 123, 0.28) !important;
+    color: #f2d49b !important;
+    box-shadow: none !important;
+}
+
+.profile-status-label {
+    min-width: 0;
+    color: var(--ui-text-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-identity .profile-level-progress {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 2 !important;
+    width: min(154px, 100%) !important;
+    height: 5px !important;
+    margin: -2px 0 0 !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: none !important;
+}
+
+.profile-side {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin: 0 !important;
+}
+
+.stat-chip {
+    height: 28px !important;
+    min-height: 28px !important;
+    min-width: 58px !important;
+    padding: 0 10px !important;
+    border-radius: var(--ui-chip-radius) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(10, 16, 29, 0.72) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px);
+}
+
+.stat-chip strong {
+    color: #e5c391 !important;
+    font-size: 0.94rem !important;
+}
+
+.profile-badge-row {
+    width: 100% !important;
+    gap: 6px !important;
+}
+
+.profile-badge-chip,
+.profile-frame-chip {
+    height: 22px !important;
+    padding: 0 9px !important;
+    border-radius: var(--ui-chip-radius) !important;
+    font-size: 0.62rem !important;
+    font-weight: 800 !important;
+    opacity: 0.9;
+}
+
+.profile-frame-chip {
+    color: rgba(209, 222, 239, 0.72) !important;
+    background: rgba(143, 218, 240, 0.07) !important;
+}
+
+#find-match-button {
+    width: 100% !important;
+    min-height: 52px !important;
+    border-radius: 17px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 18px !important;
+    color: #fff6ed !important;
+    font-weight: 850 !important;
+    text-align: center !important;
+    background:
+        linear-gradient(180deg, rgba(151, 70, 60, 0.92), rgba(103, 38, 50, 0.9)),
+        radial-gradient(circle at 50% 0%, rgba(216, 176, 123, 0.18), transparent 60%) !important;
+    border: 1px solid rgba(216, 176, 123, 0.18) !important;
+    box-shadow: 0 12px 26px rgba(79, 24, 34, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+#find-match-button:hover {
+    background:
+        linear-gradient(180deg, rgba(164, 78, 66, 0.94), rgba(111, 43, 53, 0.92)),
+        radial-gradient(circle at 50% 0%, rgba(216, 176, 123, 0.2), transparent 60%) !important;
+}
+
+#find-match-button:active {
+    transform: translateY(1px) scale(0.995) !important;
+    box-shadow: 0 8px 18px rgba(79, 24, 34, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+#find-match-button:disabled {
+    cursor: not-allowed !important;
+    color: rgba(255, 255, 255, 0.48) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+}
+
+.journal-panel {
+    max-height: none !important;
+    min-height: 260px !important;
+    margin-top: 0 !important;
+    padding: var(--ui-card-pad) !important;
+    border-radius: 22px !important;
+}
+
+.journal-panel-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+    gap: 12px !important;
+    margin: 0 0 12px !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.journal-header-copy {
+    min-width: 0 !important;
+    display: grid !important;
+    justify-content: start !important;
+    gap: 8px !important;
+}
+
+.journal-panel .panel-title-small {
+    font-size: 1.28rem !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+}
+
+.journal-zone-row {
+    width: max-content !important;
+    max-width: 100% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 3px !important;
+    border-radius: var(--ui-chip-radius) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+}
+
+.journal-zone-label,
+.journal-zone-row .badge {
+    height: 24px !important;
+    min-height: 24px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: var(--ui-chip-radius) !important;
+    padding: 0 9px !important;
+    font-size: 0.68rem !important;
+    font-weight: 850 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+.journal-zone-label {
+    color: var(--ui-text-muted) !important;
+    background: transparent !important;
+}
+
+.journal-zone-row .badge {
+    color: #e5c391 !important;
+    border: 1px solid rgba(216, 176, 123, 0.22) !important;
+    background: rgba(216, 176, 123, 0.12) !important;
+}
+
+.journal-panel-header .social-chat-fab {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    min-width: 74px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    border-radius: var(--ui-chip-radius) !important;
+    border: 1px solid rgba(143, 218, 240, 0.16) !important;
+    color: rgba(232, 242, 255, 0.88) !important;
+    background: rgba(143, 218, 240, 0.07) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.journal-panel-header .social-chat-fab-badge {
+    position: static !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    padding: 0 5px !important;
+    border-radius: 999px !important;
+    background: rgba(216, 176, 123, 0.18) !important;
+    color: #f2d49b !important;
+    font-size: 0.65rem !important;
+}
+
+.journal-panel .journal-list {
+    max-height: clamp(220px, calc(100dvh - 438px), 520px) !important;
+    gap: 10px !important;
+    padding-right: 2px !important;
+}
+
+.journal-entry {
+    display: grid !important;
+    grid-template-columns: 16px minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    box-shadow: none !important;
+}
+
+.journal-entry .entry-icon {
+    width: 10px !important;
+    height: 10px !important;
+    margin-top: 0.42em !important;
+    border-radius: 999px !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    color: transparent !important;
+    background: linear-gradient(180deg, rgba(216, 176, 123, 0.92), rgba(143, 218, 240, 0.82)) !important;
+    box-shadow: 0 0 0 3px rgba(216, 176, 123, 0.09) !important;
+}
+
+.journal-entry .entry-body,
+.journal-entry .entry-body p {
+    min-width: 0 !important;
+}
+
+.journal-entry .entry-body p {
+    color: rgba(255, 247, 236, 0.9) !important;
+    font-size: 0.86rem !important;
+    line-height: 1.42 !important;
+}
+
+.journal-entry small {
+    display: block !important;
+    margin-top: 5px !important;
+    color: rgba(148, 163, 186, 0.8) !important;
+    font-size: 0.68rem !important;
+    line-height: 1.25 !important;
+}
+
+.bottom-nav {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(400px, calc(100vw - 32px)) !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 6px !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(8, 13, 24, 0.92) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(18px) !important;
+}
+
+.nav-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    padding: 5px 2px !important;
+    border-radius: 14px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+}
+
+.nav-title {
+    grid-template-rows: 23px auto !important;
+    gap: 3px !important;
+    color: rgba(209, 222, 239, 0.64) !important;
+    font-size: 0.62rem !important;
+}
+
+.nav-title::before {
+    width: 23px !important;
+    height: 23px !important;
+    border-radius: 9px !important;
+    color: rgba(143, 218, 240, 0.76) !important;
+    background: rgba(143, 218, 240, 0.07) !important;
+    border-color: rgba(143, 218, 240, 0.12) !important;
+    box-shadow: none !important;
+}
+
+.nav-button.is-active {
+    border-color: rgba(216, 176, 123, 0.2) !important;
+    background: rgba(216, 176, 123, 0.1) !important;
+}
+
+.nav-button.is-active .nav-title {
+    color: #f2d49b !important;
+}
+
+.nav-button.is-active .nav-title::before {
+    color: #f2d49b !important;
+    background: rgba(216, 176, 123, 0.14) !important;
+    border-color: rgba(216, 176, 123, 0.22) !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 340px) {
+    .app-shell {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .player-panel,
+    .journal-panel {
+        padding: 12px !important;
+    }
+
+    .panel-cover {
+        grid-template-columns: 60px minmax(0, 1fr) !important;
+        min-height: 138px !important;
+        gap: 12px !important;
+        padding: 14px !important;
+    }
+
+    .avatar-card.profile-level-action {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .avatar-portrait {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    .profile-cover-header .panel-title {
+        font-size: 1.12rem !important;
+    }
+
+    .profile-status-label {
+        display: none !important;
+    }
+
+    .profile-badge-chip,
+    .profile-frame-chip {
+        max-width: 78px !important;
+    }
+
+    .stat-chip {
+        min-width: 52px !important;
+        padding: 0 8px !important;
+    }
+
+    .journal-panel-header {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        gap: 8px !important;
+    }
+
+    .journal-panel-header .social-chat-fab {
+        min-width: 64px !important;
+        padding-inline: 8px !important;
+    }
+
+    .bottom-nav {
+        width: calc(100vw - 32px) !important;
+        gap: 3px !important;
+    }
+
+    .nav-title {
+        font-size: 0.58rem !important;
+    }
+}
+

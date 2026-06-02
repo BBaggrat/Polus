@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260602-2">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260602-3">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -18,34 +18,37 @@
                 <button class="avatar-card profile-level-action" id="profile-level-action" type="button" aria-label="Показать прогресс уровня" title="Прогресс уровня">
                     <span class="profile-frame-ring" aria-hidden="true"></span>
                     <div class="avatar-portrait" id="profile-avatar">И</div>
-                    <span class="avatar-level-badge" aria-label="Уровень">
-                        <span class="avatar-level-label">LVL</span>
-                        <span id="profile-level">1</span>
-                    </span>
-                    <span class="profile-level-progress" aria-hidden="true">
-                        <span id="profile-level-progress-fill"></span>
-                        <span id="profile-level-progress-text">0 / 100</span>
-                    </span>
                 </button>
 
                 <div class="panel-header profile-cover-header">
                     <div class="profile-identity">
                         <p class="panel-kicker">Профиль</p>
                         <h1 class="panel-title" id="profile-name">Новый игрок</h1>
+                        <div class="profile-status-row">
+                            <span class="avatar-level-badge profile-level-pill" aria-label="Уровень">
+                                <span class="avatar-level-label">LVL</span>
+                                <span id="profile-level">1</span>
+                            </span>
+                            <span class="profile-status-label">Боевой профиль</span>
+                        </div>
+                        <span class="profile-level-progress" aria-hidden="true">
+                            <span id="profile-level-progress-fill"></span>
+                            <span id="profile-level-progress-text">0 / 100</span>
+                        </span>
+                        <div class="profile-side">
+                            <button class="stat-chip stat-chip-accent profile-stat-button" id="profile-money-action" type="button" aria-label="Открыть магазин" title="Монеты тратятся в магазине">
+                                <span class="stat-icon stat-icon-coins" aria-label="Монеты" title="Монеты"></span>
+                                <strong id="profile-money">0</strong>
+                            </button>
+                            <button class="stat-chip profile-stat-button" id="profile-rating-action" type="button" aria-label="Открыть рейтинг" title="Открыть рейтинг">
+                                <span class="stat-icon stat-icon-rating" aria-label="Рейтинг" title="Рейтинг"></span>
+                                <strong id="profile-rating">0</strong>
+                            </button>
+                        </div>
                         <div class="profile-badge-row" aria-label="Персонализация профиля">
                             <span class="profile-badge-chip" id="profile-badge-chip">Новичок</span>
                             <span class="profile-frame-chip">Рамка</span>
                         </div>
-                    </div>
-                    <div class="profile-side">
-                        <button class="stat-chip stat-chip-accent profile-stat-button" id="profile-money-action" type="button" aria-label="Открыть магазин" title="Монеты тратятся в магазине">
-                            <span class="stat-icon stat-icon-coins" aria-label="Монеты" title="Монеты"></span>
-                            <strong id="profile-money">0</strong>
-                        </button>
-                        <button class="stat-chip profile-stat-button" id="profile-rating-action" type="button" aria-label="Открыть рейтинг" title="Открыть рейтинг">
-                            <span class="stat-icon stat-icon-rating" aria-label="Рейтинг" title="Рейтинг"></span>
-                            <strong id="profile-rating">0</strong>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -80,7 +83,7 @@
             <div id="quest-pocket-count" class="hidden"></div>
         </article>
         <section class="panel journal-panel" id="home-journal-panel">
-            <div class="panel-header">
+            <div class="panel-header journal-panel-header">
                 <div class="journal-header-copy">
                     <h2 class="panel-title panel-title-small">Дневник</h2>
                     <div class="journal-zone-row">
@@ -88,6 +91,10 @@
                         <span class="badge badge-muted" id="journal-zone">Город</span>
                     </div>
                 </div>
+                <button class="social-chat-fab journal-chat-chip" id="social-chat-fab" type="button" onclick="window.PolusApp && window.PolusApp.openSocialInbox()">
+                    <span class="social-chat-fab-label">Чаты</span>
+                    <span class="social-chat-fab-badge hidden" id="social-chat-fab-badge">0</span>
+                </button>
             </div>
             <div class="journal-list" id="journal-list"></div>
         </section>
@@ -156,10 +163,6 @@
         </button>
     </nav>
 
-    <button class="social-chat-fab" id="social-chat-fab" type="button" onclick="window.PolusApp && window.PolusApp.openSocialInbox()">
-        <span class="social-chat-fab-label">Чаты</span>
-        <span class="social-chat-fab-badge hidden" id="social-chat-fab-badge">0</span>
-    </button>
 </main>
 
 <section class="social-chat-panel hidden" id="social-chat-panel" aria-hidden="true">
@@ -462,7 +465,7 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260602-2"></script>
+<script src="/duel/app.js?v=polus-20260602-3"></script>
 </body>
 </html>
 
