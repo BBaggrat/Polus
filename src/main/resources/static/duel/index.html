@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260601-7">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260602-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -113,7 +113,7 @@
             </div>
             <form class="friend-search-form" id="friend-search-form">
                 <input class="text-input" id="friend-search-input" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Найти игрока по никнейму">
-                <button class="primary-button" type="submit">Добавить</button>
+                <button class="primary-button social-icon-button friend-search-submit" type="submit" aria-label="Добавить друга" title="Добавить друга">+</button>
             </form>
             <section class="friend-request-panel" id="friend-request-panel"></section>
             <div class="friend-list" id="friend-list"></div>
@@ -171,6 +171,28 @@
                 <h4 class="social-chat-thread-title" id="social-chat-thread-title">Выбери чат</h4>
             </div>
             <div class="social-chat-messages" id="social-chat-messages"></div>
+            <div class="social-chat-selection-bar hidden" id="social-chat-selection-bar" aria-live="polite">
+                <span class="social-chat-selection-label" id="social-chat-selection-label">Сообщение выбрано</span>
+                <button class="secondary-button social-chat-action" id="social-chat-selection-copy" type="button" aria-label="Скопировать выбранное сообщение" title="Скопировать">
+                    <span aria-hidden="true">⧉</span>
+                    <span>Скопировать</span>
+                </button>
+                <button class="secondary-button social-chat-action" id="social-chat-selection-reply" type="button" aria-label="Ответить на выбранное сообщение" title="Ответить">
+                    <span aria-hidden="true">↩</span>
+                    <span>Ответить</span>
+                </button>
+                <button class="secondary-button social-chat-action social-chat-action-icon" id="social-chat-selection-cancel" type="button" aria-label="Отменить выбор сообщения" title="Отмена">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Отмена</span>
+                </button>
+            </div>
+            <div class="social-chat-reply-preview hidden" id="social-chat-reply-preview">
+                <div class="social-chat-reply-copy">
+                    <span id="social-chat-reply-title">Ответ</span>
+                    <p id="social-chat-reply-text"></p>
+                </div>
+                <button class="secondary-button social-chat-action-icon" id="social-chat-reply-cancel" type="button" aria-label="Убрать ответ" title="Убрать ответ">×</button>
+            </div>
             <form class="social-chat-form" id="social-chat-form">
                 <input class="text-input social-chat-input" id="social-chat-input" type="text" maxlength="280" placeholder="Напиши сообщение">
                 <button class="primary-button social-chat-send" id="social-chat-send" type="submit">Отправить</button>
@@ -423,7 +445,7 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260601-7"></script>
+<script src="/duel/app.js?v=polus-20260602-1"></script>
 </body>
 </html>
 

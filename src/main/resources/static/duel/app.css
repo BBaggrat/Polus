@@ -4662,3 +4662,331 @@ body.social-open {
     }
 }
 
+/* Social screens compact UX refresh */
+#screen-friends,
+.friend-list,
+.friend-request-panel,
+.friend-request-stack,
+.social-chat-panel,
+.social-chat-layout,
+.social-chat-thread-view {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+.friend-search-form {
+    grid-template-columns: minmax(0, 1fr) 44px !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+}
+
+.friend-search-form .text-input {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.friend-search-form .friend-search-submit,
+.friend-search-form .primary-button.friend-search-submit {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border-radius: 15px !important;
+    font-size: 0 !important;
+}
+
+.friend-search-form .friend-search-submit::before {
+    content: "+" !important;
+    display: grid;
+    place-items: center;
+    font-size: 1.35rem !important;
+    line-height: 1 !important;
+    font-weight: 900;
+}
+
+.social-icon-button {
+    display: inline-grid !important;
+    place-items: center !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+.friend-card {
+    padding: 10px !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: linear-gradient(180deg, rgba(21, 28, 45, 0.96), rgba(10, 15, 28, 0.96)) !important;
+    overflow: hidden !important;
+}
+
+.friend-card-row {
+    grid-template-columns: 42px minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    min-height: 62px !important;
+}
+
+.friend-avatar,
+.thread-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 14px !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.22) !important;
+}
+
+.friend-main {
+    min-width: 0 !important;
+}
+
+.friend-card h3 {
+    max-width: 100% !important;
+    margin: 0 0 6px !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    font-size: 0.98rem !important;
+    line-height: 1.15 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.friend-status-row {
+    gap: 5px !important;
+    min-width: 0 !important;
+}
+
+.friend-status-row .status-chip,
+.friend-status-row .timer-chip {
+    min-height: 24px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    font-size: 0.68rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.friend-actions-inline {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+}
+
+.friend-actions-inline .icon-button {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    border-radius: 13px !important;
+    padding: 0 !important;
+}
+
+.friend-card-empty {
+    display: grid !important;
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.friend-card-empty p {
+    min-width: 0 !important;
+    margin: 0 !important;
+    overflow-wrap: anywhere !important;
+}
+
+.social-chat-thread-view {
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto !important;
+    gap: 8px !important;
+    padding: 10px !important;
+}
+
+.social-chat-messages {
+    gap: 8px !important;
+    padding: 4px !important;
+}
+
+.social-chat-message {
+    min-width: 0 !important;
+    padding: 2px !important;
+    border-radius: 18px !important;
+    cursor: pointer;
+    outline: none;
+}
+
+.social-chat-message:focus-visible .social-chat-message-bubble,
+.social-chat-message.is-selected .social-chat-message-bubble {
+    border-color: rgba(216, 176, 123, 0.52) !important;
+    background: linear-gradient(180deg, rgba(54, 43, 36, 0.96), rgba(26, 23, 32, 0.96)) !important;
+    box-shadow: 0 0 0 1px rgba(216, 176, 123, 0.18), 0 10px 22px rgba(0, 0, 0, 0.24) !important;
+}
+
+.social-chat-message-bubble {
+    max-width: min(88%, 300px) !important;
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+}
+
+.social-chat-selection-bar,
+.social-chat-reply-preview {
+    min-width: 0 !important;
+    border: 1px solid rgba(216, 176, 123, 0.2) !important;
+    background: rgba(12, 17, 30, 0.96) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.social-chat-selection-bar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto 34px !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px !important;
+    border-radius: 15px !important;
+}
+
+.social-chat-selection-bar.hidden,
+.social-chat-reply-preview.hidden {
+    display: none !important;
+}
+
+.social-chat-selection-label {
+    min-width: 0 !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.social-chat-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.72rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.social-chat-action-icon {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    padding: 0 !important;
+}
+
+.social-chat-reply-preview {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 32px !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 7px 8px !important;
+    border-radius: 15px !important;
+}
+
+.social-chat-reply-copy {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 3px !important;
+}
+
+.social-chat-reply-copy span {
+    color: #d8b07b !important;
+    font-size: 0.68rem !important;
+    font-weight: 900 !important;
+}
+
+.social-chat-reply-copy p {
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: rgba(255, 255, 255, 0.78) !important;
+    font-size: 0.74rem !important;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.social-chat-form {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+.social-chat-input {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+.social-chat-send {
+    flex: 0 0 78px !important;
+    width: 78px !important;
+    min-width: 78px !important;
+    max-width: 78px !important;
+    padding-inline: 8px !important;
+}
+
+@media (max-width: 380px) {
+    .friend-card-row {
+        grid-template-columns: 40px minmax(0, 1fr) auto !important;
+        gap: 8px !important;
+    }
+
+    .friend-avatar,
+    .thread-avatar {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .friend-actions-inline {
+        grid-column: auto !important;
+        justify-self: end !important;
+    }
+
+    .friend-actions-inline .icon-button {
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+    }
+
+    .friend-status-row .timer-chip {
+        max-width: 86px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .social-chat-selection-bar {
+        grid-template-columns: minmax(0, 1fr) 32px 32px 32px !important;
+    }
+
+    .social-chat-action {
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        padding: 0 !important;
+    }
+
+    .social-chat-action span:not([aria-hidden="true"]):not(.sr-only) {
+        display: none !important;
+    }
+}
+

@@ -297,6 +297,7 @@
     let toastTimer = null;
     let liveSyncPending = false;
     let friendSyncPending = false;
+    let socialLongPressTimer = null;
     const RUBLE_SIGN = "\u20BD";
     const DUEL_DEFAULT_NOTE = "РџРѕРїР°РґР°РЅРёРµ РїСЂРѕС…РѕРґРёС‚, РµСЃР»Рё Р»РёРЅРёСЏ РІС‹СЃС‚СЂРµР»Р° СЃРѕРІРїР°Р»Р° СЃ Р»РёРЅРёРµР№ СѓРІРѕСЂРѕС‚Р° СЃРѕРїРµСЂРЅРёРєР°.";
 
@@ -372,6 +373,15 @@
         elements.socialChatThreadList = document.getElementById("social-chat-thread-list");
         elements.socialChatThreadTitle = document.getElementById("social-chat-thread-title");
         elements.socialChatMessages = document.getElementById("social-chat-messages");
+        elements.socialChatSelectionBar = document.getElementById("social-chat-selection-bar");
+        elements.socialChatSelectionLabel = document.getElementById("social-chat-selection-label");
+        elements.socialChatSelectionCopy = document.getElementById("social-chat-selection-copy");
+        elements.socialChatSelectionReply = document.getElementById("social-chat-selection-reply");
+        elements.socialChatSelectionCancel = document.getElementById("social-chat-selection-cancel");
+        elements.socialChatReplyPreview = document.getElementById("social-chat-reply-preview");
+        elements.socialChatReplyTitle = document.getElementById("social-chat-reply-title");
+        elements.socialChatReplyText = document.getElementById("social-chat-reply-text");
+        elements.socialChatReplyCancel = document.getElementById("social-chat-reply-cancel");
         elements.socialChatForm = document.getElementById("social-chat-form");
         elements.socialChatInput = document.getElementById("social-chat-input");
         elements.socialChatSend = document.getElementById("social-chat-send");
@@ -443,6 +453,10 @@
     function bindEvents() {
         document.addEventListener("click", onDocumentClick);
         document.addEventListener("submit", onDocumentSubmit);
+        document.addEventListener("keydown", onDocumentKeyDown);
+        document.addEventListener("pointerdown", onDocumentPointerDown);
+        document.addEventListener("pointerup", clearSocialLongPressTimer);
+        document.addEventListener("pointercancel", clearSocialLongPressTimer);
     }
 
     function stripInlineButtonActions() {
@@ -1041,6 +1055,12 @@
     }
 
     function onDocumentClick(event) {
+        const messageTarget = event.target && event.target.closest ? event.target.closest("[data-social-message-key]") : null;
+        if (messageTarget && elements.socialChatMessages && elements.socialChatMessages.contains(messageTarget)) {
+            selectSocialChatMessage(messageTarget.getAttribute("data-social-message-key"));
+            return;
+        }
+
         const target = event.target.closest("button");
         if (!target) {
             return;
@@ -1063,6 +1083,26 @@
 
         if (target.id === "social-chat-close") {
             closeSocialInbox();
+            return;
+        }
+
+        if (target.id === "social-chat-selection-copy") {
+            copySelectedSocialMessage();
+            return;
+        }
+
+        if (target.id === "social-chat-selection-reply") {
+            replyToSelectedSocialMessage();
+            return;
+        }
+
+        if (target.id === "social-chat-selection-cancel") {
+            cancelSocialMessageSelection();
+            return;
+        }
+
+        if (target.id === "social-chat-reply-cancel") {
+            cancelSocialReply();
             return;
         }
 
@@ -1199,6 +1239,39 @@
         if (target.hasAttribute("data-shop-id")) {
             buyShopItem(target.getAttribute("data-shop-id"));
         }
+    }
+
+    function onDocumentKeyDown(event) {
+        const messageTarget = event.target && event.target.closest ? event.target.closest("[data-social-message-key]") : null;
+        if (messageTarget && elements.socialChatMessages && elements.socialChatMessages.contains(messageTarget) && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            selectSocialChatMessage(messageTarget.getAttribute("data-social-message-key"));
+            return;
+        }
+        if (event.key === "Escape" && state.social && state.social.selectedMessageKey) {
+            cancelSocialMessageSelection();
+        }
+    }
+
+    function onDocumentPointerDown(event) {
+        const messageTarget = event.target && event.target.closest ? event.target.closest("[data-social-message-key]") : null;
+        clearSocialLongPressTimer();
+        if (!messageTarget || !elements.socialChatMessages || !elements.socialChatMessages.contains(messageTarget)) {
+            return;
+        }
+        const messageKey = messageTarget.getAttribute("data-social-message-key");
+        socialLongPressTimer = window.setTimeout(function () {
+            socialLongPressTimer = null;
+            selectSocialChatMessage(messageKey);
+        }, 420);
+    }
+
+    function clearSocialLongPressTimer() {
+        if (!socialLongPressTimer) {
+            return;
+        }
+        window.clearTimeout(socialLongPressTimer);
+        socialLongPressTimer = null;
     }
 
     function onDocumentSubmit(event) {
@@ -2299,6 +2372,9 @@
             return;
         }
         const thread = ensureSocialThread(friend);
+        if (state.social.activeThreadId !== thread.id) {
+            resetSocialChatDrafts();
+        }
         state.social.isOpen = true;
         state.social.activeThreadId = thread.id;
         saveState();
@@ -2307,11 +2383,15 @@
 
     function openSocialInbox(threadId) {
         state.social = state.social || {};
+        const previousThreadId = state.social.activeThreadId;
         state.social.isOpen = true;
         if (threadId) {
             state.social.activeThreadId = threadId;
         } else if (!state.social.activeThreadId && Array.isArray(state.social.threads) && state.social.threads.length) {
             state.social.activeThreadId = state.social.threads[0].id;
+        }
+        if (state.social.activeThreadId !== previousThreadId) {
+            resetSocialChatDrafts();
         }
         saveState();
         renderSocialInbox();
@@ -2322,6 +2402,7 @@
             return;
         }
         state.social.isOpen = false;
+        resetSocialChatDrafts();
         saveState();
         renderSocialInbox();
     }
@@ -3732,6 +3813,8 @@
             createdAt: Date.now()
         });
         elements.socialChatInput.value = "";
+        state.social.selectedMessageKey = null;
+        state.social.replyDraft = null;
         saveState();
         renderSocialInbox();
     }
@@ -11565,7 +11648,11 @@ function repairStateAfterLegacyLoad() {
     state.ui = Object.assign({ screen: "home", shopSection: "weapon", journalLocation: "street" }, state.ui || {});
     state.matchmaking = Object.assign({ status: "IDLE", duelId: null, queuedAt: null, message: "" }, state.matchmaking || {});
     state.inventory = Object.assign({ unlockedAugments: [] }, state.inventory || {});
-    state.social = Object.assign({ isOpen: false, threads: [], activeThreadId: null }, state.social || {});
+    state.social = Object.assign({ isOpen: false, threads: [], activeThreadId: null, selectedMessageKey: null, replyDraft: null }, state.social || {});
+    state.social.threads = Array.isArray(state.social.threads) ? state.social.threads : [];
+    if (state.social.replyDraft && state.social.replyDraft.threadId !== state.social.activeThreadId) {
+        state.social.replyDraft = null;
+    }
     state.world = Object.assign({ lastJournalEventAt: 0, journalHistory: {} }, state.world || {});
     state.friendRequests = Array.isArray(state.friendRequests) ? state.friendRequests : [];
     state.friends = Array.isArray(state.friends) ? state.friends : [];
@@ -11717,7 +11804,7 @@ function refreshStaticCopy() {
     setText("#screen-inventory .panel-title", "Доступные аугментации");
     setText("#screen-friends .panel-title", "Друзья");
     setText("#screen-shop .panel-title", "Магазин");
-    setText("#friend-search-form button[type='submit']", "Поиск");
+    setText("#friend-search-form button[type='submit']", "+");
     setText('#shop-tabs [data-shop-section="weapon"]', "Оружейная");
     setText('#shop-tabs [data-shop-section="defense"]', "Защитная");
     setText(".social-chat-fab-label", "Чаты");
@@ -11760,8 +11847,8 @@ function refreshStaticCopy() {
     });
     const friendSearchButton = document.querySelector("#friend-search-form button[type='submit']");
     if (friendSearchButton) {
-        friendSearchButton.setAttribute("aria-label", "Найти игрока");
-        friendSearchButton.setAttribute("title", "Найти игрока");
+        friendSearchButton.setAttribute("aria-label", "Добавить друга");
+        friendSearchButton.setAttribute("title", "Добавить друга");
     }
     document.querySelectorAll("[data-nav-target]").forEach(function (button) {
         const target = button.getAttribute("data-nav-target");
@@ -13116,6 +13203,191 @@ function friendStatusLabel(status) {
     return "Оффлайн";
 }
 
+function resetSocialChatDrafts() {
+    state.social = state.social || {};
+    state.social.selectedMessageKey = null;
+    state.social.replyDraft = null;
+}
+
+function getActiveSocialThread() {
+    if (!state.social || !Array.isArray(state.social.threads)) {
+        return null;
+    }
+    return state.social.threads.find(function (thread) {
+        return thread.id === state.social.activeThreadId;
+    }) || null;
+}
+
+function getSocialMessageKey(message, index) {
+    if (message && message.id) {
+        return String(message.id);
+    }
+    return ["social-message", message && message.author ? message.author : "unknown", message && message.createdAt ? message.createdAt : "time", index].join("-");
+}
+
+function getSocialMessageByKey(thread, messageKey) {
+    if (!thread || !messageKey) {
+        return null;
+    }
+    const messages = Array.isArray(thread.messages) ? thread.messages : [];
+    for (let index = 0; index < messages.length; index += 1) {
+        const message = messages[index];
+        const key = getSocialMessageKey(message, index);
+        if (key !== messageKey) {
+            continue;
+        }
+        const own = message.author === "you";
+        const authorName = own ? sanitizeVisibleText(state.player && state.player.name, "Ты") : sanitizeVisibleText(thread.friendName, "Друг");
+        return {
+            key: key,
+            own: own,
+            authorName: authorName,
+            text: sanitizeVisibleText(message.text, "Сообщение скрыто."),
+            createdAt: message.createdAt || Date.now()
+        };
+    }
+    return null;
+}
+
+function truncateSocialMessageText(text, limit) {
+    const normalized = sanitizeVisibleText(text, "");
+    const max = Number(limit) || 72;
+    return normalized.length > max ? normalized.slice(0, max - 1).trim() + "…" : normalized;
+}
+
+function selectSocialChatMessage(messageKey) {
+    state.social = state.social || {};
+    const selected = getSocialMessageByKey(getActiveSocialThread(), messageKey);
+    if (!selected) {
+        state.social.selectedMessageKey = null;
+        renderSocialInbox();
+        return;
+    }
+    state.social.selectedMessageKey = selected.key;
+    renderSocialInbox();
+}
+
+function cancelSocialMessageSelection() {
+    if (!state.social) {
+        return;
+    }
+    state.social.selectedMessageKey = null;
+    renderSocialInbox();
+}
+
+function cancelSocialReply() {
+    if (!state.social) {
+        return;
+    }
+    state.social.replyDraft = null;
+    renderSocialInbox();
+    if (elements.socialChatInput && !elements.socialChatInput.disabled) {
+        elements.socialChatInput.focus();
+    }
+}
+
+function copyTextToClipboard(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+        if (!document.body) {
+            reject(new Error("Clipboard fallback is unavailable."));
+            return;
+        }
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "readonly");
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        try {
+            if (document.execCommand("copy")) {
+                resolve();
+            } else {
+                reject(new Error("Copy command failed."));
+            }
+        } catch (error) {
+            reject(error);
+        } finally {
+            document.body.removeChild(area);
+        }
+    });
+}
+
+function copySelectedSocialMessage() {
+    const selected = getSocialMessageByKey(getActiveSocialThread(), state.social && state.social.selectedMessageKey);
+    if (!selected) {
+        cancelSocialMessageSelection();
+        return;
+    }
+    copyTextToClipboard(selected.text).then(function () {
+        showToast("Сообщение скопировано.");
+        cancelSocialMessageSelection();
+    }).catch(function () {
+        showToast("Не удалось скопировать сообщение.");
+    });
+}
+
+function replyToSelectedSocialMessage() {
+    const activeThread = getActiveSocialThread();
+    const selected = getSocialMessageByKey(activeThread, state.social && state.social.selectedMessageKey);
+    if (!activeThread || !selected) {
+        cancelSocialMessageSelection();
+        return;
+    }
+    state.social.replyDraft = {
+        threadId: activeThread.id,
+        messageKey: selected.key,
+        authorName: selected.authorName,
+        text: selected.text
+    };
+    state.social.selectedMessageKey = null;
+    renderSocialInbox();
+    if (elements.socialChatInput && !elements.socialChatInput.disabled) {
+        elements.socialChatInput.focus();
+    }
+}
+
+function renderSocialChatActions(activeThread) {
+    state.social = state.social || {};
+    const selected = getSocialMessageByKey(activeThread, state.social.selectedMessageKey);
+    const hasSelection = Boolean(selected);
+    if (!hasSelection) {
+        state.social.selectedMessageKey = null;
+    }
+    if (elements.socialChatSelectionBar) {
+        elements.socialChatSelectionBar.classList.toggle("hidden", !hasSelection);
+    }
+    if (elements.socialChatSelectionLabel) {
+        elements.socialChatSelectionLabel.textContent = hasSelection
+            ? "Выбрано: " + selected.authorName
+            : "Сообщение выбрано";
+    }
+    [elements.socialChatSelectionCopy, elements.socialChatSelectionReply, elements.socialChatSelectionCancel].forEach(function (button) {
+        if (button) {
+            button.disabled = !hasSelection;
+        }
+    });
+
+    let replyDraft = state.social.replyDraft || null;
+    if (replyDraft && (!activeThread || replyDraft.threadId !== activeThread.id)) {
+        replyDraft = null;
+        state.social.replyDraft = null;
+    }
+    if (elements.socialChatReplyPreview) {
+        elements.socialChatReplyPreview.classList.toggle("hidden", !replyDraft);
+    }
+    if (elements.socialChatReplyTitle) {
+        elements.socialChatReplyTitle.textContent = replyDraft ? "Ответ: " + sanitizeVisibleText(replyDraft.authorName, "Сообщение") : "Ответ";
+    }
+    if (elements.socialChatReplyText) {
+        elements.socialChatReplyText.textContent = replyDraft ? truncateSocialMessageText(replyDraft.text, 96) : "";
+    }
+}
+
 function renderFriendRow(friend, mode) {
     const friendName = sanitizeVisibleText(friend.name, "Игрок");
     const status = friend.status || "offline";
@@ -13123,8 +13395,8 @@ function renderFriendRow(friend, mode) {
     const id = escapeHtml(friend.id);
     const statusClass = status === "online" ? "is-online" : status === "busy" ? "is-busy" : status === "invited" ? "is-invited" : "is-offline";
     const actions = mode === "request"
-        ? '<div class="friend-actions friend-actions-inline"><button class="primary-button compact-button" type="button" data-request-accept-id="' + id + '">Принять</button><button class="secondary-button icon-button" type="button" data-request-reject-id="' + id + '" aria-label="Отклонить">×</button></div>'
-        : '<div class="friend-actions friend-actions-inline"><button class="secondary-button icon-button" data-friend-chat-id="' + id + '" type="button" aria-label="Чат">></button><button class="secondary-button compact-button" data-friend-profile-id="' + id + '" type="button">Профиль</button></div>';
+        ? '<div class="friend-actions friend-actions-inline"><button class="primary-button icon-button social-icon-button" type="button" data-request-accept-id="' + id + '" aria-label="Принять приглашение" title="Принять">✓</button><button class="secondary-button icon-button social-icon-button" type="button" data-request-reject-id="' + id + '" aria-label="Отклонить приглашение" title="Отклонить">×</button></div>'
+        : '<div class="friend-actions friend-actions-inline"><button class="secondary-button icon-button social-icon-button" data-friend-chat-id="' + id + '" type="button" aria-label="Открыть чат" title="Чат">↗</button><button class="secondary-button icon-button social-icon-button" data-friend-profile-id="' + id + '" type="button" aria-label="Открыть профиль" title="Профиль">i</button></div>';
     return '<article class="friend-card friend-card-row">'
         + '<div class="friend-avatar" aria-hidden="true">' + escapeHtml(friendInitial(friendName)) + '</div>'
         + '<div class="friend-main"><h3>' + escapeHtml(friendName) + '</h3><div class="friend-status-row"><span class="status-chip ' + statusClass + '">' + escapeHtml(friendStatusLabel(status)) + '</span><span class="timer-chip">Рейтинг ' + escapeHtml(String(rating)) + '</span></div></div>'
@@ -13166,6 +13438,7 @@ function renderSocialInbox() {
         elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
         elements.socialChatInput.disabled = true;
         elements.socialChatSend.disabled = true;
+        renderSocialChatActions(null);
         return;
     }
 
@@ -13185,21 +13458,28 @@ function renderSocialInbox() {
         elements.socialChatMessages.innerHTML = '<div class="social-chat-empty">Открой чат через карточку друга.</div>';
         elements.socialChatInput.disabled = true;
         elements.socialChatSend.disabled = true;
+        renderSocialChatActions(null);
         return;
     }
 
     elements.socialChatThreadTitle.textContent = sanitizeVisibleText(activeThread.friendName, "Друг");
+    const selectedMessageKey = state.social && state.social.selectedMessageKey ? state.social.selectedMessageKey : null;
     elements.socialChatMessages.innerHTML = (activeThread.messages || []).length
-        ? (activeThread.messages || []).map(function (message) {
+        ? (activeThread.messages || []).map(function (message, index) {
             const own = message.author === "you";
             const authorName = own ? sanitizeVisibleText(state.player.name, "Ты") : sanitizeVisibleText(activeThread.friendName, "Друг");
             const messageText = sanitizeVisibleText(message.text, "Сообщение скрыто.");
-            return '<div class="social-chat-message' + (own ? " social-chat-message-own" : "") + '"><div class="social-chat-message-bubble"><strong>' + escapeHtml(authorName) + '</strong><p>' + escapeHtml(messageText) + '</p><small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small></div></div>';
+            const messageKey = getSocialMessageKey(message, index);
+            const selected = selectedMessageKey === messageKey;
+            return '<div class="social-chat-message' + (own ? " social-chat-message-own" : "") + (selected ? " is-selected" : "") + '" role="button" tabindex="0" data-social-message-key="' + escapeHtml(messageKey) + '" aria-pressed="' + (selected ? "true" : "false") + '"><div class="social-chat-message-bubble"><strong>' + escapeHtml(authorName) + '</strong><p>' + escapeHtml(messageText) + '</p><small>' + escapeHtml(formatTimestamp(message.createdAt || Date.now())) + '</small></div></div>';
         }).join("")
         : '<div class="social-chat-empty">Пока сообщений нет. Напиши первым.</div>';
     elements.socialChatInput.disabled = false;
     elements.socialChatSend.disabled = false;
-    elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+    renderSocialChatActions(activeThread);
+    if (!state.social.selectedMessageKey) {
+        elements.socialChatMessages.scrollTop = elements.socialChatMessages.scrollHeight;
+    }
 }
 
 function renderShop() {
