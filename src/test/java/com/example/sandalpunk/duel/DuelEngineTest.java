@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
+import com.example.sandalpunk.config.DuelBalanceProperties;
 import org.junit.jupiter.api.Test;
 
 class DuelEngineTest {
@@ -14,8 +15,9 @@ class DuelEngineTest {
 
     @Test
     void rifleHitsWhenShotGoesCenterAndDefenderStays() {
-        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC));
-        Duel duel = new Duel("duel-1", "p1", "Player", "p2", "Opponent", NOW);
+        DuelBalanceProperties balance = defaultBalance();
+        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC), balance);
+        Duel duel = duel("duel-1", balance);
 
         DuelRoundAction playerOneAction = new DuelRoundAction(
                 "p1",
@@ -44,8 +46,9 @@ class DuelEngineTest {
 
     @Test
     void pistolHitsWhenLinesMatchWithoutShieldBlock() {
-        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC));
-        Duel duel = new Duel("duel-2", "p1", "Player", "p2", "Opponent", NOW);
+        DuelBalanceProperties balance = defaultBalance();
+        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC), balance);
+        Duel duel = duel("duel-2", balance);
 
         DuelRoundAction playerOneAction = new DuelRoundAction(
                 "p1",
@@ -74,8 +77,9 @@ class DuelEngineTest {
 
     @Test
     void pistolShieldAlwaysReducesIncomingDamageByThirtyPercent() {
-        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC));
-        Duel duel = new Duel("duel-3", "p1", "Player", "p2", "Opponent", NOW);
+        DuelBalanceProperties balance = defaultBalance();
+        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC), balance);
+        Duel duel = duel("duel-3", balance);
 
         DuelRoundAction playerOneAction = new DuelRoundAction(
                 "p1",
@@ -104,13 +108,14 @@ class DuelEngineTest {
 
     @Test
     void shotgunCanGrazeOnMiss() {
-        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC)) {
+        DuelBalanceProperties balance = defaultBalance();
+        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC), balance) {
             @Override
             protected double nextRandom() {
                 return 0.10d;
             }
         };
-        Duel duel = new Duel("duel-4", "p1", "Player", "p2", "Opponent", NOW);
+        Duel duel = duel("duel-4", balance);
 
         DuelRoundAction playerOneAction = new DuelRoundAction(
                 "p1",
@@ -139,13 +144,14 @@ class DuelEngineTest {
 
     @Test
     void pistolShieldAlwaysReducesShotgunDamageByThirtyPercent() {
-        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC)) {
+        DuelBalanceProperties balance = defaultBalance();
+        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC), balance) {
             @Override
             protected double nextRandom() {
                 return 0.0d;
             }
         };
-        Duel duel = new Duel("duel-5", "p1", "Player", "p2", "Opponent", NOW);
+        Duel duel = duel("duel-5", balance);
 
         DuelRoundAction playerOneAction = new DuelRoundAction(
                 "p1",
@@ -170,5 +176,52 @@ class DuelEngineTest {
 
         assertEquals(100, result.playerOneHpAfter());
         assertEquals(82, result.playerTwoHpAfter());
+    }
+
+    @Test
+    void rifleDamageComesFromBalanceConfiguration() {
+        DuelBalanceProperties balance = defaultBalance();
+        balance.getRifle().setDamage(44);
+        DuelEngine engine = new DuelEngine(Clock.fixed(NOW, ZoneOffset.UTC), balance);
+        Duel duel = duel("duel-config", balance);
+
+        DuelRoundAction playerOneAction = new DuelRoundAction(
+                "p1",
+                1,
+                WeaponType.RIFLE,
+                ShotDirection.CENTER,
+                DodgeDirection.STAY,
+                DuelActionSource.MANUAL,
+                NOW
+        );
+        DuelRoundAction playerTwoAction = new DuelRoundAction(
+                "p2",
+                1,
+                WeaponType.RIFLE,
+                ShotDirection.LEFT,
+                DodgeDirection.STAY,
+                DuelActionSource.MANUAL,
+                NOW
+        );
+
+        DuelEngine.RoundResolution result = engine.resolveRound(duel, playerOneAction, playerTwoAction);
+
+        assertEquals(56, result.playerTwoHpAfter());
+    }
+
+    private DuelBalanceProperties defaultBalance() {
+        return new DuelBalanceProperties();
+    }
+
+    private Duel duel(String duelId, DuelBalanceProperties balance) {
+        return new Duel(
+                duelId,
+                "p1",
+                "Player",
+                "p2",
+                "Opponent",
+                balance.getStartingHp(),
+                NOW
+        );
     }
 }

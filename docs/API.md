@@ -10,12 +10,17 @@ Response:
 
 ```json
 {
-  "status": "UP",
+  "status": "ok",
+  "service": "polus-backend",
+  "version": "0.8",
+  "timestamp": "2026-06-14T10:00:00Z",
   "appName": "sandalpunk",
   "storage": "jdbc",
   "time": "2026-03-14T10:00:00Z"
 }
 ```
+
+`appName`, `storage`, and `time` remain present for compatibility with the earlier response.
 
 ## `POST /api/player/session`
 

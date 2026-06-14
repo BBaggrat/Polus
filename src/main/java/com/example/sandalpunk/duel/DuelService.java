@@ -2,12 +2,13 @@ package com.example.sandalpunk.duel;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
+import com.example.sandalpunk.config.DuelBalanceProperties;
 import com.example.sandalpunk.logging.AppEventLogger;
 import com.example.sandalpunk.logging.AppEventType;
 import com.example.sandalpunk.player.PlayerProfile;
@@ -21,11 +22,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class DuelService {
 
-    private static final int VICTORY_COINS = 100;
-    private static final int DEFEAT_COINS = 25;
-    private static final int RATING_DELTA = 10;
-    private static final int MAX_CHAT_MESSAGES = 80;
-    private static final int ROUND_TIMEOUT_SECONDS = 120;
     private static final Pattern LINK_PATTERN = Pattern.compile(
             "(?i)\\b(?:https?://|www\\.|t\\.me/|telegram\\.me/|[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:/|\\b))"
     );
@@ -35,19 +31,22 @@ public class DuelService {
     private final PlayerService playerService;
     private final AppEventLogger appEventLogger;
     private final Clock clock;
+    private final DuelBalanceProperties balance;
 
     public DuelService(
             DuelRepository duelRepository,
             DuelEngine duelEngine,
             PlayerService playerService,
             AppEventLogger appEventLogger,
-            Clock clock
+            Clock clock,
+            DuelBalanceProperties balance
     ) {
         this.duelRepository = duelRepository;
         this.duelEngine = duelEngine;
         this.playerService = playerService;
         this.appEventLogger = appEventLogger;
         this.clock = clock;
+        this.balance = balance;
     }
 
     public Duel createDuel(PlayerProfile playerOne, PlayerProfile playerTwo) {
@@ -58,17 +57,19 @@ public class DuelService {
                 playerOne.displayName(),
                 playerTwo.getId(),
                 playerTwo.displayName(),
+                balance.getStartingHp(),
                 now
         );
-        duel.setRoundDeadlineAt(now.plusSeconds(ROUND_TIMEOUT_SECONDS));
+        duel.setRoundDeadlineAt(now.plusSeconds(balance.getRoundTimeoutSeconds()));
         duelRepository.save(duel);
         appEventLogger.info(
-                AppEventType.DUEL_CREATED,
-                "Duel created",
+                AppEventType.DUEL_STARTED,
+                "Duel started",
                 Map.of(
                         "duelId", duel.getId(),
                         "playerOneId", duel.getPlayerOneId(),
-                        "playerTwoId", duel.getPlayerTwoId()
+                        "playerTwoId", duel.getPlayerTwoId(),
+                        "balanceVersion", balance.getBalanceVersion()
                 )
         );
         return duel;
@@ -115,11 +116,15 @@ public class DuelService {
                     AppEventType.ROUND_ACTION_SUBMIT,
                     "Round action submitted",
                     Map.of(
-                            "duelId", duel.getId(),
-                            "playerId", actor.getId(),
-                            "round", duel.getRoundNumber()
+                        "duelId", duel.getId(),
+                        "playerId", actor.getId(),
+                        "round", duel.getRoundNumber(),
+                        "weapon", request.weapon(),
+                        "shotDirection", request.shotDirection(),
+                        "dodgeDirection", request.dodgeDirection()
                     )
             );
+            logSelectionEvents(duel, actor, request);
 
             if (duel.getPendingActions().size() == 2) {
                 resolveRound(duel);
@@ -205,12 +210,30 @@ public class DuelService {
                     now
             ));
 
-            playerService.rewardVictory(winnerPlayerId, VICTORY_COINS, RATING_DELTA);
-            playerService.rewardDefeat(actorId, DEFEAT_COINS, -RATING_DELTA);
+            playerService.rewardVictory(
+                    winnerPlayerId,
+                    balance.getRewards().getVictoryCoins(),
+                    balance.getRewards().getRatingDelta()
+            );
+            playerService.rewardDefeat(
+                    actorId,
+                    balance.getRewards().getDefeatCoins(),
+                    -balance.getRewards().getRatingDelta()
+            );
 
             appEventLogger.info(
-                    AppEventType.MATCH_FINISH,
-                    "Match finished by forfeit",
+                    AppEventType.PLAYER_DEFEATED,
+                    "Player defeated by forfeit",
+                    Map.of(
+                            "duelId", duel.getId(),
+                            "playerId", actorId,
+                            "winnerPlayerId", winnerPlayerId,
+                            "result", "forfeit"
+                    )
+            );
+            appEventLogger.info(
+                    AppEventType.DUEL_FINISHED,
+                    "Duel finished by forfeit",
                     Map.of(
                             "duelId", duel.getId(),
                             "winnerPlayerId", winnerPlayerId,
@@ -233,7 +256,7 @@ public class DuelService {
             duel.setRoundStartedAt(now);
         }
         if (duel.getRoundDeadlineAt() == null) {
-            duel.setRoundDeadlineAt(now.plusSeconds(ROUND_TIMEOUT_SECONDS));
+            duel.setRoundDeadlineAt(now.plusSeconds(balance.getRoundTimeoutSeconds()));
         }
 
         if (!now.isBefore(duel.getRoundDeadlineAt())) {
@@ -269,24 +292,11 @@ public class DuelService {
         );
     }
 
-    private WeaponType randomWeapon() {
-        WeaponType[] values = WeaponType.values();
-        return values[ThreadLocalRandom.current().nextInt(values.length)];
-    }
-
-    private ShotDirection randomShotDirection() {
-        ShotDirection[] values = ShotDirection.values();
-        return values[ThreadLocalRandom.current().nextInt(values.length)];
-    }
-
-    private DodgeDirection randomDodgeDirection() {
-        DodgeDirection[] values = DodgeDirection.values();
-        return values[ThreadLocalRandom.current().nextInt(values.length)];
-    }
-
     private void resolveRound(Duel duel) {
         DuelRoundAction playerOneAction = duel.getPendingActions().get(duel.getPlayerOneId());
         DuelRoundAction playerTwoAction = duel.getPendingActions().get(duel.getPlayerTwoId());
+        int playerOneHpBefore = duel.getPlayerOneHp();
+        int playerTwoHpBefore = duel.getPlayerTwoHp();
         DuelEngine.RoundResolution resolution = duelEngine.resolveRound(duel, playerOneAction, playerTwoAction);
         duel.setPlayerOneHp(resolution.playerOneHpAfter());
         duel.setPlayerTwoHp(resolution.playerTwoHpAfter());
@@ -304,6 +314,20 @@ public class DuelService {
                         "playerTwoHp", duel.getPlayerTwoHp()
                 )
         );
+        logDamageApplied(
+                duel,
+                playerTwoAction,
+                duel.getPlayerOneId(),
+                playerOneHpBefore,
+                resolution.playerOneHpAfter()
+        );
+        logDamageApplied(
+                duel,
+                playerOneAction,
+                duel.getPlayerTwoId(),
+                playerTwoHpBefore,
+                resolution.playerTwoHpAfter()
+        );
 
         if (resolution.duelStatus() == DuelStatus.FINISHED) {
             duel.setStatus(DuelStatus.FINISHED);
@@ -311,18 +335,29 @@ public class DuelService {
             duel.setFinishedAt(clock.instant());
             if (resolution.winnerPlayerId() != null) {
                 String loserPlayerId = duel.opponentId(resolution.winnerPlayerId());
-                playerService.rewardVictory(resolution.winnerPlayerId(), VICTORY_COINS, RATING_DELTA);
-                playerService.rewardDefeat(loserPlayerId, DEFEAT_COINS, -RATING_DELTA);
+                playerService.rewardVictory(
+                        resolution.winnerPlayerId(),
+                        balance.getRewards().getVictoryCoins(),
+                        balance.getRewards().getRatingDelta()
+                );
+                playerService.rewardDefeat(
+                        loserPlayerId,
+                        balance.getRewards().getDefeatCoins(),
+                        -balance.getRewards().getRatingDelta()
+                );
             } else {
                 playerService.rewardDraw(duel.getPlayerOneId());
                 playerService.rewardDraw(duel.getPlayerTwoId());
             }
+            logDefeatedPlayers(duel, resolution);
             appEventLogger.info(
-                    AppEventType.MATCH_FINISH,
-                    "Match finished",
+                    AppEventType.DUEL_FINISHED,
+                    "Duel finished",
                     Map.of(
                             "duelId", duel.getId(),
-                            "winnerPlayerId", String.valueOf(resolution.winnerPlayerId())
+                            "winnerPlayerId", String.valueOf(resolution.winnerPlayerId()),
+                            "result", resolution.winnerPlayerId() == null ? "draw" : "victory",
+                            "round", duel.getRoundNumber()
                     )
             );
         } else {
@@ -333,13 +368,91 @@ public class DuelService {
     private void startNextRound(Duel duel, Instant now) {
         duel.incrementRoundNumber();
         duel.setRoundStartedAt(now);
-        duel.setRoundDeadlineAt(now.plusSeconds(ROUND_TIMEOUT_SECONDS));
+        duel.setRoundDeadlineAt(now.plusSeconds(balance.getRoundTimeoutSeconds()));
     }
 
     private void trimChatIfNeeded(Duel duel) {
-        while (duel.getChatMessages().size() > MAX_CHAT_MESSAGES) {
+        while (duel.getChatMessages().size() > balance.getMaxChatMessages()) {
             duel.getChatMessages().remove(0);
         }
+    }
+
+    private void logSelectionEvents(Duel duel, PlayerProfile actor, DuelActionRequest request) {
+        Map<String, Object> commonMetadata = Map.of(
+                "duelId", duel.getId(),
+                "playerId", actor.getId(),
+                "round", duel.getRoundNumber()
+        );
+        appEventLogger.info(
+                AppEventType.WEAPON_SELECTED,
+                "Weapon selected",
+                withValue(commonMetadata, "weapon", request.weapon())
+        );
+        appEventLogger.info(
+                AppEventType.SHOT_DIRECTION_SELECTED,
+                "Shot direction selected",
+                withValue(commonMetadata, "shotDirection", request.shotDirection())
+        );
+        appEventLogger.info(
+                AppEventType.DODGE_DIRECTION_SELECTED,
+                "Dodge direction selected",
+                withValue(commonMetadata, "dodgeDirection", request.dodgeDirection())
+        );
+    }
+
+    private Map<String, Object> withValue(Map<String, Object> metadata, String key, Object value) {
+        Map<String, Object> enriched = new LinkedHashMap<>(metadata);
+        enriched.put(key, value);
+        return enriched;
+    }
+
+    private void logDamageApplied(
+            Duel duel,
+            DuelRoundAction attackerAction,
+            String targetPlayerId,
+            int hpBefore,
+            int hpAfter
+    ) {
+        int damage = Math.max(0, hpBefore - hpAfter);
+        if (damage == 0) {
+            return;
+        }
+        appEventLogger.info(
+                AppEventType.DAMAGE_APPLIED,
+                "Damage applied",
+                Map.of(
+                        "duelId", duel.getId(),
+                        "round", duel.getRoundNumber(),
+                        "attackerPlayerId", attackerAction.playerId(),
+                        "targetPlayerId", targetPlayerId,
+                        "weapon", attackerAction.weapon(),
+                        "damage", damage,
+                        "remainingHp", hpAfter
+                )
+        );
+    }
+
+    private void logDefeatedPlayers(Duel duel, DuelEngine.RoundResolution resolution) {
+        if (resolution.playerOneHpAfter() <= 0) {
+            logPlayerDefeated(duel, duel.getPlayerOneId(), resolution.winnerPlayerId());
+        }
+        if (resolution.playerTwoHpAfter() <= 0) {
+            logPlayerDefeated(duel, duel.getPlayerTwoId(), resolution.winnerPlayerId());
+        }
+    }
+
+    private void logPlayerDefeated(Duel duel, String playerId, String winnerPlayerId) {
+        appEventLogger.info(
+                AppEventType.PLAYER_DEFEATED,
+                "Player defeated",
+                Map.of(
+                        "duelId", duel.getId(),
+                        "playerId", playerId,
+                        "winnerPlayerId", String.valueOf(winnerPlayerId),
+                        "round", duel.getRoundNumber(),
+                        "result", winnerPlayerId == null ? "draw" : "defeat"
+                )
+        );
     }
 
     private DuelStateResponse toState(Duel duel, String viewerPlayerId) {
@@ -390,50 +503,6 @@ public class DuelService {
                 duel.getUpdatedAt(),
                 duel.getFinishedAt()
         );
-    }
-
-    private boolean isAutoBattleEnabled(Duel duel, String playerId) {
-        if (duel.getPlayerOneId().equals(playerId)) {
-            return duel.isPlayerOneAutoBattleEnabled();
-        }
-        if (duel.getPlayerTwoId().equals(playerId)) {
-            return duel.isPlayerTwoAutoBattleEnabled();
-        }
-        throw new UnauthorizedException("Player is not part of this duel");
-    }
-
-    private void setAutoBattleEnabled(Duel duel, String playerId, boolean enabled) {
-        if (duel.getPlayerOneId().equals(playerId)) {
-            duel.setPlayerOneAutoBattleEnabled(enabled);
-            return;
-        }
-        if (duel.getPlayerTwoId().equals(playerId)) {
-            duel.setPlayerTwoAutoBattleEnabled(enabled);
-            return;
-        }
-        throw new UnauthorizedException("Player is not part of this duel");
-    }
-
-    private Boolean getPendingAutoBattleEnabled(Duel duel, String playerId) {
-        if (duel.getPlayerOneId().equals(playerId)) {
-            return duel.getPlayerOneAutoBattlePendingEnabled();
-        }
-        if (duel.getPlayerTwoId().equals(playerId)) {
-            return duel.getPlayerTwoAutoBattlePendingEnabled();
-        }
-        throw new UnauthorizedException("Player is not part of this duel");
-    }
-
-    private void setPendingAutoBattleEnabled(Duel duel, String playerId, Boolean enabled) {
-        if (duel.getPlayerOneId().equals(playerId)) {
-            duel.setPlayerOneAutoBattlePendingEnabled(enabled);
-            return;
-        }
-        if (duel.getPlayerTwoId().equals(playerId)) {
-            duel.setPlayerTwoAutoBattlePendingEnabled(enabled);
-            return;
-        }
-        throw new UnauthorizedException("Player is not part of this duel");
     }
 
     private void verifyParticipant(Duel duel, String playerId) {

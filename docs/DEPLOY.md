@@ -56,16 +56,21 @@ sudo install -m 0644 target/sandalpunk-0.0.1-SNAPSHOT.jar /opt/sandalpunk/sandal
 ```bash
 sudo tee /opt/sandalpunk/.env >/dev/null <<'EOF'
 APP_NAME=sandalpunk
+SERVICE_NAME=polus-backend
+APP_VERSION=0.8
 PORT=8080
+SPRING_PROFILES_ACTIVE=prod
 BASE_URL=https://play.example.com
 BOT_TOKEN=replace_me
 BOT_USERNAME=replace_me_bot
 APP_STORAGE=jdbc
+ALLOW_DEV_SESSIONS=true
 LOG_LEVEL=INFO
 DB_DATA_DIR=/opt/sandalpunk/data
 DB_URL=
 DB_USERNAME=sa
 DB_PASSWORD=
+DUEL_BALANCE_VERSION=polus-pvp-20260614
 EOF
 sudo chown sandalpunk:sandalpunk /opt/sandalpunk/.env
 sudo chmod 600 /opt/sandalpunk/.env
@@ -104,6 +109,15 @@ If certbot rewrites the Nginx file, keep the reverse-proxy location that forward
 sudo systemctl restart sandalpunk
 sudo systemctl reload nginx
 ```
+
+The repository deploy script keeps the previous JAR at `/opt/sandalpunk/sandalpunk.jar.previous`.
+To roll back the application binary:
+
+```bash
+bash deploy/scripts/rollback.sh
+```
+
+This does not roll back database changes. Back up `/opt/sandalpunk/data` separately before schema changes.
 
 ## 12. Inspect logs
 

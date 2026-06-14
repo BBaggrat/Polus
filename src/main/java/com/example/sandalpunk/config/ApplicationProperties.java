@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private String name = "sandalpunk";
+    private String serviceName = "polus-backend";
+    private String version = "0.8";
     private String baseUrl = "http://localhost:8080";
     private String storage = "jdbc";
     private boolean allowDevSessions = true;
@@ -18,6 +20,22 @@ public class ApplicationProperties {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getBaseUrl() {

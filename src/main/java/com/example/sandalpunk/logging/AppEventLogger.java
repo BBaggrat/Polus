@@ -1,6 +1,7 @@
 package com.example.sandalpunk.logging;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,23 +30,44 @@ public class AppEventLogger {
     }
 
     public void info(AppEventType type, String message, Map<String, ?> metadata) {
-        log.info("{} | {}", type, message);
-        addEvent(type, message, metadata);
+        Instant timestamp = clock.instant();
+        Map<String, String> safeMetadata = sanitizeMetadata(metadata);
+        log.info(
+                "game_event={} timestamp={} metadata={} message={}",
+                type.eventName(),
+                timestamp,
+                safeMetadata,
+                message
+        );
+        addEvent(timestamp, type, message, safeMetadata);
     }
 
     public void error(String message, Throwable throwable) {
-        log.error(message, throwable);
-        addEvent(AppEventType.ERROR, message, Map.of("error", throwable.getClass().getSimpleName()));
+        Instant timestamp = clock.instant();
+        Map<String, String> metadata = Map.of("error", throwable.getClass().getSimpleName());
+        log.error(
+                "game_event={} timestamp={} metadata={} message={}",
+                AppEventType.ERROR_OCCURRED.eventName(),
+                timestamp,
+                metadata,
+                message,
+                throwable
+        );
+        addEvent(timestamp, AppEventType.ERROR_OCCURRED, message, metadata);
     }
 
     public List<AppEvent> recentEvents() {
         return new ArrayList<>(recentEvents);
     }
 
-    private void addEvent(AppEventType type, String message, Map<String, ?> metadata) {
+    private Map<String, String> sanitizeMetadata(Map<String, ?> metadata) {
         Map<String, String> safeMetadata = new LinkedHashMap<>();
         metadata.forEach((key, value) -> safeMetadata.put(key, value == null ? "null" : String.valueOf(value)));
-        recentEvents.addFirst(new AppEvent(clock.instant(), type, message, safeMetadata));
+        return safeMetadata;
+    }
+
+    private void addEvent(Instant timestamp, AppEventType type, String message, Map<String, String> metadata) {
+        recentEvents.addFirst(new AppEvent(timestamp, type, message, metadata));
         while (recentEvents.size() > MAX_EVENTS) {
             recentEvents.pollLast();
         }

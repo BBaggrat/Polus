@@ -13,6 +13,7 @@ Sandalpunk is a modular monolith built as one Spring Boot application.
 ## Modules
 
 - `config`: application properties, shared beans, clock, Telegram `RestClient`
+- `config/DuelBalanceProperties`: validated PvP balance, rewards, timeout, and chat limits
 - `health`: `/api/health`
 - `web`: route forwarding for `/duel`, API error model, global exception handling
 - `auth`: Telegram Mini App session bootstrap, `initData` validation, session token storage
@@ -22,6 +23,8 @@ Sandalpunk is a modular monolith built as one Spring Boot application.
 - `bot`: Telegram Bot API client and long polling lifecycle service
 - `zrp`: recent application event feed at `/api/zrp/events`
 - `logging`: structured event capture for gameplay and operational actions
+
+PvP values are loaded from the `app.duel` configuration tree. The current values and environment overrides are documented in [`11_BALANCE_CONFIG.md`](./11_BALANCE_CONFIG.md).
 
 ## Runtime flow
 

@@ -74,6 +74,15 @@ public class SessionService {
                         "telegramUser", authenticatedUser.telegramUser()
                 )
         );
+        appEventLogger.info(
+                AppEventType.APP_OPEN,
+                "Application session opened",
+                Map.of(
+                        "playerId", playerProfile.getId(),
+                        "channel", authenticatedUser.telegramUser() ? "telegram" : "browser",
+                        "verified", authenticatedUser.verified()
+                )
+        );
         return new SessionResponse(session.getToken(), PlayerResponse.from(playerProfile));
     }
 

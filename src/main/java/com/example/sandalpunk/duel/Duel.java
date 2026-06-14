@@ -7,15 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Duel {
 
-    public static final int STARTING_HP = 100;
-
     private final String id;
     private final String playerOneId;
     private final String playerOneName;
     private final String playerTwoId;
     private final String playerTwoName;
-    private int playerOneHp = STARTING_HP;
-    private int playerTwoHp = STARTING_HP;
+    private int playerOneHp;
+    private int playerTwoHp;
     private int roundNumber = 1;
     private DuelStatus status = DuelStatus.ACTIVE;
     private String winnerPlayerId;
@@ -32,12 +30,22 @@ public class Duel {
     private Boolean playerOneAutoBattlePendingEnabled;
     private Boolean playerTwoAutoBattlePendingEnabled;
 
-    public Duel(String id, String playerOneId, String playerOneName, String playerTwoId, String playerTwoName, Instant createdAt) {
+    public Duel(
+            String id,
+            String playerOneId,
+            String playerOneName,
+            String playerTwoId,
+            String playerTwoName,
+            int startingHp,
+            Instant createdAt
+    ) {
         this.id = id;
         this.playerOneId = playerOneId;
         this.playerOneName = playerOneName;
         this.playerTwoId = playerTwoId;
         this.playerTwoName = playerTwoName;
+        this.playerOneHp = startingHp;
+        this.playerTwoHp = startingHp;
         this.createdAt = createdAt;
         this.roundStartedAt = createdAt;
         this.updatedAt = createdAt;

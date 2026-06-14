@@ -21,11 +21,15 @@ public class HealthController {
 
     @GetMapping
     public HealthResponse health() {
+        var timestamp = clock.instant();
         return new HealthResponse(
-                "UP",
+                "ok",
+                applicationProperties.getServiceName(),
+                applicationProperties.getVersion(),
+                timestamp,
                 applicationProperties.getName(),
                 applicationProperties.getStorage(),
-                clock.instant()
+                timestamp
         );
     }
 }

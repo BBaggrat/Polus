@@ -12,6 +12,8 @@
 
 `STAY` maps to the `CENTER` line for hit checking.
 
+The backend values below are loaded from `app.duel` in `application.yml` and validated by `DuelBalanceProperties`. See [`11_BALANCE_CONFIG.md`](./11_BALANCE_CONFIG.md).
+
 ## Hit logic
 
 If the attack line matches the target dodge line, the selected weapon resolves according to its own rules. If the line does not match:

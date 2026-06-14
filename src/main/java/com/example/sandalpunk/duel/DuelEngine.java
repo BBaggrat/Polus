@@ -5,22 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.example.sandalpunk.config.DuelBalanceProperties;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DuelEngine {
-    private static final double SHIELD_DAMAGE_REDUCTION = 0.30d;
-    private static final double SHOTGUN_EDGE_GRAZE_CHANCE = 0.35d;
-    private static final int SHOTGUN_EDGE_DAMAGE = 5;
-    private static final int PISTOL_DAMAGE = 18;
-    private static final int RIFLE_DAMAGE = 30;
-    private static final int SHOTGUN_PELLET_DAMAGE = 5;
-    private static final int SHOTGUN_PELLET_COUNT = 5;
-
     private final Clock clock;
+    private final DuelBalanceProperties balance;
 
-    public DuelEngine(Clock clock) {
+    public DuelEngine(Clock clock, DuelBalanceProperties balance) {
         this.clock = clock;
+        this.balance = balance;
     }
 
     public RoundResolution resolveRound(Duel duel, DuelRoundAction playerOneAction, DuelRoundAction playerTwoAction) {
@@ -77,29 +72,42 @@ public class DuelEngine {
         if (!lineMatched) {
             return new AttackResolution(0, Outcome.MISS_LINE, 0, 0);
         }
-        return new AttackResolution(applyShieldDamageReduction(PISTOL_DAMAGE, defenderWeapon), Outcome.HIT, 0, 0);
+        return new AttackResolution(
+                applyShieldDamageReduction(balance.getPistols().getDamage(), defenderWeapon),
+                Outcome.HIT,
+                0,
+                0
+        );
     }
 
     private AttackResolution resolveRifle(boolean lineMatched, WeaponType defenderWeapon) {
         if (!lineMatched) {
             return new AttackResolution(0, Outcome.MISS_LINE, 0, 0);
         }
-        return new AttackResolution(applyShieldDamageReduction(RIFLE_DAMAGE, defenderWeapon), Outcome.HIT, 0, 0);
+        return new AttackResolution(
+                applyShieldDamageReduction(balance.getRifle().getDamage(), defenderWeapon),
+                Outcome.HIT,
+                0,
+                0
+        );
     }
 
     private AttackResolution resolveShotgun(boolean lineMatched, WeaponType defenderWeapon) {
         if (!lineMatched) {
-            if (nextRandom() < SHOTGUN_EDGE_GRAZE_CHANCE) {
-                return new AttackResolution(SHOTGUN_EDGE_DAMAGE, Outcome.GRAZE, 0, 0);
+            if (nextRandom() < balance.getShotgun().getEdgeGrazeChance()) {
+                return new AttackResolution(balance.getShotgun().getEdgeDamage(), Outcome.GRAZE, 0, 0);
             }
             return new AttackResolution(0, Outcome.GRAZE_MISS, 0, 0);
         }
 
         return new AttackResolution(
-                applyShieldDamageReduction(SHOTGUN_PELLET_COUNT * SHOTGUN_PELLET_DAMAGE, defenderWeapon),
+                applyShieldDamageReduction(
+                        balance.getShotgun().getPelletCount() * balance.getShotgun().getPelletDamage(),
+                        defenderWeapon
+                ),
                 Outcome.SHOTGUN_HIT,
                 0,
-                SHOTGUN_PELLET_COUNT
+                balance.getShotgun().getPelletCount()
         );
     }
 
@@ -107,7 +115,9 @@ public class DuelEngine {
         if (defenderWeapon != WeaponType.PISTOLS || damage <= 0) {
             return Math.max(0, damage);
         }
-        return Math.max(0, (int) Math.round(damage * (1d - SHIELD_DAMAGE_REDUCTION)));
+        return Math.max(0, (int) Math.round(
+                damage * (1d - balance.getPistols().getShieldDamageReduction())
+        ));
     }
 
     private String buildIntentLine(String playerName, DuelRoundAction action) {

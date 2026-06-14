@@ -60,7 +60,7 @@ public class TelegramLongPollingService implements SmartLifecycle {
         });
         executorService.submit(this::pollLoop);
         appEventLogger.info(
-                AppEventType.BOT_STARTUP,
+                AppEventType.BOT_START,
                 "Telegram long polling bot started",
                 Map.of(
                         "botUsername", applicationProperties.getBot().getUsername(),

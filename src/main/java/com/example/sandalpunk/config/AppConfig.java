@@ -17,7 +17,10 @@ import org.springframework.web.client.RestClient;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableConfigurationProperties(ApplicationProperties.class)
+@EnableConfigurationProperties({
+        ApplicationProperties.class,
+        DuelBalanceProperties.class
+})
 public class AppConfig {
 
     @Bean

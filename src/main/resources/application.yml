@@ -11,6 +11,8 @@ spring:
 
 app:
   name: ${APP_NAME:sandalpunk}
+  service-name: ${SERVICE_NAME:polus-backend}
+  version: ${APP_VERSION:0.8}
   base-url: ${BASE_URL:http://localhost:8080}
   storage: ${APP_STORAGE:jdbc}
   allow-dev-sessions: ${ALLOW_DEV_SESSIONS:true}
@@ -22,6 +24,25 @@ app:
     data-dir: ${DB_DATA_DIR:}
     username: ${DB_USERNAME:}
     password: ${DB_PASSWORD:}
+  duel:
+    balance-version: ${DUEL_BALANCE_VERSION:polus-pvp-20260614}
+    starting-hp: ${DUEL_STARTING_HP:100}
+    round-timeout-seconds: ${DUEL_ROUND_TIMEOUT_SECONDS:120}
+    max-chat-messages: ${DUEL_MAX_CHAT_MESSAGES:80}
+    rewards:
+      victory-coins: ${DUEL_VICTORY_COINS:100}
+      defeat-coins: ${DUEL_DEFEAT_COINS:25}
+      rating-delta: ${DUEL_RATING_DELTA:10}
+    pistols:
+      damage: ${DUEL_PISTOLS_DAMAGE:18}
+      shield-damage-reduction: ${DUEL_PISTOLS_SHIELD_DAMAGE_REDUCTION:0.30}
+    rifle:
+      damage: ${DUEL_RIFLE_DAMAGE:30}
+    shotgun:
+      pellet-count: ${DUEL_SHOTGUN_PELLET_COUNT:5}
+      pellet-damage: ${DUEL_SHOTGUN_PELLET_DAMAGE:5}
+      edge-graze-chance: ${DUEL_SHOTGUN_EDGE_GRAZE_CHANCE:0.35}
+      edge-damage: ${DUEL_SHOTGUN_EDGE_DAMAGE:5}
 
 logging:
   level:
