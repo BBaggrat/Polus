@@ -15,7 +15,7 @@
     <artifactId>sandalpunk</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>sandalpunk</name>
-    <description>Telegram Mini App PvP duel MVP</description>
+    <description>Telegram survival-RPG Mini App with PvP encounters</description>
 
     <properties>
         <java.version>17</java.version>

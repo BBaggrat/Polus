@@ -1,6 +1,6 @@
 # Deploy
 
-This MVP is designed for one Linux VPS with Java 17, Maven, Nginx, Let's Encrypt, and systemd.
+The current release architecture is designed for one Linux VPS with Java 17, Maven, Nginx, Let's Encrypt, and systemd.
 
 ## 1. Buy a domain
 

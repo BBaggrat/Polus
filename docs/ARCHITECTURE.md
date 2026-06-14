@@ -7,7 +7,8 @@ Sandalpunk is a modular monolith built as one Spring Boot application.
 - The Telegram bot uses Bot API long polling inside the same JVM.
 - The Mini App frontend is static HTML/CSS/JS served from Spring Boot.
 - The backend API provides session bootstrap, player state, matchmaking, duels, health, and recent events.
-- Storage defaults to in-memory repositories backed by `ConcurrentHashMap`.
+- Player profiles and friendships use JDBC by default, with a file-backed H2 database when no external URL is configured.
+- Sessions, matchmaking, active duels, browser demo profiles, and recent app events currently live in process memory.
 
 ## Modules
 
@@ -41,11 +42,13 @@ Sandalpunk is a modular monolith built as one Spring Boot application.
 - `MatchmakingRepository`
 - `DuelRepository`
 
-Each repository currently has an in-memory implementation. The interfaces are intentionally small so a PostgreSQL-backed implementation can be added later without changing controllers or services.
+`PlayerRepository` and `FriendRepository` have JDBC and in-memory implementations. JDBC is the default and can use file-backed H2 or an external PostgreSQL-compatible URL.
+
+`SessionRepository`, `MatchmakingRepository`, and `DuelRepository` currently use in-memory implementations. Their interfaces remain the boundary for future persistence work without changing controllers.
 
 ## Production notes
 
-- Single VPS deployment keeps the MVP operationally simple.
+- Single VPS deployment keeps the release product operationally manageable for a small team.
 - Nginx terminates TLS and proxies to Spring Boot on localhost.
 - systemd keeps the process alive and makes logs available through `journalctl`.
 - Secrets are read from environment variables, not from committed files.

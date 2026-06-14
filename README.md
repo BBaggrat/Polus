@@ -1,29 +1,50 @@
 # Sandalpunk / Полюс
 
-Sandalpunk is a minimal production-oriented Telegram Mini App MVP for 1v1 simultaneous-round duels. A Telegram bot handles `/start`, opens the WebApp at `/duel`, and the Spring Boot app serves both the JSON API and the static frontend.
+Sandalpunk / Полюс — компактная Telegram survival-RPG / Mini App о выживании в аномальной сибирской топи. Игрок выходит из убежища на вылазки, принимает решения о риске, собирает ресурсы и дневниковые записи, встречает аномалии, PvE-угрозы и других игроков.
 
-## Quick start
+Существующая PvP-механика сохраняется как **стычка в топи**: два игрока одновременно выбирают оружие, направление атаки и направление уворота.
 
-1. Copy `.env.example` to `.env`.
-2. Export the variables into your shell or IDE run configuration.
-3. Run `mvn spring-boot:run`.
-4. Open `http://localhost:8080/duel`.
+Проект находится в переходе к релизной версии 1.0. Текущая задача — собрать работающие профили, друзей, матчмейкинг, дуэли, журнал и Telegram-бота в цельный полноценный игровой продукт с базой, вылазками и измеримой прогрессией.
 
-For a real Telegram flow, set `BASE_URL`, `BOT_TOKEN`, and `BOT_USERNAME`. For local browser-only development, the frontend falls back to a guest profile if Telegram `initData` is unavailable.
+## Текущая архитектура
 
-## What is included
+- один Spring Boot 3.3 / Java 17 модуль;
+- JSON API и статический Mini App в одном приложении;
+- Telegram-бот через long polling в том же JVM;
+- JDBC-хранение профилей и друзей, файловая H2 по умолчанию;
+- матчмейкинг и активные дуэли в памяти процесса;
+- frontend на HTML/CSS/JavaScript без внешнего UI-фреймворка;
+- деплой одного JAR через Nginx и systemd.
 
-- `/api/health`
-- Telegram bot `/start` long polling flow
-- Player session bootstrap via Telegram Mini App `initData`
-- Matchmaking queue and duel room
-- In-memory repositories behind repository interfaces
-- Static mobile-friendly frontend under `src/main/resources/static/duel`
-- VPS deployment assets for Nginx, systemd, and Let's Encrypt
+Подробный снимок состояния: [аудит репозитория](./docs/07_CURRENT_STATE_AUDIT.md).
 
-## Docs
+## Локальный запуск
 
-- [Architecture](./docs/ARCHITECTURE.md)
+1. Скопировать `.env.example` в `.env` и загрузить переменные в shell или IDE.
+2. Запустить:
+
+```bash
+mvn spring-boot:run
+```
+
+3. Открыть [http://localhost:8080/duel](http://localhost:8080/duel).
+
+Для Telegram-сценария нужны `BASE_URL`, `BOT_TOKEN` и `BOT_USERNAME`. Для браузерной демонстрации используется отдельная временная demo-сессия без создания постоянного Telegram-профиля.
+
+## Документация перехода к 1.0
+
+- [Видение продукта](./docs/00_PRODUCT_VISION.md)
+- [Игровые циклы](./docs/01_CORE_LOOP.md)
+- [Scope релиза 1.0](./docs/02_RELEASE_1_SCOPE.md)
+- [Roadmap](./docs/03_ROADMAP.md)
+- [Метрики](./docs/04_METRICS.md)
+- [Производство контента](./docs/05_CONTENT_PIPELINE.md)
+- [Модель малой команды](./docs/06_PRODUCTION_MODEL.md)
+- [Следующий технический этап](./docs/99_CODEX_NEXT_STEPS.md)
+
+## Технические документы
+
+- [Архитектура](./docs/ARCHITECTURE.md)
 - [API](./docs/API.md)
-- [Deploy](./docs/DEPLOY.md)
-- [Gameplay](./docs/GAMEPLAY.md)
+- [Деплой](./docs/DEPLOY.md)
+- [Текущие правила PvP](./docs/GAMEPLAY.md)

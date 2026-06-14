@@ -54,5 +54,5 @@ If the attack line matches the target dodge line, the selected weapon resolves a
 
 - First player to reduce the opponent to 0 HP wins
 - Simultaneous knockout is treated as a draw
-- Draws do not change wins or losses in this MVP
+- Draws do not change wins or losses under the current release rules
 
