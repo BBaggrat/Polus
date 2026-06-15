@@ -9,6 +9,13 @@ import java.time.ZoneOffset;
 import com.example.sandalpunk.config.DuelBalanceProperties;
 import com.example.sandalpunk.logging.AppEventLogger;
 import com.example.sandalpunk.player.PlayerProfile;
+import com.example.sandalpunk.progression.BaseService;
+import com.example.sandalpunk.progression.EquipmentService;
+import com.example.sandalpunk.progression.InMemoryBaseStateRepository;
+import com.example.sandalpunk.progression.InMemoryEquipmentStateRepository;
+import com.example.sandalpunk.progression.InMemoryMapProgressRepository;
+import com.example.sandalpunk.progression.MapService;
+import com.example.sandalpunk.progression.ProgressionBalance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,12 +36,43 @@ class ExplorationServiceTest {
                 new DuelBalanceProperties(),
                 clock
         );
+        AppEventLogger eventLogger = new AppEventLogger(clock);
+        ProgressionBalance balance = new ProgressionBalance();
+        MapService mapService = new MapService(
+                new InMemoryMapProgressRepository(),
+                balance,
+                eventLogger,
+                clock
+        );
+        BaseService baseService = new BaseService(
+                new InMemoryBaseStateRepository(),
+                mapService,
+                playerStateService,
+                balance,
+                eventLogger,
+                clock
+        );
+        EquipmentService equipmentService = new EquipmentService(
+                new InMemoryEquipmentStateRepository(),
+                baseService,
+                playerStateService,
+                balance,
+                eventLogger,
+                clock
+        );
+        ExplorationModifierService modifierService = new ExplorationModifierService(
+                baseService,
+                equipmentService,
+                mapService,
+                eventLogger
+        );
         explorationService = new ExplorationService(
                 new InMemoryExplorationRepository(),
                 new InMemoryJournalRepository(),
                 playerStateService,
                 new PredictableEncounterGenerator(),
-                new AppEventLogger(clock),
+                modifierService,
+                eventLogger,
                 clock
         );
         player = new PlayerProfile(

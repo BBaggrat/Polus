@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260615-1">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260615-2">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -46,6 +46,21 @@
 
             <div class="exploration-intro" id="exploration-intro">
                 <p>За настилом начинается топь. Скрытый маршрут безопаснее, открытый может привести к чужим следам и стычке.</p>
+                <section class="base-preparation" aria-labelledby="base-preparation-title">
+                    <div class="base-preparation-header">
+                        <div>
+                            <span class="base-preparation-kicker">Подготовка</span>
+                            <h2 id="base-preparation-title">База выжившего</h2>
+                        </div>
+                        <span class="base-preparation-summary" id="base-preparation-summary">Загрузка...</span>
+                    </div>
+                    <div class="progression-tabs" role="tablist" aria-label="Разделы базы">
+                        <button class="progression-tab is-active" type="button" role="tab" aria-selected="true" data-progression-view="upgrades">Улучшения</button>
+                        <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="equipment">Снаряжение</button>
+                        <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="map">Карта</button>
+                    </div>
+                    <div class="progression-content" id="progression-content" aria-live="polite"></div>
+                </section>
                 <div class="exploration-start-actions">
                     <button class="primary-button" id="exploration-start-hidden" type="button">Начать исследование скрытно</button>
                     <button class="secondary-button" id="exploration-start-open" type="button">Идти открыто</button>
@@ -537,8 +552,8 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260615-1"></script>
-<script src="/duel/exploration.js?v=polus-20260615-1"></script>
+<script src="/duel/app.js?v=polus-20260615-2"></script>
+<script src="/duel/exploration.js?v=polus-20260615-2"></script>
 </body>
 </html>
 

@@ -1,6 +1,7 @@
 package com.example.sandalpunk.exploration;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -256,9 +257,27 @@ public class EncounterGenerator {
     }
 
     public Encounter nextEncounter(ExplorationVisibilityMode visibilityMode) {
+        return nextEncounter(visibilityMode, Set.of(), 0.0d);
+    }
+
+    public Encounter nextEncounter(
+            ExplorationVisibilityMode visibilityMode,
+            Set<EncounterType> preferredTypes,
+            double preferenceChance
+    ) {
         List<EncounterTemplate> pool = visibilityMode == ExplorationVisibilityMode.OPEN_PVP
                 ? openPvpEncounters
                 : hiddenEncounters;
+        if (preferredTypes != null
+                && !preferredTypes.isEmpty()
+                && nextDouble() < Math.max(0.0d, Math.min(1.0d, preferenceChance))) {
+            List<EncounterTemplate> preferredPool = pool.stream()
+                    .filter(template -> preferredTypes.contains(template.type()))
+                    .toList();
+            if (!preferredPool.isEmpty()) {
+                pool = preferredPool;
+            }
+        }
         EncounterTemplate template = pool.get(nextInt(pool.size()));
         return new Encounter(
                 UUID.randomUUID().toString(),

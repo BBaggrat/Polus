@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.example.sandalpunk.logging.AppEventLogger;
 import com.example.sandalpunk.logging.AppEventType;
 import com.example.sandalpunk.player.PlayerProfile;
+import com.example.sandalpunk.progression.MapFragment;
 import com.example.sandalpunk.web.BadRequestException;
 import com.example.sandalpunk.web.ConflictException;
 import com.example.sandalpunk.web.NotFoundException;
@@ -25,6 +26,7 @@ public class ExplorationService {
     private final JournalRepository journalRepository;
     private final PlayerStateService playerStateService;
     private final EncounterGenerator encounterGenerator;
+    private final ExplorationModifierService modifierService;
     private final AppEventLogger appEventLogger;
     private final Clock clock;
 
@@ -33,6 +35,7 @@ public class ExplorationService {
             JournalRepository journalRepository,
             PlayerStateService playerStateService,
             EncounterGenerator encounterGenerator,
+            ExplorationModifierService modifierService,
             AppEventLogger appEventLogger,
             Clock clock
     ) {
@@ -40,6 +43,7 @@ public class ExplorationService {
         this.journalRepository = journalRepository;
         this.playerStateService = playerStateService;
         this.encounterGenerator = encounterGenerator;
+        this.modifierService = modifierService;
         this.appEventLogger = appEventLogger;
         this.clock = clock;
     }
@@ -125,9 +129,26 @@ public class ExplorationService {
                 Map.of("step", explorationState.getStep(), "maxSteps", explorationState.getMaxSteps())
         );
 
+        MapFragment fragment = modifierService.tryDiscoverMapFragment(
+                playerProfile,
+                explorationState.getExplorationId()
+        );
+        if (fragment != null) {
+            addJournalEntry(
+                    explorationState,
+                    JournalEntryType.OBJECT,
+                    "Картографический стол помог заметить старую метку. " + fragment.text(),
+                    Map.of("fragmentId", fragment.id(), "mapFragment", "true")
+            );
+        }
+
         boolean encounterDue = explorationState.getStep() % 2 == 0 || encounterGenerator.shouldGenerateEncounter();
         if (encounterDue) {
-            Encounter encounter = encounterGenerator.nextEncounter(explorationState.getVisibilityMode());
+            Encounter encounter = modifierService.nextEncounter(
+                    playerProfile,
+                    explorationState.getVisibilityMode(),
+                    encounterGenerator
+            );
             explorationState.setCurrentEncounter(encounter);
             addJournalEntry(
                     explorationState,
@@ -136,7 +157,7 @@ public class ExplorationService {
                     Map.of(
                             "encounterId", encounter.id(),
                             "contentId", encounter.contentId(),
-                            "risk", encounter.risk()
+                            "risk", encounter.risk().name()
                     )
             );
             log(
@@ -189,21 +210,27 @@ public class ExplorationService {
                 .orElseThrow(() -> new BadRequestException("Выбранное действие недоступно"));
 
         explorationState.setStartPvpDuel(false);
-        if (choice.reward() != null && !choice.reward().isEmpty()) {
+        ExplorationModifierService.ChoiceOutcome outcome = modifierService.applyChoice(
+                playerProfile,
+                explorationState,
+                encounter,
+                choice
+        );
+        if (outcome.reward() != null && !outcome.reward().isEmpty()) {
             explorationState.setCollectedResources(
-                    explorationState.getCollectedResources().add(choice.reward())
+                    explorationState.getCollectedResources().add(outcome.reward())
             );
             log(
                     AppEventType.RESOURCE_EARNED,
                     explorationState,
-                    resourceMetadata(choice.reward(), "exploration")
+                    resourceMetadata(outcome.reward(), "exploration")
             );
         }
 
         PlayerState playerState = playerStateService.getOrCreate(playerProfile);
         int hpBefore = playerState.getHp();
-        if (choice.hpDelta() != 0) {
-            playerState.setHp(playerState.getHp() + choice.hpDelta());
+        if (outcome.hpDelta() != 0) {
+            playerState.setHp(playerState.getHp() + outcome.hpDelta());
             playerStateService.save(playerState);
             log(
                     AppEventType.HP_CHANGED,
@@ -222,6 +249,14 @@ public class ExplorationService {
                 choice.resultText(),
                 choiceMetadata(encounter, choice)
         );
+        for (String message : outcome.journalMessages()) {
+            addJournalEntry(
+                    explorationState,
+                    JournalEntryType.SYSTEM,
+                    message,
+                    Map.of("progressionEffect", "true")
+            );
+        }
         log(
                 AppEventType.ENCOUNTER_CHOICE_MADE,
                 explorationState,
@@ -252,7 +287,7 @@ public class ExplorationService {
         explorationRepository.save(explorationState);
 
         if (playerState.getHp() <= 0) {
-            failExploration(explorationState, playerState);
+            failExploration(playerProfile, explorationState, playerState);
             return explorationState;
         }
         if (choice.resultType() == ChoiceResultType.RETURN_TO_BASE) {
@@ -328,9 +363,16 @@ public class ExplorationService {
     }
 
     private void failExploration(
+            PlayerProfile playerProfile,
             ExplorationState explorationState,
             PlayerState playerState
     ) {
+        ExplorationModifierService.FailureOutcome failure = modifierService.failureOutcome(
+                playerProfile,
+                explorationState
+        );
+        playerState.setResources(playerState.getResources().add(failure.preserved()));
+        playerState.setHp(Math.max(25, playerState.getMaxHp() / 4));
         playerState.setCurrentExplorationId(null);
         playerState.setVisibilityMode(ExplorationVisibilityMode.HIDDEN);
         playerStateService.save(playerState);
@@ -339,15 +381,30 @@ public class ExplorationService {
         explorationState.setFinishedAt(clock.instant());
         explorationState.setCurrentEncounter(null);
         explorationState.setStartPvpDuel(false);
-        explorationState.setCollectedResources(PlayerResources.empty());
+        explorationState.setCollectedResources(failure.preserved());
         addJournalEntry(
                 explorationState,
                 JournalEntryType.RETURN,
-                "Силы закончились. Поисковая группа вернула тебя на базу, но добыча осталась в топи.",
-                Map.of("hp", "0", "resourcesLost", "true")
+                "Силы закончились. Поисковая группа вернула тебя на базу. Потеряно "
+                        + failure.lossPercent() + "% добычи, остальное удалось сохранить.",
+                Map.of(
+                        "hp", String.valueOf(playerState.getHp()),
+                        "resourcesLost", "true",
+                        "lossPercent", String.valueOf(failure.lossPercent()),
+                        "storageProtection", String.valueOf(failure.storageReductionPercent())
+                )
         );
         explorationRepository.save(explorationState);
-        log(AppEventType.EXPLORATION_FAILED, explorationState, Map.of("reason", "hp_depleted"));
+        log(
+                AppEventType.EXPLORATION_FAILED,
+                explorationState,
+                Map.of(
+                        "reason", "hp_depleted",
+                        "lossPercent", failure.lossPercent(),
+                        "resourcesLost", failure.lost(),
+                        "resourcesPreserved", failure.preserved()
+                )
+        );
     }
 
     private void enableOpenPvp(

@@ -27,7 +27,10 @@
         directPvp: document.getElementById("exploration-direct-pvp"),
         step: document.getElementById("exploration-step"),
         openPvp: document.getElementById("exploration-open-pvp"),
-        returnButton: document.getElementById("exploration-return")
+        returnButton: document.getElementById("exploration-return"),
+        progressionSummary: document.getElementById("base-preparation-summary"),
+        progressionContent: document.getElementById("progression-content"),
+        progressionTabs: document.querySelector(".progression-tabs")
     };
 
     if (!elements.panel) {
@@ -36,13 +39,15 @@
 
     var state = {
         player: null,
+        base: null,
         exploration: null,
         history: [],
         busy: false,
         initialized: false,
         browserSessionToken: null,
         browserPlayerId: null,
-        recoveringBrowserSession: false
+        recoveringBrowserSession: false,
+        progressionView: "upgrades"
     };
 
     function getApp() {
@@ -98,11 +103,13 @@
         var results = await Promise.all([
             api("/api/player/state"),
             api("/api/exploration/current" + query),
-            api("/api/journal" + query + (query ? "&" : "?") + "limit=60")
+            api("/api/journal" + query + (query ? "&" : "?") + "limit=60"),
+            api("/api/base/state" + query)
         ]);
         state.player = results[0];
         state.exploration = results[1];
         state.history = Array.isArray(results[2]) ? results[2] : [];
+        state.base = results[3];
         state.initialized = true;
         setStatus("", false);
         render();
@@ -245,11 +252,164 @@
         }
     }
 
+    async function buyUpgrade(upgradeId) {
+        var result = await run(function () {
+            return api("/api/base/upgrades/" + encodeURIComponent(upgradeId) + "/buy", {
+                method: "POST",
+                body: JSON.stringify({ playerId: getPlayerId() })
+            });
+        }, "База стала надёжнее.");
+        if (result) {
+            state.base = result;
+            state.player = result.player;
+            render();
+        }
+    }
+
+    async function equipItem(slot, itemId) {
+        var result = await run(function () {
+            return api("/api/equipment/equip", {
+                method: "POST",
+                body: JSON.stringify({
+                    playerId: getPlayerId(),
+                    slot: slot,
+                    itemId: itemId
+                })
+            });
+        }, "Снаряжение подготовлено.");
+        if (result) {
+            await loadSnapshot();
+        }
+    }
+
+    async function upgradeItem(itemId) {
+        var result = await run(function () {
+            return api("/api/equipment/upgrade", {
+                method: "POST",
+                body: JSON.stringify({ playerId: getPlayerId(), itemId: itemId })
+            });
+        }, "Предмет улучшен.");
+        if (result) {
+            await loadSnapshot();
+        }
+    }
+
+    async function selectRoute(routeId) {
+        var result = await run(function () {
+            return api("/api/map/routes/" + encodeURIComponent(routeId) + "/select", {
+                method: "POST",
+                body: JSON.stringify({ playerId: getPlayerId() })
+            });
+        }, "Маршрут отмечен в дневнике.");
+        if (result) {
+            await loadSnapshot();
+        }
+    }
+
     function render() {
         renderPlayer();
+        renderProgression();
         renderExploration();
         renderHistory();
         renderBusy();
+    }
+
+    function renderProgression() {
+        if (!elements.progressionContent || !state.base) {
+            return;
+        }
+        var base = state.base.base || {};
+        var map = state.base.map || {};
+        var upgrades = Array.isArray(base.upgrades) ? base.upgrades : [];
+        var activeEffects = upgrades.filter(function (upgrade) {
+            return Number(upgrade.level || 0) > 0;
+        }).length;
+        elements.progressionSummary.textContent = "Фрагменты " + Number(map.fragmentsFound || 0)
+            + " · Бонусы " + activeEffects;
+        elements.progressionTabs.querySelectorAll("[data-progression-view]").forEach(function (button) {
+            var active = button.getAttribute("data-progression-view") === state.progressionView;
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        if (state.progressionView === "equipment") {
+            renderEquipment(state.base.equipment || {}, state.base.equipmentCatalog || []);
+        } else if (state.progressionView === "map") {
+            renderMap(map);
+        } else {
+            renderUpgrades(upgrades);
+        }
+    }
+
+    function renderUpgrades(upgrades) {
+        var resources = state.player && state.player.resources ? state.player.resources : {};
+        elements.progressionContent.innerHTML = upgrades.map(function (upgrade) {
+            var maxed = Number(upgrade.level || 0) >= Number(upgrade.maxLevel || 0);
+            var affordable = canAfford(resources, upgrade.cost);
+            var effect = Array.isArray(upgrade.effects) && upgrade.effects[0]
+                ? upgrade.effects[0].description
+                : upgrade.description;
+            return '<article class="progression-item">'
+                + '<div class="progression-item-copy"><div class="progression-item-title"><strong>'
+                + escapeHtml(upgrade.name) + '</strong><span>ур. ' + Number(upgrade.level || 0)
+                + '/' + Number(upgrade.maxLevel || 0) + '</span></div><p>'
+                + escapeHtml(effect || upgrade.description || "") + '</p><small>'
+                + (maxed ? "Максимальный уровень" : "Цена: " + compactResources(upgrade.cost))
+                + '</small></div><button class="progression-action" type="button" data-buy-upgrade="'
+                + escapeHtml(upgrade.id) + '" ' + (maxed || !affordable || state.busy ? "disabled" : "")
+                + ' aria-label="Улучшить ' + escapeHtml(upgrade.name) + '">'
+                + (maxed ? "✓" : "+") + '</button></article>';
+        }).join("");
+    }
+
+    function renderEquipment(equipment, catalog) {
+        var upgrades = state.base && state.base.base && Array.isArray(state.base.base.upgrades)
+            ? state.base.base.upgrades
+            : [];
+        var hasWorkbench = upgrades.some(function (upgrade) {
+            return upgrade.id === "weapon_workbench" && Number(upgrade.level || 0) > 0;
+        });
+        elements.progressionContent.innerHTML = catalog.map(function (item) {
+            var unlocked = item.unlocked !== false && item.isUnlocked !== false;
+            var disabled = !unlocked || state.busy || (item.equipped && !hasWorkbench);
+            var owned = item.owned !== false;
+            var action = item.equipped ? "Улучшить" : owned ? "Экипировать" : "Купить";
+            var attribute = item.equipped ? "data-upgrade-item" : "data-equip-item";
+            return '<article class="progression-item ' + (!unlocked ? "is-locked" : "") + '">'
+                + '<div class="progression-item-copy"><div class="progression-item-title"><strong>'
+                + escapeHtml(item.name) + '</strong><span>' + escapeHtml(slotLabel(item.slot))
+                + (item.equipped ? " · выбрано" : "") + '</span></div><p>'
+                + escapeHtml(item.description || "") + '</p><small>'
+                + (unlocked ? (owned ? "Ур. " + Number(item.level || 1) + " · улучшение "
+                    : "Цена: ") + compactResources(item.upgradeCost)
+                    : "Нужен оружейный верстак")
+                + '</small></div><button class="progression-action progression-action-wide" type="button" '
+                + attribute + '="' + escapeHtml(item.id) + '" data-equipment-slot="'
+                + escapeHtml(item.slot) + '" ' + (disabled ? "disabled" : "") + '>'
+                + escapeHtml(action) + '</button></article>';
+        }).join("");
+    }
+
+    function renderMap(map) {
+        var routes = Array.isArray(map.knownRoutes) ? map.knownRoutes : [];
+        var fragments = Array.isArray(map.fragments) ? map.fragments : [];
+        var latest = fragments.length ? fragments[fragments.length - 1] : null;
+        elements.progressionContent.innerHTML = '<div class="map-fragment-summary"><strong>'
+            + Number(map.fragmentsFound || 0) + ' фрагм.</strong><span>'
+            + escapeHtml(latest ? latest.text : "Карта ещё не начала складываться.") + '</span></div>'
+            + routes.map(function (route) {
+                var unlocked = route.unlocked === true || route.isUnlocked === true;
+                var selected = route.selected === true || route.isSelected === true;
+                var disabled = !unlocked || selected || state.busy;
+                return '<article class="progression-item ' + (!unlocked ? "is-locked" : "") + '">'
+                    + '<div class="progression-item-copy"><div class="progression-item-title"><strong>'
+                    + escapeHtml(route.name) + '</strong><span>'
+                    + (selected ? "активен" : route.requiredFragments + " фрагм.")
+                    + '</span></div><p>' + escapeHtml(route.description || "") + '</p><small>'
+                    + escapeHtml(route.effects && route.effects[0] ? route.effects[0].description : "")
+                    + '</small></div><button class="progression-action" type="button" data-select-route="'
+                    + escapeHtml(route.id) + '" ' + (disabled ? "disabled" : "") + ' aria-label="Выбрать маршрут">'
+                    + (selected ? "✓" : "→") + '</button></article>';
+            }).join("");
     }
 
     function renderPlayer() {
@@ -315,14 +475,14 @@
             return;
         }
         elements.encounterType.textContent = encounterTypeLabel(encounter.type);
-        elements.encounterRisk.textContent = "Риск: " + (encounter.risk || "неизвестен");
+        elements.encounterRisk.textContent = "Риск: " + riskLabel(encounter.risk);
         elements.encounterTitle.textContent = encounter.title || "Событие";
         elements.encounterText.textContent = encounter.text || "";
         var choices = Array.isArray(encounter.choices) ? encounter.choices : [];
         elements.choices.innerHTML = choices.map(function (choice) {
             return '<button class="exploration-choice" type="button" data-exploration-choice="'
                 + escapeHtml(choice.id) + '"><span>' + escapeHtml(choice.text)
-                + '</span><span>' + escapeHtml(choice.riskLevel || "") + '</span></button>';
+                + '</span><span>' + escapeHtml(riskLabel(choice.riskLevel)) + '</span></button>';
         }).join("");
     }
 
@@ -412,6 +572,46 @@
         }[type] || "Событие";
     }
 
+    function riskLabel(value) {
+        return {
+            LOW: "низкий",
+            MEDIUM: "средний",
+            HIGH: "высокий"
+        }[value] || String(value || "неизвестен");
+    }
+
+    function slotLabel(slot) {
+        return {
+            WEAPON: "оружие",
+            ARMOR: "броня",
+            CHARM: "оберег",
+            TOOL: "инструмент"
+        }[slot] || "предмет";
+    }
+
+    function canAfford(resources, cost) {
+        var available = resources || {};
+        var price = cost || {};
+        return Number(available.scrap || 0) >= Number(price.scrap || 0)
+            && Number(available.supplies || 0) >= Number(price.supplies || 0)
+            && Number(available.swampResin || 0) >= Number(price.swampResin || 0);
+    }
+
+    function compactResources(resources) {
+        var value = resources || {};
+        var parts = [];
+        if (Number(value.scrap || 0)) {
+            parts.push("⌁" + Number(value.scrap));
+        }
+        if (Number(value.supplies || 0)) {
+            parts.push("▣" + Number(value.supplies));
+        }
+        if (Number(value.swampResin || 0)) {
+            parts.push("◆" + Number(value.swampResin));
+        }
+        return parts.length ? parts.join(" ") : "без затрат";
+    }
+
     function entryMarker(type) {
         return {
             MOVEMENT: "→",
@@ -471,6 +671,28 @@
             var button = event.target.closest("[data-exploration-choice]");
             if (button) {
                 choose(button.getAttribute("data-exploration-choice"));
+            }
+        });
+        elements.progressionTabs.addEventListener("click", function (event) {
+            var tab = event.target.closest("[data-progression-view]");
+            if (tab) {
+                state.progressionView = tab.getAttribute("data-progression-view");
+                renderProgression();
+            }
+        });
+        elements.progressionContent.addEventListener("click", function (event) {
+            var buy = event.target.closest("[data-buy-upgrade]");
+            var equip = event.target.closest("[data-equip-item]");
+            var upgrade = event.target.closest("[data-upgrade-item]");
+            var route = event.target.closest("[data-select-route]");
+            if (buy) {
+                buyUpgrade(buy.getAttribute("data-buy-upgrade"));
+            } else if (equip) {
+                equipItem(equip.getAttribute("data-equipment-slot"), equip.getAttribute("data-equip-item"));
+            } else if (upgrade) {
+                upgradeItem(upgrade.getAttribute("data-upgrade-item"));
+            } else if (route) {
+                selectRoute(route.getAttribute("data-select-route"));
             }
         });
     }
