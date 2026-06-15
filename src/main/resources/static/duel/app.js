@@ -11827,7 +11827,7 @@ function scrollDuelLogsToLatest() {
 
 function refreshStaticCopy() {
     document.title = "Полюс";
-    setText(".panel-kicker", "Профиль");
+    setText(".player-panel .panel-kicker", "Профиль");
     setText("#screen-home .panel-title.panel-title-small", "Дневник");
     setText(".journal-zone-label", "Зона");
     setText('#bottom-nav [data-nav-target="home"] .nav-title', "Хаб");
@@ -11851,22 +11851,22 @@ function refreshStaticCopy() {
     setText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
     setText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
     setText("#registration-submit", "Создать аккаунт");
-    setText("#start-duel-title", "Начать бой?");
-    setText("#start-duel-copy", "Подтверди, что хочешь войти в PvP-матч.");
+    setText("#start-duel-title", "Вступить в стычку?");
+    setText("#start-duel-copy", "Подтверди выход в открытый просвет топи.");
     setText("#start-duel-cancel", "Нет, вернуться в хаб");
-    setText("#start-duel-confirm", "Да, начать бой");
+    setText("#start-duel-confirm", "Вступить в стычку");
     setText("#duel-exit-cancel", "Нет, остаться");
     setText("#duel-exit-confirm", "Да, выйти");
     setText("#duel-tab-logs", "Логи");
     setText("#duel-tab-chat", "Чат");
     setText("#duel-clear-log-button", "Очистить");
     setText("#duel-close-button", "Выйти");
-    setText("#find-match-button", "Найти матч");
-    setText(".queue-status-label", "Поиск дуэли");
+    setText("#find-match-button", "Вступить в стычку");
+    setText(".queue-status-label", "Поиск другого выжившего");
     setText("#queue-cancel-button", "Отменить");
     setText(".duel-block-title", "Оружие");
-    setText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    setText(".vector-card:nth-of-type(2) h4", "Уворот");
+    setText(".vector-card:nth-of-type(1) h4", "Куда стрелять по силуэту?");
+    setText(".vector-card:nth-of-type(2) h4", "Куда уйти от выстрела?");
     renderStaticWeaponOptions();
     renderStaticDirectionButtons();
     Object.keys(UX_WEAPON_HINTS || {}).forEach(function (code) {
@@ -11946,7 +11946,7 @@ function getProfileBadgeLabel() {
         return "Ветеран";
     }
     if (rating >= 20 || level >= 3) {
-        return "Дуэлянт";
+        return "Выживший";
     }
     return "Новичок";
 }
@@ -12020,7 +12020,7 @@ function renderLeaderboardModal() {
     }
     const entries = buildLeaderboardEntries();
     if (!entries.length) {
-        elements.leaderboardList.innerHTML = '<article class="leaderboard-empty"><strong>Рейтинг пуст</strong><span>Сыграй дуэль, чтобы появиться в таблице.</span></article>';
+        elements.leaderboardList.innerHTML = '<article class="leaderboard-empty"><strong>Рейтинг пуст</strong><span>Сыграй стычку, чтобы появиться в таблице.</span></article>';
         return;
     }
     elements.leaderboardList.innerHTML = entries.map(function (entry) {
@@ -13089,8 +13089,8 @@ function finalFriendDuel(friendId) {
     }
     requestStartDuel({
         mode: "friend",
-        title: "Вызвать на дуэль?",
-        copy: "Соперник: " + sanitizeVisibleText(friend.name, "Игрок") + ".",
+        title: "Вызвать на стычку?",
+        copy: "Другой выживший: " + sanitizeVisibleText(friend.name, "Игрок") + ".",
         execute: function () {
             startQueueDuel(true);
         }
@@ -13099,6 +13099,32 @@ function finalFriendDuel(friendId) {
 
 function exposeGlobalActions() {
     window.PolusApp = {
+        getSessionToken: function () {
+            if (state.auth && state.auth.sessionToken) {
+                return state.auth.sessionToken;
+            }
+            try {
+                const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "null");
+                return persisted && persisted.auth && persisted.auth.sessionToken
+                    ? persisted.auth.sessionToken
+                    : null;
+            } catch (error) {
+                return null;
+            }
+        },
+        getPlayerId: function () {
+            if (state.auth && state.auth.playerId) {
+                return state.auth.playerId;
+            }
+            try {
+                const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "null");
+                return persisted && persisted.auth && persisted.auth.playerId
+                    ? persisted.auth.playerId
+                    : null;
+            } catch (error) {
+                return null;
+            }
+        },
         navigate: finalAction(navigateTo),
         startQueueDuel: finalAction(startQueueDuel),
         startBotDuel: finalAction(startBotDuel),
@@ -13218,7 +13244,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем другого выжившего.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -13711,8 +13737,8 @@ async function startQueueDuel(skipConfirm) {
     if (!skipConfirm) {
         requestStartDuel({
             mode: "queue",
-            title: "Начать бой?",
-            copy: "Подтверди вход в PvP-матч.",
+            title: "Вступить в стычку?",
+            copy: "Подтверди выход в открытый просвет топи.",
             execute: function () {
                 startQueueDuel(true);
             }
@@ -13720,14 +13746,14 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (state.matchmaking.status === "QUEUED") {
-        showToast("Ты уже в очереди. Ищем соперника.");
+        showToast("Ты уже в очереди. Ищем другого выжившего.");
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("В браузере доступна локальная демо-дуэль.");
+        showToast("В браузере доступна локальная демо-стычка.");
         openDuel({
             mode: "pvp",
-            title: "Дуэль",
+            title: "Стычка",
             modeLabel: "PvP",
             opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
             opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
@@ -13740,7 +13766,7 @@ async function startQueueDuel(skipConfirm) {
         applyMatchmakingStatus(payload);
         if (payload.status === "IN_DUEL" && payload.duelId) {
             await refreshLiveDuel(payload.duelId);
-            showToast("Соперник найден.");
+            showToast("Другой выживший найден.");
         } else {
             showToast("Очередь запущена.");
         }
@@ -13821,7 +13847,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Выбор изменен. Нажми «Изменить ход», чтобы отправить новый вариант."
-            : "Ход зафиксирован. Ждем соперника.";
+            : "Ход зафиксирован. Ждем другого выжившего.";
     }
     if (duel.yourActionSubmitted && !hasPendingDuelChanges(duel)) {
         return "Ход сделан.";
@@ -14009,7 +14035,7 @@ function resolveDuelRound(playerAction, opponentAction) {
     }
     const roundNumber = duel.round;
     const playerName = sanitizeVisibleText(duel.playerName, "Игрок");
-    const opponentName = sanitizeVisibleText(duel.opponentName, "Соперник");
+    const opponentName = sanitizeVisibleText(duel.opponentName, "Другой выживший");
     const playerAttack = resolveAttack(playerName, opponentName, playerAction, opponentAction, "player");
     const opponentAttack = resolveAttack(opponentName, playerName, opponentAction, playerAction, "opponent");
 
@@ -14037,11 +14063,11 @@ function resolveDuelRound(playerAction, opponentAction) {
         if (playerWon) {
             duel.resultText = "Ты победил.";
             state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
-            openDuelResultModal({ title: "Победа", copy: "Ты победил в дуэли.", rating: 0, money: BATTLE_VICTORY_COINS });
+            openDuelResultModal({ title: "Победа", copy: "Ты победил в стычке.", rating: 0, money: BATTLE_VICTORY_COINS });
         } else if (opponentWon) {
             duel.resultText = "Ты проиграл.";
             state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
-            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в дуэли.", rating: 0, money: BATTLE_DEFEAT_COINS });
+            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в стычке.", rating: 0, money: BATTLE_DEFEAT_COINS });
         } else {
             duel.resultText = "Ничья.";
             openDuelResultModal({ title: "Ничья", copy: "Оба бойца выбыли одновременно.", rating: 0, money: 0 });
@@ -14147,7 +14173,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другому выжившему первое сообщение." : "Чат доступен только во время стычки.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -14160,7 +14186,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши другому выжившему" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -14250,11 +14276,11 @@ function renderDuel() {
         elements.duelAutoCover.style.display = "none";
     }
 
-    elements.duelTitle.textContent = duel.mode === "pvp-live" ? "Матч" : "Дуэль";
+    elements.duelTitle.textContent = "Стычка";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     const youName = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
-    const opponentName = sanitizeVisibleText(duel.opponentName, "Соперник");
+    const opponentName = sanitizeVisibleText(duel.opponentName, "Другой выживший");
     elements.duelYouName.textContent = youName;
     elements.duelYouMeta.textContent = "";
     elements.duelYouAvatar.textContent = youName.slice(0, 1).toUpperCase();
@@ -14277,7 +14303,7 @@ function renderDuel() {
     elements.duelSubmitButton.textContent = duel.finished
         ? "Бой завершен"
         : duel.yourActionSubmitted
-            ? (duelHasPendingChanges ? "Изменить ход" : "Ожидаем соперника")
+            ? (duelHasPendingChanges ? "Изменить ход" : "Ожидаем другого выжившего")
             : "Сделать ход";
     elements.duelSubmitButton.disabled = duel.finished || !duelSelectionComplete || (duel.yourActionSubmitted && !duelHasPendingChanges);
     elements.duelSubmitButton.classList.toggle("is-turn-submitted", Boolean(duel.yourActionSubmitted && !duelHasPendingChanges && !duel.finished));
@@ -14318,7 +14344,7 @@ function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
     const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackCopy = inferredVictory ? "Ты победил в стычке." : inferredDefeat ? "Ты проиграл в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -14352,7 +14378,7 @@ function openLiveDuelResult(payload) {
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
         title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        copy: isVictory ? "Ты победил в стычке." : isDefeat ? "Ты проиграл в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });

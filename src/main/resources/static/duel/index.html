@@ -4,12 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260602-3">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260615-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 <main class="app-shell">
     <section class="screen is-active" id="screen-home" data-screen="home">
+        <section class="panel exploration-panel" id="exploration-panel" aria-labelledby="exploration-title">
+            <div class="exploration-header">
+                <div>
+                    <p class="panel-kicker">Топь</p>
+                    <h1 class="panel-title exploration-title" id="exploration-title">Дневник выжившего</h1>
+                </div>
+                <span class="exploration-mode-chip" id="exploration-mode-chip">На базе</span>
+            </div>
+
+            <div class="exploration-vitals" aria-label="Состояние выжившего">
+                <div class="exploration-vital exploration-vital-hp">
+                    <span>HP</span>
+                    <strong id="exploration-hp">100 / 100</strong>
+                    <span class="exploration-hp-track" aria-hidden="true">
+                        <span id="exploration-hp-fill"></span>
+                    </span>
+                </div>
+                <div class="exploration-resource" title="Лом">
+                    <span aria-hidden="true">⌁</span>
+                    <strong id="exploration-scrap">0</strong>
+                    <span>лом</span>
+                </div>
+                <div class="exploration-resource" title="Припасы">
+                    <span aria-hidden="true">▣</span>
+                    <strong id="exploration-supplies">3</strong>
+                    <span>припасы</span>
+                </div>
+                <div class="exploration-resource" title="Топяная смола">
+                    <span aria-hidden="true">◆</span>
+                    <strong id="exploration-resin">0</strong>
+                    <span>смола</span>
+                </div>
+            </div>
+
+            <div class="exploration-intro" id="exploration-intro">
+                <p>За настилом начинается топь. Скрытый маршрут безопаснее, открытый может привести к чужим следам и стычке.</p>
+                <div class="exploration-start-actions">
+                    <button class="primary-button" id="exploration-start-hidden" type="button">Начать исследование скрытно</button>
+                    <button class="secondary-button" id="exploration-start-open" type="button">Идти открыто</button>
+                    <button class="ghost-button" id="exploration-direct-pvp" type="button">Вступить в стычку</button>
+                </div>
+            </div>
+
+            <div class="exploration-active hidden" id="exploration-active">
+                <div class="exploration-progress-row">
+                    <span id="exploration-step-label">Шаг 0 из 8</span>
+                    <span id="exploration-collected">В рюкзаке пока пусто</span>
+                </div>
+                <div class="exploration-journal" id="exploration-live-journal" aria-live="polite"></div>
+                <article class="exploration-encounter hidden" id="exploration-encounter">
+                    <div class="exploration-encounter-head">
+                        <span class="exploration-encounter-type" id="exploration-encounter-type">Событие</span>
+                        <span class="exploration-encounter-risk" id="exploration-encounter-risk">Риск</span>
+                    </div>
+                    <h2 id="exploration-encounter-title">Находка</h2>
+                    <p id="exploration-encounter-text"></p>
+                    <div class="exploration-choice-list" id="exploration-choice-list"></div>
+                </article>
+                <div class="exploration-actions">
+                    <button class="primary-button" id="exploration-step" type="button">Идти дальше</button>
+                    <button class="secondary-button hidden" id="exploration-open-pvp" type="button">Перестать скрываться</button>
+                    <button class="ghost-button" id="exploration-return" type="button">Вернуться на базу</button>
+                </div>
+            </div>
+
+            <details class="exploration-history">
+                <summary>Прошлые записи</summary>
+                <div class="exploration-history-list" id="exploration-history-list"></div>
+            </details>
+            <p class="exploration-status hidden" id="exploration-status" role="status"></p>
+        </section>
+
         <article class="panel player-panel">
             <div class="panel-cover">
                 <div class="cover-glow cover-glow-left"></div>
@@ -54,7 +126,7 @@
             </div>
 
             <div class="action-row">
-                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Найти матч</button>
+                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Вступить в стычку</button>
                 <button class="secondary-button hidden" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()" hidden aria-hidden="true">Быстрая дуэль (бот)</button>
             </div>
 
@@ -82,7 +154,7 @@
             <div id="quest-pocket-list" class="hidden"></div>
             <div id="quest-pocket-count" class="hidden"></div>
         </article>
-        <section class="panel journal-panel" id="home-journal-panel">
+        <section class="panel journal-panel hidden" id="home-journal-panel">
             <div class="panel-header journal-panel-header">
                 <div class="journal-header-copy">
                     <h2 class="panel-title panel-title-small">Дневник</h2>
@@ -254,13 +326,13 @@
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="start-duel-title">Начать бой?</h3>
-                <p class="panel-copy duel-exit-copy" id="start-duel-copy">Подтверди, что хочешь войти в бой.</p>
+                <h3 class="panel-title panel-title-small" id="start-duel-title">Вступить в стычку?</h3>
+                <p class="panel-copy duel-exit-copy" id="start-duel-copy">Подтверди выход в открытый просвет топи.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
             <button class="secondary-button full-width" id="start-duel-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelStartDuel()">Нет, вернуться в хаб</button>
-            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Да, начать бой</button>
+            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Вступить в стычку</button>
         </div>
     </div>
 </section>
@@ -284,7 +356,7 @@
     <div class="duel-sheet">
         <section class="duel-stage">
             <div class="duel-topbar">
-                <h2 class="sr-only" id="duel-title">Дуэль</h2>
+                <h2 class="sr-only" id="duel-title">Стычка</h2>
                 <div class="duel-round-pill" id="duel-round-pill">Раунд 1</div>
                 <div class="duel-timer-box">
                     <span class="duel-timer-label">Таймер</span>
@@ -317,7 +389,7 @@
                         <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">С</div>
                         <div class="duelist-main">
                             <div class="duelist-name-row">
-                                <h3 id="duel-opponent-name">Соперник</h3>
+                                <h3 id="duel-opponent-name">Другой выживший</h3>
                                 <p class="hp-copy" id="duel-opponent-hp">100 HP</p>
                             </div>
                             <div class="duelist-hp-wrap">
@@ -380,7 +452,7 @@
 
                 <div class="duel-vector-grid">
                     <section class="vector-card">
-                        <h4>Выстрел</h4>
+                        <h4>Куда стрелять по силуэту?</h4>
                         <div class="toggle-row">
                             <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Лево</span></button>
                             <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Центр</span></button>
@@ -389,7 +461,7 @@
                     </section>
 
                     <section class="vector-card">
-                        <h4>Уворот</h4>
+                        <h4>Куда уйти от выстрела?</h4>
                         <div class="toggle-row">
                             <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Лево</span></button>
                             <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Стоять</span></button>
@@ -465,7 +537,8 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260602-3"></script>
+<script src="/duel/app.js?v=polus-20260615-1"></script>
+<script src="/duel/exploration.js?v=polus-20260615-1"></script>
 </body>
 </html>
 

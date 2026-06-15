@@ -3,6 +3,8 @@ package com.example.sandalpunk.player;
 import com.example.sandalpunk.auth.SessionRequest;
 import com.example.sandalpunk.auth.SessionResponse;
 import com.example.sandalpunk.auth.SessionService;
+import com.example.sandalpunk.exploration.PlayerState;
+import com.example.sandalpunk.exploration.PlayerStateService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +18,16 @@ public class PlayerController {
 
     private final SessionService sessionService;
     private final PlayerService playerService;
+    private final PlayerStateService playerStateService;
 
-    public PlayerController(SessionService sessionService, PlayerService playerService) {
+    public PlayerController(
+            SessionService sessionService,
+            PlayerService playerService,
+            PlayerStateService playerStateService
+    ) {
         this.sessionService = sessionService;
         this.playerService = playerService;
+        this.playerStateService = playerStateService;
     }
 
     @PostMapping("/session")
@@ -41,5 +49,10 @@ public class PlayerController {
     @GetMapping("/me")
     public PlayerResponse me(@RequestHeader("X-Session-Token") String sessionToken) {
         return PlayerResponse.from(sessionService.requirePlayer(sessionToken));
+    }
+
+    @GetMapping("/state")
+    public PlayerState state(@RequestHeader("X-Session-Token") String sessionToken) {
+        return playerStateService.getOrCreate(sessionService.requirePlayer(sessionToken));
     }
 }

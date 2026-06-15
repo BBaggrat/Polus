@@ -7,7 +7,7 @@ public class ApplicationProperties {
 
     private String name = "sandalpunk";
     private String serviceName = "polus-backend";
-    private String version = "0.8";
+    private String version = "0.9";
     private String baseUrl = "http://localhost:8080";
     private String storage = "jdbc";
     private boolean allowDevSessions = true;

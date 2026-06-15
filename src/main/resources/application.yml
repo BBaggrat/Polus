@@ -12,7 +12,7 @@ spring:
 app:
   name: ${APP_NAME:sandalpunk}
   service-name: ${SERVICE_NAME:polus-backend}
-  version: ${APP_VERSION:0.8}
+  version: ${APP_VERSION:0.9}
   base-url: ${BASE_URL:http://localhost:8080}
   storage: ${APP_STORAGE:jdbc}
   allow-dev-sessions: ${ALLOW_DEV_SESSIONS:true}
