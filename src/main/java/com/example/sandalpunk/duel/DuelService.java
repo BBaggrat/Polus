@@ -241,6 +241,16 @@ public class DuelService {
                             "forfeit", true
                     )
             );
+            appEventLogger.info(
+                    AppEventType.PVP_FINISHED,
+                    "PvP finished by forfeit",
+                    Map.of(
+                            "duelId", duel.getId(),
+                            "winnerPlayerId", winnerPlayerId,
+                            "loserPlayerId", actorId,
+                            "result", "forfeit"
+                    )
+            );
 
             duelRepository.save(duel);
             return toState(duel, actorId);
@@ -353,6 +363,16 @@ public class DuelService {
             appEventLogger.info(
                     AppEventType.DUEL_FINISHED,
                     "Duel finished",
+                    Map.of(
+                            "duelId", duel.getId(),
+                            "winnerPlayerId", String.valueOf(resolution.winnerPlayerId()),
+                            "result", resolution.winnerPlayerId() == null ? "draw" : "victory",
+                            "round", duel.getRoundNumber()
+                    )
+            );
+            appEventLogger.info(
+                    AppEventType.PVP_FINISHED,
+                    "PvP finished",
                     Map.of(
                             "duelId", duel.getId(),
                             "winnerPlayerId", String.valueOf(resolution.winnerPlayerId()),

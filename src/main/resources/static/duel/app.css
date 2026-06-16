@@ -6065,6 +6065,65 @@ body.social-open {
     gap: 12px;
 }
 
+.release-onboarding {
+    display: grid;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid rgba(143, 216, 255, 0.16);
+    border-radius: 16px;
+    background:
+        linear-gradient(135deg, rgba(9, 16, 28, 0.82), rgba(45, 35, 28, 0.54)),
+        rgba(5, 10, 18, 0.58);
+}
+
+.release-onboarding-kicker {
+    margin: 0;
+    color: #c89e68;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.release-onboarding h2 {
+    margin: 0;
+    color: #f3eadc;
+    font-size: 1.03rem;
+}
+
+.release-onboarding p {
+    margin: 0;
+    color: #c1cadb;
+    font-size: 0.82rem;
+    line-height: 1.48;
+}
+
+.release-help-toggle {
+    justify-self: start;
+    width: auto;
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 0.72rem;
+}
+
+.release-help-panel {
+    display: grid;
+    gap: 5px;
+    padding: 9px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.release-help-panel p {
+    color: #aeb8ca;
+    font-size: 0.74rem;
+}
+
+.release-help-panel strong {
+    color: #efd19d;
+}
+
 .base-preparation {
     display: grid;
     gap: 10px;

@@ -111,6 +111,7 @@ public class ExplorationService {
                 Map.of("source", "exploration_start")
         );
         if (previousExplorationCount == 0) {
+            log(AppEventType.FIRST_EXPLORATION_STARTED, explorationState, Map.of("reason", "first_start"));
             log(AppEventType.RETENTION_MARKER_D1_CANDIDATE, explorationState, Map.of("reason", "first_start"));
         } else if (previousExplorationCount == 1) {
             log(AppEventType.SECOND_EXPLORATION_STARTED, explorationState, Map.of("previousExplorations", previousExplorationCount));

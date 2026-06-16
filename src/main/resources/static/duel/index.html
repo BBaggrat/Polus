@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260616-stage4">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260616-rc1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -45,7 +45,16 @@
             </div>
 
             <div class="exploration-intro" id="exploration-intro">
-                <p>За настилом начинается топь. Скрытый маршрут безопаснее, открытый может привести к чужим следам и стычке.</p>
+                <section class="release-onboarding" aria-labelledby="release-onboarding-title">
+                    <p class="release-onboarding-kicker">Первый выход</p>
+                    <h2 id="release-onboarding-title">Ты у края топи</h2>
+                    <p>База держится на старых досках. Дальше — вода, камыш и чужие следы. Иди скрытно, если хочешь вернуться целым. Перестань скрываться, если готов рискнуть ради большей добычи.</p>
+                    <button class="ghost-button release-help-toggle" id="exploration-help-toggle" type="button" aria-expanded="false" aria-controls="exploration-help-panel">Что это значит?</button>
+                    <div class="release-help-panel hidden" id="exploration-help-panel">
+                        <p><strong>Скрытно:</strong> безопаснее, без PvP, меньше добычи.</p>
+                        <p><strong>Открыто:</strong> выше риск, возможны стычки, больше добычи.</p>
+                    </div>
+                </section>
                 <section class="base-preparation" aria-labelledby="base-preparation-title">
                     <div class="base-preparation-header">
                         <div>
@@ -63,7 +72,7 @@
                     <div class="progression-content" id="progression-content" aria-live="polite"></div>
                 </section>
                 <div class="exploration-start-actions">
-                    <button class="primary-button" id="exploration-start-hidden" type="button">Начать исследование скрытно</button>
+                    <button class="primary-button" id="exploration-start-hidden" type="button">Начать скрытно</button>
                     <button class="secondary-button" id="exploration-start-open" type="button">Идти открыто</button>
                     <button class="ghost-button" id="exploration-direct-pvp" type="button">Вступить в стычку</button>
                 </div>
@@ -554,8 +563,8 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260616-stage4"></script>
-<script src="/duel/exploration.js?v=polus-20260616-stage4"></script>
+<script src="/duel/app.js?v=polus-20260616-rc1"></script>
+<script src="/duel/exploration.js?v=polus-20260616-rc1"></script>
 </body>
 </html>
 

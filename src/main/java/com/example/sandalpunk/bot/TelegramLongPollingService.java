@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TelegramLongPollingService implements SmartLifecycle {
-    private static final String WEB_APP_BUILD = "20260616-stage4";
+    private static final String WEB_APP_BUILD = "20260616-rc1";
 
     private final ApplicationProperties applicationProperties;
     private final TelegramBotClient telegramBotClient;
@@ -131,7 +131,7 @@ public class TelegramLongPollingService implements SmartLifecycle {
                 try {
                     telegramBotClient.sendPlainMessage(
                             message.chat().id(),
-                            "Mini App временно открылся в запасном режиме.\nОткрой duel вручную: " + webAppUrl()
+                            "Не удалось отправить кнопку WebApp. Открой топь вручную: " + webAppUrl()
                     );
                 } catch (Exception fallbackException) {
                     appEventLogger.error("Telegram /start fallback message failed", fallbackException);

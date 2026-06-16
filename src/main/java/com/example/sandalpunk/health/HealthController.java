@@ -4,11 +4,9 @@ import java.time.Clock;
 
 import com.example.sandalpunk.config.ApplicationProperties;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/health")
 public class HealthController {
 
     private final ApplicationProperties applicationProperties;
@@ -19,7 +17,7 @@ public class HealthController {
         this.clock = clock;
     }
 
-    @GetMapping
+    @GetMapping({"/api/health", "/actuator/health"})
     public HealthResponse health() {
         var timestamp = clock.instant();
         return new HealthResponse(

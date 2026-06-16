@@ -555,7 +555,7 @@
                 }
                 applySession(await response.json(), { browserDemo: true });
             } catch (error) {
-                console.error("Polus browser demo session init failed", error);
+                console.error("Polus browser session init failed", error);
                 fallbackToDemoSession(error);
             }
             return;
@@ -5344,7 +5344,7 @@ function renderRegistrationModal() {
     elements.registrationCopy.textContent = auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
         : (auth.browserDemo || !(getTelegramWebApp() && getTelegramWebApp().initData))
-            ? "Введи никнейм для сетевого демо. Профиль живет только до перезапуска сервера."
+            ? "Введи никнейм для браузерного входа. Профиль живет только до перезапуска сервера."
         : "Ник будет привязан к твоему Telegram ID.";
     if (!elements.registrationNickname.value) {
         elements.registrationNickname.value = auth.nickname || "";
@@ -5810,7 +5810,7 @@ function renderRegistrationModal() {
     elements.registrationCopy.textContent = auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
         : (auth.browserDemo || !(getTelegramWebApp() && getTelegramWebApp().initData))
-            ? "Введи никнейм для сетевого демо. Профиль живет только до перезапуска сервера."
+            ? "Введи никнейм для браузерного входа. Профиль живет только до перезапуска сервера."
         : "Ник будет привязан к твоему Telegram ID.";
     if (!elements.registrationNickname.value) {
         elements.registrationNickname.value = auth.nickname || "";
@@ -6187,7 +6187,7 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("В браузере доступна локальная демо-дуэль.");
+        showToast("В браузере доступна локальная стычка.");
         openDuel({
             mode: "pvp",
             title: "Дуэль",
@@ -10499,7 +10499,7 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("В браузере доступна локальная демо-дуэль.");
+        showToast("В браузере доступна локальная стычка.");
         openDuel({
             mode: "pvp",
             title: "Дуэль",
@@ -13301,7 +13301,7 @@ function renderRegistrationModal() {
     elements.registrationCopy.textContent = auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
         : (auth.browserDemo || !(getTelegramWebApp() && getTelegramWebApp().initData))
-            ? "Введи никнейм для сетевого демо. Профиль живет только до перезапуска сервера."
+            ? "Введи никнейм для браузерного входа. Профиль живет только до перезапуска сервера."
         : "Ник будет привязан к твоему Telegram ID.";
     if (!elements.registrationNickname.value && nickname) {
         elements.registrationNickname.value = nickname;
@@ -13750,7 +13750,7 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
-        showToast("В браузере доступна локальная демо-стычка.");
+        showToast("В браузере доступна локальная стычка.");
         openDuel({
             mode: "pvp",
             title: "Стычка",

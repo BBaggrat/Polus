@@ -50,6 +50,7 @@ public enum AppEventType {
     EQUIPMENT_EFFECT_APPLIED("equipment_effect_applied"),
     OPEN_PVP_REWARD_APPLIED("open_pvp_reward_applied"),
     RETENTION_MARKER_D1_CANDIDATE("retention_marker_d1_candidate"),
+    FIRST_EXPLORATION_STARTED("first_exploration_started"),
     FIRST_EXPLORATION_COMPLETED("first_exploration_completed"),
     SECOND_EXPLORATION_STARTED("second_exploration_started"),
     REPEAT_EXPLORATION_STARTED("repeat_exploration_started"),
@@ -68,6 +69,7 @@ public enum AppEventType {
     FIRST_UPGRADE_AFTER_EXPLORATION("first_upgrade_after_exploration"),
     MAP_ROUTE_USED("map_route_used"),
     CONTENT_EVENT_REPEATED("content_event_repeated"),
+    PVP_FINISHED("pvp_finished"),
     ERROR_OCCURRED("error_occurred"),
     ERROR("error");
 

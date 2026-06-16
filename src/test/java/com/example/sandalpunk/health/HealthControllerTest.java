@@ -37,6 +37,14 @@ class HealthControllerTest {
                 .andExpect(jsonPath("$.appName").value("sandalpunk"))
                 .andExpect(jsonPath("$.storage").value("jdbc"));
 
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ok"))
+                .andExpect(jsonPath("$.service").value("polus-backend"))
+                .andExpect(jsonPath("$.version").value("0.8"))
+                .andExpect(jsonPath("$.appName").value("sandalpunk"))
+                .andExpect(jsonPath("$.storage").value("jdbc"));
+
         HealthResponse response = controller.health();
         assertEquals(Instant.parse("2026-06-14T12:00:00Z"), response.timestamp());
         assertEquals(response.timestamp(), response.time());

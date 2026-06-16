@@ -64,4 +64,28 @@ public class AnalyticsDebugController {
         payload.put("recentEvents", events);
         return payload;
     }
+
+    @GetMapping("/api/analytics/debug/summary")
+    public Map<String, Object> summary(
+            @RequestHeader("X-Session-Token") String sessionToken
+    ) {
+        PlayerProfile player = sessionService.requirePlayer(sessionToken);
+        List<AppEvent> events = eventLogger.recentEvents();
+        Map<String, Long> countsByEvent = new LinkedHashMap<>();
+        for (AppEvent event : events) {
+            countsByEvent.merge(event.type().eventName(), 1L, Long::sum);
+        }
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("requestedByPlayerId", player.getId());
+        payload.put("recentEventsTracked", events.size());
+        payload.put("countsByEvent", countsByEvent);
+        payload.put("errorEvents", countsByEvent.getOrDefault(AppEventType.ERROR_OCCURRED.eventName(), 0L)
+                + countsByEvent.getOrDefault(AppEventType.ERROR.eventName(), 0L));
+        payload.put("explorations", explorationRepository.findAll().size());
+        payload.put("activeExplorations", explorationRepository.findAll().stream()
+                .filter(exploration -> "ACTIVE".equals(exploration.getStatus().name()))
+                .count());
+        return payload;
+    }
 }

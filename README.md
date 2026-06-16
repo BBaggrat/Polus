@@ -4,9 +4,9 @@ Sandalpunk / Полюс — компактная Telegram survival-RPG / Mini Ap
 
 Существующая PvP-механика сохраняется как **стычка в топи**: два игрока одновременно выбирают оружие, направление атаки и направление уворота.
 
-Проект находится в переходе к релизной версии 1.0.
+Проект находится в состоянии **Release 1.0 Candidate**.
 
-**Текущий статус: этап 4 — контент, цепочки событий и release 1.0 prep.** Игрок возвращает добычу, улучшает убежище и снаряжение, собирает фрагменты карты, открывает находки, проходит короткие цепочки событий и выбирает между скрытым маршрутом и рискованным `OPEN_PVP`.
+**Текущий статус: релизная сборка 1.0.** Игрок открывает бота, запускает Mini App, выходит в топь через живой дневник, выбирает `HIDDEN` или `OPEN_PVP`, возвращает добычу на базу, улучшает убежище, снаряжение и карту, затем повторяет цикл.
 
 ## Текущая архитектура
 
@@ -31,7 +31,18 @@ mvn spring-boot:run
 
 3. Открыть [http://localhost:8080/duel](http://localhost:8080/duel).
 
-Для Telegram-сценария нужны `BASE_URL`, `BOT_TOKEN` и `BOT_USERNAME`. Для браузерной демонстрации используется отдельная временная demo-сессия без создания постоянного Telegram-профиля.
+Для Telegram-сценария нужны `BASE_URL`, `BOT_TOKEN` и `BOT_USERNAME`. Для браузерной проверки можно оставить `ALLOW_DEV_SESSIONS=true`; для публичного production выставить `ALLOW_DEV_SESSIONS=false`.
+
+Основные env:
+
+- `APP_VERSION=1.0-rc1`
+- `PORT`
+- `BASE_URL`
+- `BOT_TOKEN`
+- `BOT_USERNAME`
+- `SPRING_PROFILES_ACTIVE=prod`
+- `APP_STORAGE`
+- `DB_DATA_DIR` или `DB_URL`
 
 На главном экране:
 
@@ -53,7 +64,31 @@ Healthcheck:
 
 ```bash
 curl http://localhost:8080/api/health
+curl http://localhost:8080/actuator/health
 ```
+
+Минимальная проверка release smoke описана в [docs/57_RELEASE_1_SMOKE_TEST.md](./docs/57_RELEASE_1_SMOKE_TEST.md).
+
+## Деплой
+
+Сборка:
+
+```bash
+mvn clean package
+```
+
+Production checklist:
+
+```bash
+sudo systemctl status polus
+sudo journalctl -u polus -f
+curl https://YOUR_DOMAIN/api/health
+curl https://YOUR_DOMAIN/actuator/health
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Подробно: [release deploy checklist](./docs/56_RELEASE_DEPLOY_CHECKLIST.md).
 
 ## Документация перехода к 1.0
 
@@ -106,6 +141,20 @@ curl http://localhost:8080/api/health
 - [Баланс контента](./docs/47_CONTENT_BALANCE.md)
 - [Smoke checklist этапа 4](./docs/48_STAGE_4_SMOKE_TEST.md)
 - [Release 1.0 backlog](./docs/49_RELEASE_1_BACKLOG.md)
+
+## Документация Release 1.0 Candidate
+
+- [Release audit](./docs/50_RELEASE_1_AUDIT.md)
+- [Scope freeze](./docs/51_RELEASE_1_SCOPE_FREEZE.md)
+- [Content QA report](./docs/52_CONTENT_QA_REPORT.md)
+- [Release balance](./docs/53_RELEASE_1_BALANCE.md)
+- [PvP release check](./docs/54_PVP_RELEASE_CHECK.md)
+- [Analytics check](./docs/55_RELEASE_ANALYTICS_CHECK.md)
+- [Deploy checklist](./docs/56_RELEASE_DEPLOY_CHECKLIST.md)
+- [Smoke test](./docs/57_RELEASE_1_SMOKE_TEST.md)
+- [Regression test](./docs/58_RELEASE_1_REGRESSION_TEST.md)
+- [Post-release backlog](./docs/59_POST_RELEASE_BACKLOG.md)
+- [Changelog](./CHANGELOG.md)
 
 ## Технические документы
 

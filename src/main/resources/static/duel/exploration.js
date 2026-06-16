@@ -26,6 +26,8 @@
         startHidden: document.getElementById("exploration-start-hidden"),
         startOpen: document.getElementById("exploration-start-open"),
         directPvp: document.getElementById("exploration-direct-pvp"),
+        helpToggle: document.getElementById("exploration-help-toggle"),
+        helpPanel: document.getElementById("exploration-help-panel"),
         step: document.getElementById("exploration-step"),
         openPvp: document.getElementById("exploration-open-pvp"),
         returnButton: document.getElementById("exploration-return"),
@@ -756,6 +758,13 @@
     }
 
     function bind() {
+        if (elements.helpToggle && elements.helpPanel) {
+            elements.helpToggle.addEventListener("click", function () {
+                var expanded = elements.helpToggle.getAttribute("aria-expanded") === "true";
+                elements.helpToggle.setAttribute("aria-expanded", expanded ? "false" : "true");
+                elements.helpPanel.classList.toggle("hidden", expanded);
+            });
+        }
         elements.startHidden.addEventListener("click", function () {
             startExploration("HIDDEN");
         });
@@ -835,7 +844,7 @@
             if (!response.ok || !payload || !payload.sessionToken || !payload.player) {
                 throw new Error(payload && payload.message
                     ? payload.message
-                    : "Browser demo session is unavailable");
+                    : "Browser session is unavailable");
             }
             state.browserSessionToken = payload.sessionToken;
             state.browserPlayerId = payload.player.id;
@@ -866,7 +875,7 @@
             return;
         }
         if (attempt >= 4 && !hasTelegramIdentity()) {
-            setStatus("Подключаем браузерный демо-режим...", false);
+            setStatus("Подключаем браузерный вход...", false);
             recoverBrowserSession().catch(function (error) {
                 setStatus(
                     error && error.message ? error.message : "Не удалось открыть browser-сессию.",
