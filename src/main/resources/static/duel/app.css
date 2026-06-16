@@ -5404,6 +5404,18 @@ body.social-open {
     gap: var(--ui-block-gap) !important;
 }
 
+#screen-home .player-panel {
+    order: -1 !important;
+}
+
+#screen-home .exploration-panel {
+    order: 0 !important;
+}
+
+#screen-home .journal-panel {
+    order: 1 !important;
+}
+
 #screen-home > .panel,
 .bottom-nav {
     width: 100% !important;

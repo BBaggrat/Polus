@@ -4,12 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260616-rc1">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260616-rc1-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 <main class="app-shell">
     <section class="screen is-active" id="screen-home" data-screen="home">
+        <article class="panel player-panel">
+            <div class="panel-cover">
+                <div class="cover-glow cover-glow-left"></div>
+                <div class="cover-glow cover-glow-right"></div>
+                <div class="cover-ridges"></div>
+                <button class="avatar-card profile-level-action" id="profile-level-action" type="button" aria-label="Показать прогресс уровня" title="Прогресс уровня">
+                    <span class="profile-frame-ring" aria-hidden="true"></span>
+                    <div class="avatar-portrait" id="profile-avatar">И</div>
+                </button>
+
+                <div class="panel-header profile-cover-header">
+                    <div class="profile-identity">
+                        <p class="panel-kicker">Профиль</p>
+                        <h1 class="panel-title" id="profile-name">Новый игрок</h1>
+                        <div class="profile-status-row">
+                            <span class="avatar-level-badge profile-level-pill" aria-label="Уровень">
+                                <span class="avatar-level-label">LVL</span>
+                                <span id="profile-level">1</span>
+                            </span>
+                            <span class="profile-status-label">Боевой профиль</span>
+                        </div>
+                        <span class="profile-level-progress" aria-hidden="true">
+                            <span id="profile-level-progress-fill"></span>
+                            <span id="profile-level-progress-text">0 / 100</span>
+                        </span>
+                        <div class="profile-side">
+                            <button class="stat-chip stat-chip-accent profile-stat-button" id="profile-money-action" type="button" aria-label="Открыть магазин" title="Монеты тратятся в магазине">
+                                <span class="stat-icon stat-icon-coins" aria-label="Монеты" title="Монеты"></span>
+                                <strong id="profile-money">0</strong>
+                            </button>
+                            <button class="stat-chip profile-stat-button" id="profile-rating-action" type="button" aria-label="Открыть рейтинг" title="Открыть рейтинг">
+                                <span class="stat-icon stat-icon-rating" aria-label="Рейтинг" title="Рейтинг"></span>
+                                <strong id="profile-rating">0</strong>
+                            </button>
+                        </div>
+                        <div class="profile-badge-row" aria-label="Персонализация профиля">
+                            <span class="profile-badge-chip" id="profile-badge-chip">Новичок</span>
+                            <span class="profile-frame-chip">Рамка</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Вступить в стычку</button>
+                <button class="secondary-button hidden" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()" hidden aria-hidden="true">Быстрая дуэль (бот)</button>
+            </div>
+
+            <section class="queue-status hidden" id="queue-status-card" aria-live="polite">
+                <div class="queue-status-copy">
+                    <p class="queue-status-label">Поиск дуэли</p>
+                    <strong class="queue-status-time" id="queue-status-time">0 сек</strong>
+                    <p class="queue-status-note" id="queue-status-note">Ищем соперника в очереди.</p>
+                </div>
+                <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
+            </section>
+
+            <div class="hidden" id="stat-points-badge">0</div>
+            <div class="hidden" id="hero-stats"></div>
+
+            <div id="quest-badge" class="hidden"></div>
+            <div id="quest-counter" class="hidden"></div>
+            <div id="quest-list" class="hidden"></div>
+            <div id="quest-detail-title" class="hidden"></div>
+            <div id="quest-detail-subtitle" class="hidden"></div>
+            <div id="quest-story-text" class="hidden"></div>
+            <div id="quest-choice-list" class="hidden"></div>
+            <div id="quest-state-tags" class="hidden"></div>
+            <div id="quest-state-count" class="hidden"></div>
+            <div id="quest-pocket-list" class="hidden"></div>
+            <div id="quest-pocket-count" class="hidden"></div>
+        </article>
+
         <section class="panel exploration-panel" id="exploration-panel" aria-labelledby="exploration-title">
             <div class="exploration-header">
                 <div>
@@ -108,78 +181,6 @@
             <p class="exploration-status hidden" id="exploration-status" role="status"></p>
         </section>
 
-        <article class="panel player-panel">
-            <div class="panel-cover">
-                <div class="cover-glow cover-glow-left"></div>
-                <div class="cover-glow cover-glow-right"></div>
-                <div class="cover-ridges"></div>
-                <button class="avatar-card profile-level-action" id="profile-level-action" type="button" aria-label="Показать прогресс уровня" title="Прогресс уровня">
-                    <span class="profile-frame-ring" aria-hidden="true"></span>
-                    <div class="avatar-portrait" id="profile-avatar">И</div>
-                </button>
-
-                <div class="panel-header profile-cover-header">
-                    <div class="profile-identity">
-                        <p class="panel-kicker">Профиль</p>
-                        <h1 class="panel-title" id="profile-name">Новый игрок</h1>
-                        <div class="profile-status-row">
-                            <span class="avatar-level-badge profile-level-pill" aria-label="Уровень">
-                                <span class="avatar-level-label">LVL</span>
-                                <span id="profile-level">1</span>
-                            </span>
-                            <span class="profile-status-label">Боевой профиль</span>
-                        </div>
-                        <span class="profile-level-progress" aria-hidden="true">
-                            <span id="profile-level-progress-fill"></span>
-                            <span id="profile-level-progress-text">0 / 100</span>
-                        </span>
-                        <div class="profile-side">
-                            <button class="stat-chip stat-chip-accent profile-stat-button" id="profile-money-action" type="button" aria-label="Открыть магазин" title="Монеты тратятся в магазине">
-                                <span class="stat-icon stat-icon-coins" aria-label="Монеты" title="Монеты"></span>
-                                <strong id="profile-money">0</strong>
-                            </button>
-                            <button class="stat-chip profile-stat-button" id="profile-rating-action" type="button" aria-label="Открыть рейтинг" title="Открыть рейтинг">
-                                <span class="stat-icon stat-icon-rating" aria-label="Рейтинг" title="Рейтинг"></span>
-                                <strong id="profile-rating">0</strong>
-                            </button>
-                        </div>
-                        <div class="profile-badge-row" aria-label="Персонализация профиля">
-                            <span class="profile-badge-chip" id="profile-badge-chip">Новичок</span>
-                            <span class="profile-frame-chip">Рамка</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="action-row">
-                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Вступить в стычку</button>
-                <button class="secondary-button hidden" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()" hidden aria-hidden="true">Быстрая дуэль (бот)</button>
-            </div>
-
-            <section class="queue-status hidden" id="queue-status-card" aria-live="polite">
-                <div class="queue-status-copy">
-                    <p class="queue-status-label">Поиск дуэли</p>
-                    <strong class="queue-status-time" id="queue-status-time">0 сек</strong>
-                    <p class="queue-status-note" id="queue-status-note">Ищем соперника в очереди.</p>
-                </div>
-                <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
-            </section>
-
-            <div class="hidden" id="stat-points-badge">0</div>
-            <div class="hidden" id="hero-stats"></div>
-
-            <div id="quest-badge" class="hidden"></div>
-            <div id="quest-counter" class="hidden"></div>
-            <div id="quest-list" class="hidden"></div>
-            <div id="quest-detail-title" class="hidden"></div>
-            <div id="quest-detail-subtitle" class="hidden"></div>
-            <div id="quest-story-text" class="hidden"></div>
-            <div id="quest-choice-list" class="hidden"></div>
-            <div id="quest-state-tags" class="hidden"></div>
-            <div id="quest-state-count" class="hidden"></div>
-            <div id="quest-pocket-list" class="hidden"></div>
-            <div id="quest-pocket-count" class="hidden"></div>
-        </article>
         <section class="panel journal-panel hidden" id="home-journal-panel">
             <div class="panel-header journal-panel-header">
                 <div class="journal-header-copy">
