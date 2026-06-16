@@ -5,7 +5,11 @@ public enum EncounterType {
     MONSTER,
     ANOMALY,
     LOOT,
+    MAP_FRAGMENT,
+    BASE_MEMORY,
     PVP_TRACE,
     PVP_ENCOUNTER,
+    PVP_AFTERMATH,
+    RISK_REWARD,
     QUIET_EVENT
 }

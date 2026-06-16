@@ -4,6 +4,8 @@ import java.time.Clock;
 import java.util.Map;
 import java.util.Set;
 
+import com.example.sandalpunk.exploration.ExplorationRepository;
+import com.example.sandalpunk.exploration.ExplorationStatus;
 import com.example.sandalpunk.exploration.PlayerState;
 import com.example.sandalpunk.exploration.PlayerStateService;
 import com.example.sandalpunk.logging.AppEventLogger;
@@ -19,6 +21,7 @@ public class BaseService {
     private final BaseStateRepository repository;
     private final MapService mapService;
     private final PlayerStateService playerStateService;
+    private final ExplorationRepository explorationRepository;
     private final ProgressionBalance balance;
     private final AppEventLogger eventLogger;
     private final Clock clock;
@@ -27,6 +30,7 @@ public class BaseService {
             BaseStateRepository repository,
             MapService mapService,
             PlayerStateService playerStateService,
+            ExplorationRepository explorationRepository,
             ProgressionBalance balance,
             AppEventLogger eventLogger,
             Clock clock
@@ -34,6 +38,7 @@ public class BaseService {
         this.repository = repository;
         this.mapService = mapService;
         this.playerStateService = playerStateService;
+        this.explorationRepository = explorationRepository;
         this.balance = balance;
         this.eventLogger = eventLogger;
         this.clock = clock;
@@ -96,6 +101,18 @@ public class BaseService {
                         "resourcesDelta", "-" + current.cost()
                 )
         );
+        boolean hasReturnedExploration = explorationRepository.findByPlayerId(player.getId()).stream()
+                .anyMatch(exploration -> exploration.getStatus() == ExplorationStatus.RETURNED);
+        long upgradedCount = base.getUpgrades().stream()
+                .filter(upgrade -> upgrade.level() > 0)
+                .count();
+        if (hasReturnedExploration && upgradedCount == 1) {
+            eventLogger.info(
+                    AppEventType.FIRST_UPGRADE_AFTER_EXPLORATION,
+                    "Первое улучшение после экспедиции",
+                    Map.of("playerId", player.getId(), "upgradeId", upgraded.id())
+            );
+        }
         return base;
     }
 

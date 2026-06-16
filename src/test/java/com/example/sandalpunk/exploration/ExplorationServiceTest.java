@@ -6,6 +6,8 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
+import com.example.sandalpunk.discovery.DiscoveryService;
+import com.example.sandalpunk.discovery.InMemoryDiscoveryRepository;
 import com.example.sandalpunk.config.DuelBalanceProperties;
 import com.example.sandalpunk.logging.AppEventLogger;
 import com.example.sandalpunk.player.PlayerProfile;
@@ -48,6 +50,7 @@ class ExplorationServiceTest {
                 new InMemoryBaseStateRepository(),
                 mapService,
                 playerStateService,
+                new InMemoryExplorationRepository(),
                 balance,
                 eventLogger,
                 clock
@@ -60,10 +63,12 @@ class ExplorationServiceTest {
                 eventLogger,
                 clock
         );
+        ContentBalance contentBalance = new NoChainContentBalance();
         ExplorationModifierService modifierService = new ExplorationModifierService(
                 baseService,
                 equipmentService,
                 mapService,
+                contentBalance,
                 eventLogger
         );
         explorationService = new ExplorationService(
@@ -72,6 +77,9 @@ class ExplorationServiceTest {
                 playerStateService,
                 new PredictableEncounterGenerator(),
                 modifierService,
+                new EventChainService(contentBalance),
+                new DiscoveryService(new InMemoryDiscoveryRepository(), eventLogger, clock),
+                contentBalance,
                 eventLogger,
                 clock
         );
@@ -158,6 +166,14 @@ class ExplorationServiceTest {
 
         @Override
         protected double nextDouble() {
+            return 0.0d;
+        }
+    }
+
+    private static final class NoChainContentBalance extends ContentBalance {
+
+        @Override
+        public double chainStartChance() {
             return 0.0d;
         }
     }

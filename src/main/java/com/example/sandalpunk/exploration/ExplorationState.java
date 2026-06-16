@@ -2,7 +2,9 @@ package com.example.sandalpunk.exploration;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ExplorationState {
 
@@ -16,6 +18,11 @@ public class ExplorationState {
     private final List<JournalEntry> journalEntries;
     private Encounter currentEncounter;
     private boolean startPvpDuel;
+    private String activeChainId;
+    private String activeChainStep;
+    private final Set<String> completedChainIds;
+    private final Set<String> failedChainIds;
+    private final List<String> recentlySeenEventIds;
     private final Instant startedAt;
     private Instant finishedAt;
 
@@ -37,6 +44,9 @@ public class ExplorationState {
         this.maxSteps = maxSteps;
         this.collectedResources = collectedResources;
         this.journalEntries = new ArrayList<>();
+        this.completedChainIds = new LinkedHashSet<>();
+        this.failedChainIds = new LinkedHashSet<>();
+        this.recentlySeenEventIds = new ArrayList<>();
         this.startedAt = startedAt;
     }
 
@@ -106,6 +116,68 @@ public class ExplorationState {
 
     public void setStartPvpDuel(boolean startPvpDuel) {
         this.startPvpDuel = startPvpDuel;
+    }
+
+    public String getActiveChainId() {
+        return activeChainId;
+    }
+
+    public void setActiveChainId(String activeChainId) {
+        this.activeChainId = activeChainId;
+    }
+
+    public String getActiveChainStep() {
+        return activeChainStep;
+    }
+
+    public void setActiveChainStep(String activeChainStep) {
+        this.activeChainStep = activeChainStep;
+    }
+
+    public Set<String> getCompletedChainIds() {
+        return Set.copyOf(completedChainIds);
+    }
+
+    public void markChainCompleted(String chainId) {
+        if (chainId != null && !chainId.isBlank()) {
+            completedChainIds.add(chainId);
+            failedChainIds.remove(chainId);
+        }
+    }
+
+    public Set<String> getFailedChainIds() {
+        return Set.copyOf(failedChainIds);
+    }
+
+    public void markChainFailed(String chainId) {
+        if (chainId != null && !chainId.isBlank()) {
+            failedChainIds.add(chainId);
+        }
+    }
+
+    public List<String> getRecentlySeenEventIds() {
+        return List.copyOf(recentlySeenEventIds);
+    }
+
+    public boolean hasRecentlySeen(String contentId) {
+        return contentId != null && recentlySeenEventIds.contains(contentId);
+    }
+
+    public void markEventSeen(String contentId, int cooldownSize) {
+        if (contentId == null || contentId.isBlank()) {
+            return;
+        }
+        recentlySeenEventIds.remove(contentId);
+        recentlySeenEventIds.add(contentId);
+        int limit = Math.max(1, cooldownSize);
+        while (recentlySeenEventIds.size() > limit) {
+            recentlySeenEventIds.remove(0);
+        }
+    }
+
+    public void clearActiveChain() {
+        activeChainId = null;
+        activeChainStep = null;
     }
 
     public Instant getStartedAt() {

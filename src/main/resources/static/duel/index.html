@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260615-2">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260616-stage4">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -58,6 +58,7 @@
                         <button class="progression-tab is-active" type="button" role="tab" aria-selected="true" data-progression-view="upgrades">Улучшения</button>
                         <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="equipment">Снаряжение</button>
                         <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="map">Карта</button>
+                        <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="discoveries">Находки</button>
                     </div>
                     <div class="progression-content" id="progression-content" aria-live="polite"></div>
                 </section>
@@ -71,6 +72,7 @@
             <div class="exploration-active hidden" id="exploration-active">
                 <div class="exploration-progress-row">
                     <span id="exploration-step-label">Шаг 0 из 8</span>
+                    <span class="exploration-chain-label hidden" id="exploration-chain-label">Цепочка</span>
                     <span id="exploration-collected">В рюкзаке пока пусто</span>
                 </div>
                 <div class="exploration-journal" id="exploration-live-journal" aria-live="polite"></div>
@@ -552,8 +554,8 @@
 <div class="toast hidden" id="toast"></div>
 
 <script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260615-2"></script>
-<script src="/duel/exploration.js?v=polus-20260615-2"></script>
+<script src="/duel/app.js?v=polus-20260616-stage4"></script>
+<script src="/duel/exploration.js?v=polus-20260616-stage4"></script>
 </body>
 </html>
 

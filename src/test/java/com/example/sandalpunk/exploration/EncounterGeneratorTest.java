@@ -12,8 +12,8 @@ class EncounterGeneratorTest {
 
     @Test
     void exposesRequiredStageTwoContentCounts() {
-        assertThat(generator.hiddenContentCount()).isEqualTo(20);
-        assertThat(generator.openPvpContentCount()).isEqualTo(7);
+        assertThat(generator.hiddenContentCount()).isGreaterThanOrEqualTo(64);
+        assertThat(generator.openPvpContentCount()).isGreaterThanOrEqualTo(23);
     }
 
     @Test

@@ -41,6 +41,7 @@ class ExplorationModifierServiceTest {
                 new InMemoryBaseStateRepository(),
                 mapService,
                 playerStateService,
+                new InMemoryExplorationRepository(),
                 balance,
                 logger,
                 clock
@@ -57,6 +58,7 @@ class ExplorationModifierServiceTest {
                 baseService,
                 equipmentService,
                 mapService,
+                new ContentBalance(),
                 logger
         );
         PlayerProfile player = new PlayerProfile(

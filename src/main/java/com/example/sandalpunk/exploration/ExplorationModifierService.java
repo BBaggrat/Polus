@@ -23,17 +23,20 @@ public class ExplorationModifierService {
     private final BaseService baseService;
     private final EquipmentService equipmentService;
     private final MapService mapService;
+    private final ContentBalance contentBalance;
     private final AppEventLogger eventLogger;
 
     public ExplorationModifierService(
             BaseService baseService,
             EquipmentService equipmentService,
             MapService mapService,
+            ContentBalance contentBalance,
             AppEventLogger eventLogger
     ) {
         this.baseService = baseService;
         this.equipmentService = equipmentService;
         this.mapService = mapService;
+        this.contentBalance = contentBalance;
         this.eventLogger = eventLogger;
     }
 
@@ -41,6 +44,15 @@ public class ExplorationModifierService {
             PlayerProfile player,
             ExplorationVisibilityMode mode,
             EncounterGenerator generator
+    ) {
+        return nextEncounter(player, mode, generator, Set.of());
+    }
+
+    public Encounter nextEncounter(
+            PlayerProfile player,
+            ExplorationVisibilityMode mode,
+            EncounterGenerator generator,
+            Set<String> recentlySeenEventIds
     ) {
         String route = mapService.selectedRoute(player);
         Set<EncounterType> preferred = Set.of();
@@ -58,11 +70,18 @@ public class ExplorationModifierService {
             preferred = Set.of(EncounterType.PVP_TRACE);
             chance += 0.05d;
         }
-        return decorateHookChoice(player, generator.nextEncounter(mode, preferred, chance));
+        if (route != null && !route.isBlank()) {
+            eventLogger.info(
+                    AppEventType.MAP_ROUTE_USED,
+                    "Маршрут повлиял на генерацию события",
+                    Map.of("playerId", player.getId(), "routeId", route, "visibilityMode", mode)
+            );
+        }
+        return decorateHookChoice(player, generator.nextEncounter(mode, preferred, chance, recentlySeenEventIds));
     }
 
     public MapFragment tryDiscoverMapFragment(PlayerProfile player, String explorationId) {
-        int chance = 8
+        int chance = contentBalance.mapFragmentChance()
                 + (baseService.level(player, BaseUpgradeType.CARTOGRAPHY_TABLE) * 10)
                 + (int) equipmentService.effect(player, "map_fragment_bonus");
         return mapService.discoverFragment(player, explorationId, chance);
@@ -77,9 +96,15 @@ public class ExplorationModifierService {
         List<String> messages = new ArrayList<>();
         PlayerResources reward = choice.reward() == null ? PlayerResources.empty() : choice.reward();
         if (!reward.isEmpty() && exploration.getVisibilityMode() == ExplorationVisibilityMode.OPEN_PVP) {
-            reward = scaleReward(reward, 1.25d);
+            reward = scaleReward(reward, contentBalance.openPvpRewardMultiplier());
             messages.add("Открытый маршрут принёс больше добычи.");
-            logEffect(AppEventType.OPEN_PVP_REWARD_APPLIED, player, exploration, "rewardMultiplier", "1.25");
+            logEffect(
+                    AppEventType.OPEN_PVP_REWARD_APPLIED,
+                    player,
+                    exploration,
+                    "rewardMultiplier",
+                    contentBalance.openPvpRewardMultiplier()
+            );
         }
 
         int dryingLevel = baseService.level(player, BaseUpgradeType.DRYING_RACK);
@@ -117,7 +142,10 @@ public class ExplorationModifierService {
     }
 
     public FailureOutcome failureOutcome(PlayerProfile player, ExplorationState exploration) {
-        int baseLoss = exploration.getVisibilityMode() == ExplorationVisibilityMode.OPEN_PVP ? 60 : 50;
+        int baseLoss = contentBalance.failureResourceLossPercent()
+                + (exploration.getVisibilityMode() == ExplorationVisibilityMode.OPEN_PVP
+                ? contentBalance.openPvpFailureResourceLossBonus()
+                : 0);
         int storageReduction = baseService.level(player, BaseUpgradeType.STORAGE) * 10;
         int lossPercent = Math.max(10, baseLoss - storageReduction);
         PlayerResources collected = exploration.getCollectedResources();
@@ -173,7 +201,10 @@ public class ExplorationModifierService {
                 encounter.text(),
                 List.copyOf(choices),
                 encounter.reward(),
-                encounter.risk()
+                encounter.risk(),
+                encounter.chainId(),
+                encounter.chainStepId(),
+                encounter.tags()
         );
     }
 

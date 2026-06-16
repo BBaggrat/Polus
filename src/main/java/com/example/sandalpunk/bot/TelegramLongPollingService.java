@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TelegramLongPollingService implements SmartLifecycle {
-    private static final String WEB_APP_BUILD = "20260615-2";
+    private static final String WEB_APP_BUILD = "20260616-stage4";
 
     private final ApplicationProperties applicationProperties;
     private final TelegramBotClient telegramBotClient;

@@ -5,8 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import com.example.sandalpunk.discovery.DiscoveryService;
+import com.example.sandalpunk.discovery.DiscoveryType;
 import com.example.sandalpunk.logging.AppEventLogger;
 import com.example.sandalpunk.logging.AppEventType;
 import com.example.sandalpunk.player.PlayerProfile;
@@ -27,6 +30,9 @@ public class ExplorationService {
     private final PlayerStateService playerStateService;
     private final EncounterGenerator encounterGenerator;
     private final ExplorationModifierService modifierService;
+    private final EventChainService eventChainService;
+    private final DiscoveryService discoveryService;
+    private final ContentBalance contentBalance;
     private final AppEventLogger appEventLogger;
     private final Clock clock;
 
@@ -36,6 +42,9 @@ public class ExplorationService {
             PlayerStateService playerStateService,
             EncounterGenerator encounterGenerator,
             ExplorationModifierService modifierService,
+            EventChainService eventChainService,
+            DiscoveryService discoveryService,
+            ContentBalance contentBalance,
             AppEventLogger appEventLogger,
             Clock clock
     ) {
@@ -44,6 +53,9 @@ public class ExplorationService {
         this.playerStateService = playerStateService;
         this.encounterGenerator = encounterGenerator;
         this.modifierService = modifierService;
+        this.eventChainService = eventChainService;
+        this.discoveryService = discoveryService;
+        this.contentBalance = contentBalance;
         this.appEventLogger = appEventLogger;
         this.clock = clock;
     }
@@ -65,6 +77,7 @@ public class ExplorationService {
         ExplorationVisibilityMode mode = request != null && request.visibilityMode() != null
                 ? request.visibilityMode()
                 : ExplorationVisibilityMode.HIDDEN;
+        int previousExplorationCount = explorationRepository.findByPlayerId(playerProfile.getId()).size();
         ExplorationState explorationState = new ExplorationState(
                 UUID.randomUUID().toString(),
                 playerProfile.getId(),
@@ -90,6 +103,20 @@ public class ExplorationService {
                 Map.of("visibilityMode", mode.name())
         );
         log(AppEventType.EXPLORATION_STARTED, explorationState, Map.of("visibilityMode", mode.name()));
+        log(
+                mode == ExplorationVisibilityMode.OPEN_PVP
+                        ? AppEventType.OPEN_PVP_MODE_SELECTED
+                        : AppEventType.HIDDEN_MODE_SELECTED,
+                explorationState,
+                Map.of("source", "exploration_start")
+        );
+        if (previousExplorationCount == 0) {
+            log(AppEventType.RETENTION_MARKER_D1_CANDIDATE, explorationState, Map.of("reason", "first_start"));
+        } else if (previousExplorationCount == 1) {
+            log(AppEventType.SECOND_EXPLORATION_STARTED, explorationState, Map.of("previousExplorations", previousExplorationCount));
+        } else {
+            log(AppEventType.REPEAT_EXPLORATION_STARTED, explorationState, Map.of("previousExplorations", previousExplorationCount));
+        }
         if (mode == ExplorationVisibilityMode.OPEN_PVP) {
             log(AppEventType.OPEN_PVP_ENABLED, explorationState, Map.of("source", "exploration_start"));
         }
@@ -136,29 +163,39 @@ public class ExplorationService {
         if (fragment != null) {
             addJournalEntry(
                     explorationState,
-                    JournalEntryType.OBJECT,
+                    JournalEntryType.MAP_FRAGMENT,
                     "Картографический стол помог заметить старую метку. " + fragment.text(),
                     Map.of("fragmentId", fragment.id(), "mapFragment", "true")
+            );
+            discoveryService.record(
+                    playerProfile,
+                    DiscoveryType.MAP_FRAGMENT,
+                    fragment.title(),
+                    fragment.text(),
+                    fragment.id(),
+                    List.of("map_fragment", "route")
             );
         }
 
         boolean encounterDue = explorationState.getStep() % 2 == 0 || encounterGenerator.shouldGenerateEncounter();
         if (encounterDue) {
-            Encounter encounter = modifierService.nextEncounter(
-                    playerProfile,
-                    explorationState.getVisibilityMode(),
-                    encounterGenerator
-            );
+            String activeChainBefore = explorationState.getActiveChainId();
+            Encounter encounter = eventChainService.nextChainEncounter(explorationState)
+                    .or(() -> eventChainService.maybeStartChain(explorationState))
+                    .orElseGet(() -> modifierService.nextEncounter(
+                            playerProfile,
+                            explorationState.getVisibilityMode(),
+                            encounterGenerator,
+                            Set.copyOf(explorationState.getRecentlySeenEventIds())
+                    ));
+            boolean repeated = explorationState.hasRecentlySeen(encounter.contentId());
+            explorationState.markEventSeen(encounter.contentId(), contentBalance.repeatedEventCooldownSize());
             explorationState.setCurrentEncounter(encounter);
             addJournalEntry(
                     explorationState,
                     journalType(encounter.type()),
                     encounter.title() + ". " + encounter.text(),
-                    Map.of(
-                            "encounterId", encounter.id(),
-                            "contentId", encounter.contentId(),
-                            "risk", encounter.risk().name()
-                    )
+                    encounterMetadata(encounter)
             );
             log(
                     AppEventType.ENCOUNTER_GENERATED,
@@ -169,6 +206,33 @@ public class ExplorationService {
                             "encounterType", encounter.type()
                     )
             );
+            if (repeated) {
+                log(
+                        AppEventType.CONTENT_EVENT_REPEATED,
+                        explorationState,
+                        Map.of("contentId", encounter.contentId(), "reason", "cooldown_pool_exhausted")
+                );
+            }
+            if (activeChainBefore == null && encounter.chainId() != null) {
+                addJournalEntry(
+                        explorationState,
+                        JournalEntryType.SYSTEM,
+                        "Началась цепочка: " + eventChainService.title(encounter.chainId()) + ".",
+                        Map.of("chainId", encounter.chainId(), "chainStarted", "true")
+                );
+                log(
+                        AppEventType.CHAIN_STARTED,
+                        explorationState,
+                        Map.of("chainId", encounter.chainId(), "chainTitle", eventChainService.title(encounter.chainId()))
+                );
+            }
+            if (encounter.type() == EncounterType.MONSTER) {
+                log(
+                        AppEventType.MONSTER_ENCOUNTER_SEEN,
+                        explorationState,
+                        Map.of("encounterId", encounter.id(), "contentId", encounter.contentId())
+                );
+            }
             if (encounter.type() == EncounterType.PVP_TRACE) {
                 log(
                         AppEventType.PVP_TRACE_SEEN,
@@ -216,6 +280,11 @@ public class ExplorationService {
                 encounter,
                 choice
         );
+        EventChainService.ChainResolution chainResolution = eventChainService.resolveChoice(
+                explorationState,
+                encounter,
+                choice
+        );
         if (outcome.reward() != null && !outcome.reward().isEmpty()) {
             explorationState.setCollectedResources(
                     explorationState.getCollectedResources().add(outcome.reward())
@@ -224,6 +293,16 @@ public class ExplorationService {
                     AppEventType.RESOURCE_EARNED,
                     explorationState,
                     resourceMetadata(outcome.reward(), "exploration")
+            );
+        }
+        if (chainResolution.reward() != null && !chainResolution.reward().isEmpty()) {
+            explorationState.setCollectedResources(
+                    explorationState.getCollectedResources().add(chainResolution.reward())
+            );
+            log(
+                    AppEventType.RESOURCE_EARNED,
+                    explorationState,
+                    resourceMetadata(chainResolution.reward(), "chain")
             );
         }
 
@@ -242,6 +321,21 @@ public class ExplorationService {
                     )
             );
         }
+        if (chainResolution.hpDelta() != 0) {
+            int beforeChainHp = playerState.getHp();
+            playerState.setHp(playerState.getHp() + chainResolution.hpDelta());
+            playerStateService.save(playerState);
+            log(
+                    AppEventType.HP_CHANGED,
+                    explorationState,
+                    Map.of(
+                            "before", beforeChainHp,
+                            "after", playerState.getHp(),
+                            "delta", playerState.getHp() - beforeChainHp,
+                            "source", "chain"
+                    )
+            );
+        }
 
         addJournalEntry(
                 explorationState,
@@ -257,6 +351,19 @@ public class ExplorationService {
                     Map.of("progressionEffect", "true")
             );
         }
+        if (chainResolution.status() != EventChainService.ChainResolutionStatus.NONE
+                && chainResolution.journalMessage() != null
+                && !chainResolution.journalMessage().isBlank()) {
+            addJournalEntry(
+                    explorationState,
+                    JournalEntryType.SYSTEM,
+                    chainResolution.journalMessage(),
+                    Map.of(
+                            "chainId", chainResolution.chain() == null ? "" : chainResolution.chain().chainId(),
+                            "chainStatus", chainResolution.status().name()
+                    )
+            );
+        }
         log(
                 AppEventType.ENCOUNTER_CHOICE_MADE,
                 explorationState,
@@ -268,6 +375,34 @@ public class ExplorationService {
                         "resultType", choice.resultType()
                 )
         );
+        if (encounter.type() == EncounterType.MONSTER) {
+            log(
+                    AppEventType.MONSTER_CHOICE_MADE,
+                    explorationState,
+                    Map.of("encounterId", encounter.id(), "contentId", encounter.contentId(), "choiceId", choice.id())
+            );
+        }
+        if (encounter.type() == EncounterType.PVP_TRACE) {
+            log(
+                    AppEventType.PVP_TRACE_CHOICE_MADE,
+                    explorationState,
+                    Map.of("encounterId", encounter.id(), "contentId", encounter.contentId(), "choiceId", choice.id())
+            );
+        }
+        if (chainResolution.status() == EventChainService.ChainResolutionStatus.COMPLETED) {
+            log(
+                    AppEventType.CHAIN_COMPLETED,
+                    explorationState,
+                    Map.of("chainId", chainResolution.chain().chainId(), "chainTitle", chainResolution.chain().title())
+            );
+        } else if (chainResolution.status() == EventChainService.ChainResolutionStatus.FAILED) {
+            log(
+                    AppEventType.CHAIN_FAILED,
+                    explorationState,
+                    Map.of("chainId", chainResolution.chain().chainId(), "chainTitle", chainResolution.chain().title())
+            );
+        }
+        recordDiscovery(playerProfile, encounter, choice);
 
         if (choice.resultType() == ChoiceResultType.ENTER_OPEN_PVP) {
             enableOpenPvp(explorationState, playerState, "encounter_choice");
@@ -280,6 +415,12 @@ public class ExplorationService {
                     AppEventType.PVP_ENCOUNTER_STARTED,
                     explorationState,
                     Map.of("encounterId", encounter.id(), "contentId", encounter.contentId())
+            );
+            addJournalEntry(
+                    explorationState,
+                    JournalEntryType.PVP_ENCOUNTER,
+                    "Стычка передана в обычный PvP-поиск. Итог дуэли будет записан отдельным событием после интеграции результата.",
+                    Map.of("pvpAdapter", "minimal", "contentId", encounter.contentId())
             );
         }
 
@@ -341,6 +482,8 @@ public class ExplorationService {
             ExplorationState explorationState,
             PlayerState playerState
     ) {
+        boolean firstReturnedBefore = explorationRepository.findByPlayerId(explorationState.getPlayerId()).stream()
+                .anyMatch(previous -> previous.getStatus() == ExplorationStatus.RETURNED);
         PlayerResources collected = explorationState.getCollectedResources();
         playerState.setResources(playerState.getResources().add(collected));
         playerState.setCurrentExplorationId(null);
@@ -351,14 +494,19 @@ public class ExplorationService {
         explorationState.setFinishedAt(clock.instant());
         explorationState.setCurrentEncounter(null);
         explorationState.setStartPvpDuel(false);
+        explorationState.clearActiveChain();
         addJournalEntry(
                 explorationState,
                 JournalEntryType.RETURN,
-                "Ты возвращаешься на базу. Все найденное перенесено в личный запас.",
+                encounterGenerator.nextReturnEntry() + " Все найденное перенесено в личный запас.",
                 resourceMetadata(collected, "return")
         );
         explorationRepository.save(explorationState);
         log(AppEventType.EXPLORATION_RETURNED, explorationState, resourceMetadata(collected, "return"));
+        log(AppEventType.RETURN_TO_BASE_SUCCESS, explorationState, resourceMetadata(collected, "return"));
+        if (!firstReturnedBefore) {
+            log(AppEventType.FIRST_EXPLORATION_COMPLETED, explorationState, Map.of("status", "returned"));
+        }
         return explorationState;
     }
 
@@ -382,10 +530,20 @@ public class ExplorationService {
         explorationState.setCurrentEncounter(null);
         explorationState.setStartPvpDuel(false);
         explorationState.setCollectedResources(failure.preserved());
+        if (explorationState.getActiveChainId() != null) {
+            String failedChainId = explorationState.getActiveChainId();
+            explorationState.markChainFailed(failedChainId);
+            explorationState.clearActiveChain();
+            log(
+                    AppEventType.CHAIN_FAILED,
+                    explorationState,
+                    Map.of("chainId", failedChainId, "reason", "exploration_failed")
+            );
+        }
         addJournalEntry(
                 explorationState,
-                JournalEntryType.RETURN,
-                "Силы закончились. Поисковая группа вернула тебя на базу. Потеряно "
+                JournalEntryType.FAILED,
+                encounterGenerator.nextFailedEntry() + " Потеряно "
                         + failure.lossPercent() + "% добычи, остальное удалось сохранить.",
                 Map.of(
                         "hp", String.valueOf(playerState.getHp()),
@@ -405,6 +563,7 @@ public class ExplorationService {
                         "resourcesPreserved", failure.preserved()
                 )
         );
+        log(AppEventType.RETURN_TO_BASE_AFTER_FAILURE, explorationState, Map.of("reason", "hp_depleted"));
     }
 
     private void enableOpenPvp(
@@ -428,6 +587,9 @@ public class ExplorationService {
                 Map.of("from", previous, "to", ExplorationVisibilityMode.OPEN_PVP, "source", source)
         );
         log(AppEventType.OPEN_PVP_ENABLED, explorationState, Map.of("source", source));
+        if (previous == ExplorationVisibilityMode.HIDDEN) {
+            log(AppEventType.OPEN_PVP_AFTER_HIDDEN_ENABLED, explorationState, Map.of("source", source));
+        }
     }
 
     private ExplorationState requireActive(PlayerProfile playerProfile, String explorationId) {
@@ -490,6 +652,64 @@ public class ExplorationService {
         appEventLogger.info(type, type.eventName(), eventMetadata);
     }
 
+    private Map<String, String> encounterMetadata(Encounter encounter) {
+        Map<String, String> metadata = new LinkedHashMap<>();
+        metadata.put("encounterId", encounter.id());
+        metadata.put("contentId", encounter.contentId());
+        metadata.put("risk", encounter.risk().name());
+        if (encounter.chainId() != null) {
+            metadata.put("chainId", encounter.chainId());
+            metadata.put("chainStepId", encounter.chainStepId());
+        }
+        if (!encounter.tags().isEmpty()) {
+            metadata.put("tags", String.join(",", encounter.tags()));
+        }
+        return metadata;
+    }
+
+    private void recordDiscovery(
+            PlayerProfile playerProfile,
+            Encounter encounter,
+            EncounterChoice choice
+    ) {
+        DiscoveryType type = discoveryType(encounter, choice);
+        if (type == null) {
+            return;
+        }
+        discoveryService.record(
+                playerProfile,
+                type,
+                encounter.title(),
+                choice.resultText(),
+                encounter.contentId(),
+                encounter.tags()
+        );
+    }
+
+    private DiscoveryType discoveryType(Encounter encounter, EncounterChoice choice) {
+        if (choice.resultType() == ChoiceResultType.AVOID || choice.resultType() == ChoiceResultType.LOSE_HP) {
+            return null;
+        }
+        return switch (encounter.type()) {
+            case MAP_FRAGMENT -> DiscoveryType.MAP_FRAGMENT;
+            case BASE_MEMORY -> DiscoveryType.NOTE;
+            case MONSTER -> choice.resultType() == ChoiceResultType.MONSTER_FIGHT_TEXT
+                    || choice.resultType() == ChoiceResultType.FIND_OBJECT
+                    ? DiscoveryType.MONSTER_TRACE
+                    : null;
+            case ANOMALY -> choice.resultType() == ChoiceResultType.FIND_OBJECT
+                    || choice.resultType() == ChoiceResultType.GAIN_RESOURCE
+                    ? DiscoveryType.ANOMALY_MARK
+                    : null;
+            case OBJECT, QUIET_EVENT, PVP_AFTERMATH -> choice.resultType() == ChoiceResultType.FIND_OBJECT
+                    ? DiscoveryType.OBJECT
+                    : null;
+            case PVP_TRACE, PVP_ENCOUNTER, RISK_REWARD, LOOT -> choice.resultType() == ChoiceResultType.FIND_OBJECT
+                    ? DiscoveryType.NOTE
+                    : null;
+        };
+    }
+
     private Map<String, String> choiceMetadata(Encounter encounter, EncounterChoice choice) {
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("encounterId", encounter.id());
@@ -514,11 +734,15 @@ public class ExplorationService {
     private JournalEntryType journalType(EncounterType encounterType) {
         return switch (encounterType) {
             case OBJECT -> JournalEntryType.OBJECT;
+            case MAP_FRAGMENT -> JournalEntryType.MAP_FRAGMENT;
+            case BASE_MEMORY -> JournalEntryType.BASE_MEMORY;
             case MONSTER -> JournalEntryType.MONSTER;
             case ANOMALY -> JournalEntryType.ANOMALY;
             case LOOT -> JournalEntryType.LOOT;
             case PVP_TRACE -> JournalEntryType.PVP_TRACE;
             case PVP_ENCOUNTER -> JournalEntryType.PVP_ENCOUNTER;
+            case PVP_AFTERMATH -> JournalEntryType.PVP_AFTERMATH;
+            case RISK_REWARD -> JournalEntryType.RISK_REWARD;
             case QUIET_EVENT -> JournalEntryType.SYSTEM;
         };
     }

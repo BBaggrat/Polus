@@ -1,5 +1,6 @@
 package com.example.sandalpunk.exploration;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ExplorationRepository {
@@ -9,4 +10,8 @@ public interface ExplorationRepository {
     Optional<ExplorationState> findById(String explorationId);
 
     Optional<ExplorationState> findActiveByPlayerId(String playerId);
+
+    List<ExplorationState> findByPlayerId(String playerId);
+
+    List<ExplorationState> findAll();
 }

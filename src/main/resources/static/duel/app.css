@@ -6104,7 +6104,7 @@ body.social-open {
 
 .progression-tabs {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
     padding: 3px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -6148,6 +6148,43 @@ body.social-open {
     border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 11px;
     background: rgba(255, 255, 255, 0.035);
+}
+
+.progression-empty {
+    padding: 12px;
+    border: 1px solid rgba(143, 216, 255, 0.16);
+    border-radius: 12px;
+    background: rgba(49, 92, 113, 0.12);
+}
+
+.progression-empty strong {
+    display: block;
+    color: #e7edf7;
+    font-size: 0.82rem;
+}
+
+.progression-empty p {
+    margin: 5px 0 0;
+    color: #9ca6b9;
+    font-size: 0.68rem;
+    line-height: 1.38;
+}
+
+.discovery-item {
+    grid-template-columns: 32px minmax(0, 1fr);
+}
+
+.discovery-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(216, 176, 123, 0.24);
+    border-radius: 10px;
+    color: #f0d4a6;
+    background: rgba(161, 112, 65, 0.16);
+    font-size: 0.8rem;
+    font-weight: 900;
 }
 
 .progression-item.is-locked {
@@ -6266,10 +6303,24 @@ body.social-open {
     align-items: flex-start;
     color: var(--muted);
     font-size: 0.72rem;
+    flex-wrap: wrap;
+}
+
+.exploration-chain-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 4px 9px;
+    border: 1px solid rgba(216, 176, 123, 0.24);
+    border-radius: 999px;
+    color: #f0d4a6;
+    background: rgba(128, 83, 44, 0.18);
+    font-size: 0.68rem;
+    font-weight: 800;
 }
 
 #exploration-collected {
-    max-width: 62%;
+    max-width: 100%;
     color: #ddbf8c;
     text-align: right;
 }
@@ -6302,6 +6353,33 @@ body.social-open {
     background: rgba(42, 34, 29, 0.68);
 }
 
+.exploration-entry.is-monster,
+.exploration-entry.is-failed {
+    border-color: rgba(183, 72, 95, 0.24);
+    background: rgba(69, 24, 35, 0.42);
+}
+
+.exploration-entry.is-anomaly {
+    border-color: rgba(143, 216, 255, 0.18);
+    background: rgba(26, 54, 72, 0.42);
+}
+
+.exploration-entry.is-loot,
+.exploration-entry.is-map-fragment,
+.exploration-entry.is-base-memory,
+.exploration-entry.is-return {
+    border-color: rgba(216, 176, 123, 0.22);
+    background: rgba(52, 40, 25, 0.46);
+}
+
+.exploration-entry.is-pvp-trace,
+.exploration-entry.is-pvp-encounter,
+.exploration-entry.is-pvp-aftermath,
+.exploration-entry.is-risk-reward {
+    border-color: rgba(183, 72, 95, 0.22);
+    background: rgba(58, 30, 39, 0.44);
+}
+
 .exploration-entry-marker {
     display: grid;
     place-items: center;
@@ -6326,11 +6404,31 @@ body.social-open {
     line-height: 1.45;
 }
 
-.exploration-entry-copy time {
-    display: block;
-    margin-top: 5px;
+.exploration-entry-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
     color: #7f899f;
     font-size: 0.64rem;
+}
+
+.exploration-entry-meta time {
+    margin-left: auto;
+}
+
+.exploration-entry-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 18px;
+    padding: 2px 6px;
+    border: 1px solid rgba(143, 216, 255, 0.16);
+    border-radius: 999px;
+    color: #b9e6ff;
+    background: rgba(48, 104, 132, 0.14);
+    font-size: 0.58rem;
+    font-weight: 800;
 }
 
 .exploration-encounter {
@@ -6464,7 +6562,9 @@ body.social-open {
     }
 
     .progression-tab {
-        font-size: 0.62rem;
+        min-height: 31px;
+        padding-inline: 2px;
+        font-size: 0.58rem;
     }
 
     .progression-action-wide {

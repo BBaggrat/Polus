@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 
 import com.example.sandalpunk.config.DuelBalanceProperties;
 import com.example.sandalpunk.exploration.InMemoryPlayerStateRepository;
+import com.example.sandalpunk.exploration.InMemoryExplorationRepository;
 import com.example.sandalpunk.exploration.PlayerResources;
 import com.example.sandalpunk.exploration.PlayerStateService;
 import com.example.sandalpunk.logging.AppEventLogger;
@@ -36,6 +37,7 @@ class BaseServiceTest {
                 new InMemoryBaseStateRepository(),
                 mapService,
                 playerStateService,
+                new InMemoryExplorationRepository(),
                 balance,
                 logger,
                 clock

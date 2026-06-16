@@ -1,5 +1,7 @@
 package com.example.sandalpunk.exploration;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,5 +41,20 @@ public class InMemoryExplorationRepository implements ExplorationRepository {
             return Optional.empty();
         }
         return Optional.of(explorationState);
+    }
+
+    @Override
+    public List<ExplorationState> findByPlayerId(String playerId) {
+        return explorations.values().stream()
+                .filter(exploration -> exploration.getPlayerId().equals(playerId))
+                .sorted(Comparator.comparing(ExplorationState::getStartedAt))
+                .toList();
+    }
+
+    @Override
+    public List<ExplorationState> findAll() {
+        return explorations.values().stream()
+                .sorted(Comparator.comparing(ExplorationState::getStartedAt))
+                .toList();
     }
 }

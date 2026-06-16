@@ -12,6 +12,7 @@
         intro: document.getElementById("exploration-intro"),
         active: document.getElementById("exploration-active"),
         stepLabel: document.getElementById("exploration-step-label"),
+        chainLabel: document.getElementById("exploration-chain-label"),
         collected: document.getElementById("exploration-collected"),
         journal: document.getElementById("exploration-live-journal"),
         encounter: document.getElementById("exploration-encounter"),
@@ -42,6 +43,7 @@
         base: null,
         exploration: null,
         history: [],
+        discoveries: [],
         busy: false,
         initialized: false,
         browserSessionToken: null,
@@ -104,12 +106,14 @@
             api("/api/player/state"),
             api("/api/exploration/current" + query),
             api("/api/journal" + query + (query ? "&" : "?") + "limit=60"),
-            api("/api/base/state" + query)
+            api("/api/base/state" + query),
+            api("/api/discoveries" + query)
         ]);
         state.player = results[0];
         state.exploration = results[1];
         state.history = Array.isArray(results[2]) ? results[2] : [];
         state.base = results[3];
+        state.discoveries = Array.isArray(results[4]) ? results[4] : [];
         state.initialized = true;
         setStatus("", false);
         render();
@@ -335,6 +339,8 @@
             renderEquipment(state.base.equipment || {}, state.base.equipmentCatalog || []);
         } else if (state.progressionView === "map") {
             renderMap(map);
+        } else if (state.progressionView === "discoveries") {
+            renderDiscoveries();
         } else {
             renderUpgrades(upgrades);
         }
@@ -412,6 +418,25 @@
             }).join("");
     }
 
+    function renderDiscoveries() {
+        var discoveries = Array.isArray(state.discoveries) ? state.discoveries : [];
+        if (!discoveries.length) {
+            elements.progressionContent.innerHTML = '<article class="progression-empty">'
+                + '<strong>Находок пока нет</strong><p>Ищи объекты, следы существ, аномальные метки и фрагменты маршрутов в топи.</p>'
+                + '</article>';
+            return;
+        }
+        elements.progressionContent.innerHTML = discoveries.slice(0, 16).map(function (discovery) {
+            return '<article class="progression-item discovery-item is-' + escapeHtml(String(discovery.type || "note").toLowerCase())
+                + '"><div class="discovery-icon" aria-hidden="true">' + escapeHtml(discoveryMarker(discovery.type)) + '</div>'
+                + '<div class="progression-item-copy"><div class="progression-item-title"><strong>'
+                + escapeHtml(discovery.title || "Находка") + '</strong><span>'
+                + escapeHtml(discoveryTypeLabel(discovery.type)) + '</span></div><p>'
+                + escapeHtml(discovery.text || "") + '</p><small>'
+                + escapeHtml(formatTime(discovery.discoveredAt)) + '</small></div></article>';
+        }).join("");
+    }
+
     function renderPlayer() {
         var player = state.player;
         if (!player) {
@@ -441,6 +466,11 @@
         setMode(open ? "Открытый PvP" : "Скрытно", open ? "is-open" : "is-hidden");
         elements.stepLabel.textContent = "Шаг " + Number(exploration.step || 0)
             + " из " + Number(exploration.maxSteps || 0);
+        var chainText = exploration.activeChainId ? "Цепочка: " + chainLabel(exploration.activeChainId) : "";
+        if (elements.chainLabel) {
+            elements.chainLabel.textContent = chainText;
+            elements.chainLabel.classList.toggle("hidden", !chainText);
+        }
         elements.collected.textContent = formatResources(
             exploration.collectedResources,
             "В рюкзаке пока пусто"
@@ -497,12 +527,22 @@
     }
 
     function renderEntry(entry) {
-        return '<article class="exploration-entry">'
+        var type = String(entry.type || "SYSTEM").toLowerCase().replace(/_/g, "-");
+        var metadata = entry.metadata || {};
+        var extra = metadata.chainId
+            ? '<span class="exploration-entry-meta-chip">цепочка</span>'
+            : metadata.mapFragment === "true"
+                ? '<span class="exploration-entry-meta-chip">карта</span>'
+                : metadata.progressionEffect === "true"
+                    ? '<span class="exploration-entry-meta-chip">эффект</span>'
+                    : "";
+        return '<article class="exploration-entry is-' + escapeHtml(type) + '">'
             + '<span class="exploration-entry-marker" aria-hidden="true">'
             + escapeHtml(entryMarker(entry.type)) + '</span>'
             + '<div class="exploration-entry-copy"><p>' + escapeHtml(entry.text || "") + '</p>'
-            + '<time datetime="' + escapeHtml(entry.createdAt || "") + '">'
-            + escapeHtml(formatTime(entry.createdAt)) + '</time></div></article>';
+            + '<div class="exploration-entry-meta"><span>' + escapeHtml(entryTypeLabel(entry.type))
+            + '</span>' + extra + '<time datetime="' + escapeHtml(entry.createdAt || "") + '">'
+            + escapeHtml(formatTime(entry.createdAt)) + '</time></div></div></article>';
     }
 
     function renderBusy() {
@@ -566,10 +606,44 @@
             MONSTER: "Существо",
             ANOMALY: "Аномалия",
             LOOT: "Находка",
+            MAP_FRAGMENT: "Фрагмент",
+            BASE_MEMORY: "Память базы",
             PVP_TRACE: "Чужой след",
             PVP_ENCOUNTER: "Встреча",
+            PVP_AFTERMATH: "След стычки",
+            RISK_REWARD: "Риск",
             QUIET_EVENT: "Запись"
         }[type] || "Событие";
+    }
+
+    function entryTypeLabel(type) {
+        return {
+            MOVEMENT: "Путь",
+            LOOT: "Добыча",
+            OBJECT: "Объект",
+            MAP_FRAGMENT: "Карта",
+            BASE_MEMORY: "Память",
+            MONSTER: "Существо",
+            ANOMALY: "Аномалия",
+            PVP_TRACE: "След",
+            PVP_ENCOUNTER: "Стычка",
+            PVP_AFTERMATH: "Итог",
+            RISK_REWARD: "Риск",
+            CHOICE_RESULT: "Выбор",
+            SYSTEM: "Система",
+            FAILED: "Провал",
+            RETURN: "База"
+        }[type] || "Запись";
+    }
+
+    function chainLabel(chainId) {
+        return {
+            chain_underwater_sign: "Знак под водой",
+            chain_walkway_trace: "След вдоль настила",
+            chain_breathing_planks: "Доски дышат",
+            chain_old_cordon: "Старая линия кордона",
+            chain_journal_voice: "Голос из дневника"
+        }[chainId] || chainId;
     }
 
     function riskLabel(value) {
@@ -617,13 +691,38 @@
             MOVEMENT: "→",
             LOOT: "+",
             OBJECT: "□",
+            MAP_FRAGMENT: "⌁",
+            BASE_MEMORY: "≡",
             MONSTER: "!",
             ANOMALY: "◇",
             PVP_TRACE: "≋",
             PVP_ENCOUNTER: "×",
+            PVP_AFTERMATH: "∴",
+            RISK_REWARD: "!",
             CHOICE_RESULT: "✓",
             SYSTEM: "i",
+            FAILED: "×",
             RETURN: "⌂"
+        }[type] || "·";
+    }
+
+    function discoveryTypeLabel(type) {
+        return {
+            NOTE: "запись",
+            OBJECT: "объект",
+            MAP_FRAGMENT: "карта",
+            MONSTER_TRACE: "след существа",
+            ANOMALY_MARK: "аномалия"
+        }[type] || "находка";
+    }
+
+    function discoveryMarker(type) {
+        return {
+            NOTE: "≡",
+            OBJECT: "□",
+            MAP_FRAGMENT: "⌁",
+            MONSTER_TRACE: "!",
+            ANOMALY_MARK: "◇"
         }[type] || "·";
     }
 
