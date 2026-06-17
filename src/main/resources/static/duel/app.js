@@ -330,6 +330,7 @@
     function cacheElements() {
         elements.profileAvatar = document.getElementById("profile-avatar");
         elements.profileName = document.getElementById("profile-name");
+        elements.explorationTitle = document.getElementById("exploration-title");
         elements.profileLevel = document.getElementById("profile-level");
         elements.profileLevelAction = document.getElementById("profile-level-action");
         elements.profileLevelProgressFill = document.getElementById("profile-level-progress-fill");
@@ -12046,6 +12047,9 @@ function renderProfile() {
     if (elements.profileName) {
         elements.profileName.textContent = playerName;
     }
+    if (elements.explorationTitle) {
+        elements.explorationTitle.textContent = playerName;
+    }
     if (elements.profileLevel) {
         elements.profileLevel.textContent = String(playerLevel);
     }
@@ -13196,6 +13200,9 @@ function renderProfile() {
     const progressTitle = "До следующего уровня: " + progress.remaining;
     if (elements.profileName) {
         elements.profileName.textContent = playerName;
+    }
+    if (elements.explorationTitle) {
+        elements.explorationTitle.textContent = playerName;
     }
     if (elements.profileLevel) {
         elements.profileLevel.textContent = String(playerLevel);

@@ -3,6 +3,7 @@
 
     var elements = {
         panel: document.getElementById("exploration-panel"),
+        title: document.getElementById("exploration-title"),
         mode: document.getElementById("exploration-mode-chip"),
         hp: document.getElementById("exploration-hp"),
         hpFill: document.getElementById("exploration-hp-fill"),
@@ -447,6 +448,9 @@
         var maxHp = Math.max(1, Number(player.maxHp || 100));
         var hp = Math.max(0, Number(player.hp || 0));
         var resources = player.resources || {};
+        if (elements.title) {
+            elements.title.textContent = player.name || "Новый игрок";
+        }
         elements.hp.textContent = hp + " / " + maxHp;
         elements.hpFill.style.width = Math.max(0, Math.min(100, Math.round((hp / maxHp) * 100))) + "%";
         elements.scrap.textContent = Number(resources.scrap || 0);
