@@ -202,8 +202,8 @@ public class DuelService {
             duel.getRoundLogs().add(new RoundLog(
                     duel.getRoundNumber(),
                     List.of(
-                            "Раунд " + duel.getRoundNumber() + ": " + actorName + " покидает бой.",
-                            "Итог: " + winnerName + " получает автопобеду."
+                            "Раунд " + duel.getRoundNumber() + ": лодка " + actorName + " уходит из стычки.",
+                            "Итог: лодка " + winnerName + " удерживает воду без нового обмена."
                     ),
                     duel.getPlayerOneHp(),
                     duel.getPlayerTwoHp(),

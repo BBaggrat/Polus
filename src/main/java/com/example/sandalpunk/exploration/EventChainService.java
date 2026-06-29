@@ -120,7 +120,7 @@ public class EventChainService {
                     chain,
                     chain.completionReward(),
                     0,
-                    "Цепочка «" + chain.title() + "» завершена. База получила новую зацепку."
+                    "Цепочка «" + chain.title() + "» завершена. Лодка получила новую зацепку."
             );
         }
 
@@ -130,7 +130,7 @@ public class EventChainService {
                 chain,
                 PlayerResources.empty(),
                 -Math.max(0, chain.failurePenalty()),
-                "Цепочка «" + chain.title() + "» оборвалась. Топь забрала силы."
+                "Цепочка «" + chain.title() + "» оборвалась. Большая вода забрала силы."
         );
     }
 
@@ -166,7 +166,7 @@ public class EventChainService {
                 "chain_sign_underwater",
                 EncounterType.OBJECT,
                 "Знак под водой",
-                "Под мутной водой светится старый знак. Стрелка на нем не совпадает ни с одним маршрутом карты.",
+                "Под мутной водой светится старый знак. Стрелка на нем не совпадает ни с одним курсом карты.",
                 RiskLevel.MEDIUM,
                 List.of("chain", "sign", "water"),
                 choice("read", "Снять ил и прочитать", ChoiceResultType.FIND_OBJECT, RiskLevel.LOW,
@@ -195,7 +195,7 @@ public class EventChainService {
                 "trace",
                 "chain_walkway_trace",
                 EncounterType.PVP_TRACE,
-                "След вдоль настила",
+                "След вдоль платформы",
                 "Свежая полоса на мокрой доске идет рядом с твоими следами, будто кто-то шел на полшага позади.",
                 RiskLevel.HIGH,
                 List.of("chain", "pvp_trace", "walkway"),
@@ -211,12 +211,12 @@ public class EventChainService {
                 "chain_walkway_ambush",
                 EncounterType.PVP_ENCOUNTER,
                 "Тихая засада",
-                "За поворотом настила лежит пустой рюкзак-приманка. Ствол в камыше еще не поднят.",
+                "За поворотом протоки лежит пустой ящик-приманка. Ствол в тумане еще не поднят.",
                 RiskLevel.HIGH,
                 List.of("chain", "pvp_encounter", "ambush"),
                 choice("signal", "Дать знак и разойтись", ChoiceResultType.GAIN_RESOURCE, RiskLevel.MEDIUM,
-                        new PlayerResources(1, 1, 0), 0, "Другой выживший отступает, оставив часть приманки."),
-                choice("fight", "Вступить в стычку", ChoiceResultType.START_PVP_DUEL, RiskLevel.HIGH,
+                        new PlayerResources(1, 1, 0), 0, "Другой капитан отступает, оставив часть приманки."),
+                choice("fight", "Принять стычку", ChoiceResultType.START_PVP_DUEL, RiskLevel.HIGH,
                         new PlayerResources(2, 0, 0), 0, "Ты поднимаешь оружие. Стычка неизбежна.")
         ));
 
@@ -245,7 +245,7 @@ public class EventChainService {
                 "Доски передают короткую фразу: «не чинить южный пролет».",
                 RiskLevel.MEDIUM,
                 List.of("chain", "base_memory"),
-                choice("record", "Записать для базы", ChoiceResultType.FIND_OBJECT, RiskLevel.LOW,
+                choice("record", "Записать для лодки", ChoiceResultType.FIND_OBJECT, RiskLevel.LOW,
                         new PlayerResources(0, 1, 0), 0, "Запись поможет обходить живые пролеты."),
                 choice("ignore", "Стереть из головы", ChoiceResultType.AVOID, RiskLevel.LOW,
                         PlayerResources.empty(), 0, "Фраза рассыпается в шум воды.")
@@ -256,14 +256,14 @@ public class EventChainService {
                 "wire",
                 "chain_cordon_wire",
                 EncounterType.RISK_REWARD,
-                "Старая линия кордона",
-                "В камыше натянута почти невидимая проволока. На ней висит чужой жетон.",
+                "Линия старых буев",
+                "В тумане натянута почти невидимая проволока. На ней висит чужой жетон.",
                 RiskLevel.HIGH,
                 List.of("chain", "cordon", "risk_reward"),
                 choice("disarm", "Снять проволоку", ChoiceResultType.GAIN_RESOURCE, RiskLevel.MEDIUM,
-                        new PlayerResources(2, 0, 0), 0, "Проволока идет в рюкзак, а жетон указывает на старый кордон."),
+                        new PlayerResources(2, 0, 0), 0, "Проволока идет в палубный ящик, а жетон указывает на старую линию буев."),
                 choice("step_over", "Перешагнуть", ChoiceResultType.LOSE_HP, RiskLevel.HIGH,
-                        PlayerResources.empty(), -7, "Проволока цепляет броню и звенит на всю топь."),
+                        PlayerResources.empty(), -7, "Проволока цепляет броню и звенит над всей водой."),
                 avoid()
         ));
         put(encounters, chainEncounter(
@@ -272,13 +272,13 @@ public class EventChainService {
                 "chain_cordon_post",
                 EncounterType.PVP_AFTERMATH,
                 "Пустой пост",
-                "У кордона остались свежие гильзы, обломок маски и записка без подписи.",
+                "У линии старых буев остались свежие гильзы, обломок маски и записка без подписи.",
                 RiskLevel.MEDIUM,
                 List.of("chain", "pvp_aftermath", "cordon"),
                 choice("search", "Разобрать пост", ChoiceResultType.FIND_OBJECT, RiskLevel.MEDIUM,
                         new PlayerResources(1, 1, 1), 0, "Ты находишь схему обхода и чужую отметку."),
                 choice("burn", "Сжечь следы", ChoiceResultType.AVOID, RiskLevel.LOW,
-                        PlayerResources.empty(), 0, "Дым скрывает кордон, но схема пропадает.")
+                        PlayerResources.empty(), 0, "Дым скрывает линию буев, но схема пропадает.")
         ));
 
         put(encounters, chainEncounter(
@@ -286,14 +286,14 @@ public class EventChainService {
                 "voice",
                 "chain_journal_voice",
                 EncounterType.BASE_MEMORY,
-                "Голос из дневника",
-                "Старая запись в дневнике произносит твое имя голосом человека, которого на базе не знают.",
+                "Голос из бортового журнала",
+                "Старая запись в бортовом журнале произносит твое имя голосом человека, которого у причала не знают.",
                 RiskLevel.MEDIUM,
                 List.of("chain", "note", "base_memory"),
                 choice("answer", "Ответить в диктофон", ChoiceResultType.FIND_OBJECT, RiskLevel.MEDIUM,
                         PlayerResources.empty(), 0, "Голос просит принести ему метку с воды."),
                 choice("erase", "Стереть запись", ChoiceResultType.AVOID, RiskLevel.LOW,
-                        PlayerResources.empty(), 0, "Пленка очищается, но в дневнике остается пустая страница.")
+                        PlayerResources.empty(), 0, "Пленка очищается, но в бортовом журнале остается пустая страница.")
         ));
         put(encounters, chainEncounter(
                 "chain_journal_voice",
@@ -301,11 +301,11 @@ public class EventChainService {
                 "chain_journal_token",
                 EncounterType.ANOMALY,
                 "Метка без владельца",
-                "На воде плавает сухая бирка с тем же номером, что прозвучал в дневнике.",
+                "На воде плавает сухая бирка с тем же номером, что прозвучал в бортовом журнале.",
                 RiskLevel.HIGH,
                 List.of("chain", "anomaly_mark", "note"),
                 choice("take", "Взять бирку", ChoiceResultType.FIND_OBJECT, RiskLevel.MEDIUM,
-                        new PlayerResources(0, 0, 1), -3, "Бирка становится теплой. Голос в дневнике замолкает."),
+                        new PlayerResources(0, 0, 1), -3, "Бирка становится теплой. Голос в бортовом журнале замолкает."),
                 choice("sink", "Утопить бирку", ChoiceResultType.LOSE_HP, RiskLevel.HIGH,
                         PlayerResources.empty(), -8, "Вода вспыхивает холодом и стирает номер.")
         ));
@@ -325,7 +325,7 @@ public class EventChainService {
                 new EventChain(
                         "chain_underwater_sign",
                         "Знак под водой",
-                        "Короткая скрытая цепочка о маршруте, который появляется только в мутной воде.",
+                        "Короткая скрытая цепочка о курсе, который появляется только в мутной воде.",
                         ExplorationVisibilityMode.HIDDEN,
                         List.of("map_fragment", "water"),
                         List.of(
@@ -338,8 +338,8 @@ public class EventChainService {
                 ),
                 new EventChain(
                         "chain_walkway_trace",
-                        "След вдоль настила",
-                        "Открытая PvP-цепочка: чужой маршрут, засада и шанс разойтись без полноценной дуэли.",
+                        "След вдоль платформы",
+                        "Открытая PvP-цепочка: чужой курс, засада и шанс разойтись без полноценной стычки.",
                         ExplorationVisibilityMode.OPEN_PVP,
                         List.of("pvp_trace", "walkway"),
                         List.of(
@@ -353,7 +353,7 @@ public class EventChainService {
                 new EventChain(
                         "chain_breathing_planks",
                         "Доски дышат",
-                        "Монстр-событие под настилом, которое раскрывает старую аварийную память базы.",
+                        "Монстр-событие под платформой, которое раскрывает старую аварийную память лодки.",
                         ExplorationVisibilityMode.HIDDEN,
                         List.of("monster_trace", "base_memory"),
                         List.of(
@@ -366,8 +366,8 @@ public class EventChainService {
                 ),
                 new EventChain(
                         "chain_old_cordon",
-                        "Старая линия кордона",
-                        "Рискованный открытый маршрут: чужие ловушки, следы стрельбы и награда за аккуратность.",
+                        "Линия старых буев",
+                        "Рискованный открытый курс: чужие ловушки, следы стрельбы и награда за аккуратность.",
                         ExplorationVisibilityMode.OPEN_PVP,
                         List.of("cordon", "risk_reward"),
                         List.of(
@@ -380,7 +380,7 @@ public class EventChainService {
                 ),
                 new EventChain(
                         "chain_journal_voice",
-                        "Голос из дневника",
+                        "Голос из бортового журнала",
                         "Аномальная цепочка о записи, которая отвечает игроку и оставляет постоянную находку.",
                         ExplorationVisibilityMode.HIDDEN,
                         List.of("note", "anomaly_mark"),
@@ -441,7 +441,7 @@ public class EventChainService {
                 RiskLevel.LOW,
                 PlayerResources.empty(),
                 0,
-                "Ты оставляешь след топи позади и продолжаешь путь."
+                "Ты оставляешь след воды позади и продолжаешь путь."
         );
     }
 

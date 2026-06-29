@@ -97,7 +97,7 @@
         var text = await response.text();
         var payload = text ? JSON.parse(text) : null;
         if (!response.ok) {
-            throw new Error(payload && payload.message ? payload.message : "Не удалось продолжить исследование");
+            throw new Error(payload && payload.message ? payload.message : "Не удалось продолжить плавание");
         }
         return payload;
     }
@@ -136,7 +136,7 @@
             }
             return result;
         } catch (error) {
-            setStatus(error && error.message ? error.message : "Топь не отвечает. Попробуй еще раз.", true);
+            setStatus(error && error.message ? error.message : "Большая вода не отвечает. Попробуй еще раз.", true);
             return null;
         } finally {
             state.busy = false;
@@ -153,7 +153,7 @@
                     visibilityMode: mode
                 })
             });
-        }, mode === "OPEN_PVP" ? "Ты вышел в открытую топь." : "Скрытый маршрут начат.");
+        }, mode === "OPEN_PVP" ? "Лодка вышла на открытую воду." : "Лодка идет тихим ходом.");
         if (result) {
             state.exploration = result;
             await refreshAfterAction();
@@ -225,7 +225,7 @@
                     })
                 }
             );
-        }, "Теперь твои следы видны другим выжившим.");
+        }, "Теперь след лодки виден другим.");
         if (result) {
             state.exploration = result;
             await refreshAfterAction();
@@ -242,7 +242,7 @@
                 method: "POST",
                 body: JSON.stringify({ playerId: getPlayerId() })
             });
-        }, "Ты вернулся на базу. Добыча сохранена.");
+        }, "Лодка вернулась к причалу. Груз сохранена.");
         if (result) {
             state.exploration = null;
             await refreshAfterAction();
@@ -265,7 +265,7 @@
                 method: "POST",
                 body: JSON.stringify({ playerId: getPlayerId() })
             });
-        }, "База стала надёжнее.");
+        }, "Лодка стала надёжнее.");
         if (result) {
             state.base = result;
             state.player = result.player;
@@ -283,7 +283,7 @@
                     itemId: itemId
                 })
             });
-        }, "Снаряжение подготовлено.");
+        }, "Модули подготовлены.");
         if (result) {
             await loadSnapshot();
         }
@@ -295,7 +295,7 @@
                 method: "POST",
                 body: JSON.stringify({ playerId: getPlayerId(), itemId: itemId })
             });
-        }, "Предмет улучшен.");
+        }, "Модуль усилен.");
         if (result) {
             await loadSnapshot();
         }
@@ -307,7 +307,7 @@
                 method: "POST",
                 body: JSON.stringify({ playerId: getPlayerId() })
             });
-        }, "Маршрут отмечен в дневнике.");
+        }, "Курс отмечен в бортовом журнале.");
         if (result) {
             await loadSnapshot();
         }
@@ -365,7 +365,7 @@
                 + (maxed ? "Максимальный уровень" : "Цена: " + compactResources(upgrade.cost))
                 + '</small></div><button class="progression-action" type="button" data-buy-upgrade="'
                 + escapeHtml(upgrade.id) + '" ' + (maxed || !affordable || state.busy ? "disabled" : "")
-                + ' aria-label="Улучшить ' + escapeHtml(upgrade.name) + '">'
+                + ' aria-label="Модифицировать ' + escapeHtml(upgrade.name) + '">'
                 + (maxed ? "✓" : "+") + '</button></article>';
         }).join("");
     }
@@ -381,14 +381,14 @@
             var unlocked = item.unlocked !== false && item.isUnlocked !== false;
             var disabled = !unlocked || state.busy || (item.equipped && !hasWorkbench);
             var owned = item.owned !== false;
-            var action = item.equipped ? "Улучшить" : owned ? "Экипировать" : "Купить";
+            var action = item.equipped ? "Модифицировать" : owned ? "Экипировать" : "Купить";
             var attribute = item.equipped ? "data-upgrade-item" : "data-equip-item";
             return '<article class="progression-item ' + (!unlocked ? "is-locked" : "") + '">'
                 + '<div class="progression-item-copy"><div class="progression-item-title"><strong>'
                 + escapeHtml(item.name) + '</strong><span>' + escapeHtml(slotLabel(item.slot))
                 + (item.equipped ? " · выбрано" : "") + '</span></div><p>'
                 + escapeHtml(item.description || "") + '</p><small>'
-                + (unlocked ? (owned ? "Ур. " + Number(item.level || 1) + " · улучшение "
+                + (unlocked ? (owned ? "Ур. " + Number(item.level || 1) + " · модификация "
                     : "Цена: ") + compactResources(item.upgradeCost)
                     : "Нужен оружейный верстак")
                 + '</small></div><button class="progression-action progression-action-wide" type="button" '
@@ -404,7 +404,7 @@
         var latest = fragments.length ? fragments[fragments.length - 1] : null;
         elements.progressionContent.innerHTML = '<div class="map-fragment-summary"><strong>'
             + Number(map.fragmentsFound || 0) + ' фрагм.</strong><span>'
-            + escapeHtml(latest ? latest.text : "Карта ещё не начала складываться.") + '</span></div>'
+            + escapeHtml(latest ? latest.text : "Карта ещё не начала складываться в курс.") + '</span></div>'
             + routes.map(function (route) {
                 var unlocked = route.unlocked === true || route.isUnlocked === true;
                 var selected = route.selected === true || route.isSelected === true;
@@ -416,7 +416,7 @@
                     + '</span></div><p>' + escapeHtml(route.description || "") + '</p><small>'
                     + escapeHtml(route.effects && route.effects[0] ? route.effects[0].description : "")
                     + '</small></div><button class="progression-action" type="button" data-select-route="'
-                    + escapeHtml(route.id) + '" ' + (disabled ? "disabled" : "") + ' aria-label="Выбрать маршрут">'
+                    + escapeHtml(route.id) + '" ' + (disabled ? "disabled" : "") + ' aria-label="Выбрать курс">'
                     + (selected ? "✓" : "→") + '</button></article>';
             }).join("");
     }
@@ -425,7 +425,7 @@
         var discoveries = Array.isArray(state.discoveries) ? state.discoveries : [];
         if (!discoveries.length) {
             elements.progressionContent.innerHTML = '<article class="progression-empty">'
-                + '<strong>Находок пока нет</strong><p>Ищи объекты, следы существ, аномальные метки и фрагменты маршрутов в топи.</p>'
+                + '<strong>Находок пока нет</strong><p>Ищи невозможные объекты, следы подводных существ, аномальные метки и фрагменты курсов на Большой воде.</p>'
                 + '</article>';
             return;
         }
@@ -464,12 +464,12 @@
         elements.active.classList.toggle("hidden", !exploration);
 
         if (!exploration) {
-            setMode("На базе", "");
+            setMode("У причала", "");
             return;
         }
 
         var open = exploration.visibilityMode === "OPEN_PVP";
-        setMode(open ? "Открытый PvP" : "Скрытно", open ? "is-open" : "is-hidden");
+        setMode(open ? "Открытая вода" : "Скрытно", open ? "is-open" : "is-hidden");
         elements.stepLabel.textContent = "Шаг " + Number(exploration.step || 0)
             + " из " + Number(exploration.maxSteps || 0);
         var chainText = exploration.activeChainId ? "Цепочка: " + chainLabel(exploration.activeChainId) : "";
@@ -479,7 +479,7 @@
         }
         elements.collected.textContent = formatResources(
             exploration.collectedResources,
-            "В рюкзаке пока пусто"
+            "В палубном ящике пока пусто"
         );
 
         var entries = Array.isArray(exploration.journalEntries)
@@ -487,17 +487,17 @@
             : [];
         elements.journal.innerHTML = entries.length
             ? entries.map(renderEntry).join("")
-            : '<p class="panel-copy">Первая запись появится после выхода с базы.</p>';
+            : '<p class="panel-copy">Первая запись появится после выхода с лодки.</p>';
 
         renderEncounter(exploration.currentEncounter);
         elements.openPvp.classList.toggle("hidden", open);
         elements.step.disabled = Boolean(exploration.currentEncounter)
             || Number(exploration.step || 0) >= Number(exploration.maxSteps || 0);
         elements.step.textContent = exploration.currentEncounter
-            ? "Сначала сделай выбор"
+            ? "Сначала выбери действие"
             : Number(exploration.step || 0) >= Number(exploration.maxSteps || 0)
-                ? "Маршрут завершен"
-                : "Идти дальше";
+                ? "Плавание завершено"
+                : "Держать курс";
 
         window.requestAnimationFrame(function () {
             elements.journal.scrollTop = elements.journal.scrollHeight;
@@ -601,9 +601,9 @@
             parts.push("припасы " + Number(value.supplies));
         }
         if (Number(value.swampResin || 0)) {
-            parts.push("смола " + Number(value.swampResin));
+            parts.push("налет " + Number(value.swampResin));
         }
-        return parts.length ? "В рюкзаке: " + parts.join(", ") : emptyText;
+        return parts.length ? "В палубном ящике: " + parts.join(", ") : emptyText;
     }
 
     function encounterTypeLabel(type) {
@@ -613,7 +613,7 @@
             ANOMALY: "Аномалия",
             LOOT: "Находка",
             MAP_FRAGMENT: "Фрагмент",
-            BASE_MEMORY: "Память базы",
+            BASE_MEMORY: "Память лодки",
             PVP_TRACE: "Чужой след",
             PVP_ENCOUNTER: "Встреча",
             PVP_AFTERMATH: "След стычки",
@@ -625,7 +625,7 @@
     function entryTypeLabel(type) {
         return {
             MOVEMENT: "Путь",
-            LOOT: "Добыча",
+            LOOT: "Груз",
             OBJECT: "Объект",
             MAP_FRAGMENT: "Карта",
             BASE_MEMORY: "Память",
@@ -638,17 +638,17 @@
             CHOICE_RESULT: "Выбор",
             SYSTEM: "Система",
             FAILED: "Провал",
-            RETURN: "База"
+            RETURN: "Лодка"
         }[type] || "Запись";
     }
 
     function chainLabel(chainId) {
         return {
             chain_underwater_sign: "Знак под водой",
-            chain_walkway_trace: "След вдоль настила",
+            chain_walkway_trace: "След вдоль платформы",
             chain_breathing_planks: "Доски дышат",
-            chain_old_cordon: "Старая линия кордона",
-            chain_journal_voice: "Голос из дневника"
+            chain_old_cordon: "Линия старых буев",
+            chain_journal_voice: "Голос из бортового журнала"
         }[chainId] || chainId;
     }
 
@@ -664,9 +664,9 @@
         return {
             WEAPON: "оружие",
             ARMOR: "броня",
-            CHARM: "оберег",
+            CHARM: "эхолот",
             TOOL: "инструмент"
-        }[slot] || "предмет";
+        }[slot] || "модуль";
     }
 
     function canAfford(resources, cost) {
@@ -861,7 +861,7 @@
     function waitForSession(attempt) {
         if (getSessionToken()) {
             loadSnapshot().catch(function (error) {
-                var message = error && error.message ? error.message : "Не удалось загрузить дневник.";
+                var message = error && error.message ? error.message : "Не удалось загрузить бортовой журнал.";
                 if (/session|сесси/i.test(message) && !hasTelegramIdentity()) {
                     setStatus("Обновляем сессию после перезапуска...", false);
                     recoverBrowserSession().catch(function (recoveryError) {
@@ -889,7 +889,7 @@
             return;
         }
         if (attempt === 0) {
-            setStatus("Подключаем дневник к твоей сессии...", false);
+            setStatus("Подключаем бортовой журнал к твоей сессии...", false);
         }
         window.setTimeout(function () {
             waitForSession(attempt + 1);

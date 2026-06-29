@@ -66,12 +66,12 @@ public class ExplorationService {
     ) {
         verifyActor(playerProfile, request == null ? null : request.playerId());
         explorationRepository.findActiveByPlayerId(playerProfile.getId()).ifPresent(active -> {
-            throw new ConflictException("Исследование уже начато");
+            throw new ConflictException("Плавание уже начато");
         });
 
         PlayerState playerState = playerStateService.getOrCreate(playerProfile);
         if (playerState.getHp() <= 0) {
-            throw new ConflictException("Для нового выхода нужно восстановить здоровье");
+            throw new ConflictException("Перед новым плаванием нужно починить корпус");
         }
 
         ExplorationVisibilityMode mode = request != null && request.visibilityMode() != null
@@ -98,8 +98,8 @@ public class ExplorationService {
                 explorationState,
                 JournalEntryType.SYSTEM,
                 mode == ExplorationVisibilityMode.OPEN_PVP
-                        ? "Ты выходишь в открытую часть топи. Здесь следы могут привести к другому выжившему."
-                        : "Ты уходишь с базы скрытым маршрутом. Другие выжившие не смогут втянуть тебя в стычку.",
+                        ? "Лодка выходит на открытую воду. Здесь следы винта могут привести к другой лодке."
+                        : "Лодка уходит тихим ходом от причала. Другие лодки не смогут втянуть тебя в стычку.",
                 Map.of("visibilityMode", mode.name())
         );
         log(AppEventType.EXPLORATION_STARTED, explorationState, Map.of("visibilityMode", mode.name()));
@@ -140,7 +140,7 @@ public class ExplorationService {
             throw new ConflictException("Сначала выбери действие в текущем событии");
         }
         if (explorationState.getStep() >= explorationState.getMaxSteps()) {
-            throw new ConflictException("Маршрут завершен. Пора возвращаться на базу");
+            throw new ConflictException("Плавание завершено. Пора возвращаться к причалу");
         }
 
         explorationState.setStartPvpDuel(false);
@@ -165,7 +165,7 @@ public class ExplorationService {
             addJournalEntry(
                     explorationState,
                     JournalEntryType.MAP_FRAGMENT,
-                    "Картографический стол помог заметить старую метку. " + fragment.text(),
+                    "Штурманский стол помог заметить старую метку. " + fragment.text(),
                     Map.of("fragmentId", fragment.id(), "mapFragment", "true")
             );
             discoveryService.record(
@@ -247,7 +247,7 @@ public class ExplorationService {
             addJournalEntry(
                     explorationState,
                     JournalEntryType.SYSTEM,
-                    "Дальше путь размывает топь. Можно забрать найденное и вернуться на базу.",
+                    "Дальше вода становится слишком ровной. Можно забрать найденное и вернуться к причалу.",
                     Map.of("routeComplete", "true")
             );
         }
@@ -420,7 +420,7 @@ public class ExplorationService {
             addJournalEntry(
                     explorationState,
                     JournalEntryType.PVP_ENCOUNTER,
-                    "Стычка передана в обычный PvP-поиск. Итог дуэли будет записан отдельным событием после интеграции результата.",
+                    "Стычка передана в общий поиск. Итог стычки будет записан отдельным событием после интеграции результата.",
                     Map.of("pvpAdapter", "minimal", "contentId", encounter.contentId())
             );
         }
@@ -452,7 +452,7 @@ public class ExplorationService {
             return explorationState;
         }
         if (request.visibilityMode() != ExplorationVisibilityMode.OPEN_PVP) {
-            throw new ConflictException("После выхода в открытую топь скрытый режим недоступен до возвращения");
+            throw new ConflictException("После выхода в открытую воду скрытый режим недоступен до возвращения");
         }
         PlayerState playerState = playerStateService.getOrCreate(playerProfile);
         enableOpenPvp(explorationState, playerState, "player_action");
@@ -545,7 +545,7 @@ public class ExplorationService {
                 explorationState,
                 JournalEntryType.FAILED,
                 encounterGenerator.nextFailedEntry() + " Потеряно "
-                        + failure.lossPercent() + "% добычи, остальное удалось сохранить.",
+                        + failure.lossPercent() + "% груза, остальное удалось сохранить.",
                 Map.of(
                         "hp", String.valueOf(playerState.getHp()),
                         "resourcesLost", "true",
@@ -579,7 +579,7 @@ public class ExplorationService {
         addJournalEntry(
                 explorationState,
                 JournalEntryType.SYSTEM,
-                "Ты выходишь из скрытого маршрута. Теперь в дневнике могут появиться чужие следы и встречи.",
+                "Ты выходишь из скрытого курса. Теперь в бортовом журнале могут появиться чужие лодки и встречи.",
                 Map.of("visibilityMode", ExplorationVisibilityMode.OPEN_PVP.name())
         );
         log(
@@ -598,12 +598,12 @@ public class ExplorationService {
             throw new BadRequestException("explorationId обязателен");
         }
         ExplorationState explorationState = explorationRepository.findById(explorationId)
-                .orElseThrow(() -> new NotFoundException("Исследование не найдено"));
+                .orElseThrow(() -> new NotFoundException("Плавание не найдено"));
         if (!explorationState.getPlayerId().equals(playerProfile.getId())) {
-            throw new UnauthorizedException("Это исследование принадлежит другому игроку");
+            throw new UnauthorizedException("Это плавание принадлежит другому игроку");
         }
         if (explorationState.getStatus() != ExplorationStatus.ACTIVE) {
-            throw new ConflictException("Исследование уже завершено");
+            throw new ConflictException("Плавание уже завершено");
         }
         return explorationState;
     }

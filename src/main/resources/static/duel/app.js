@@ -72,22 +72,22 @@
     }
     const JOURNAL_EVENT_CATALOG = normalizeJournalEventCatalog(window.POLUS_JOURNAL_EVENTS || []);
     const JOURNAL_LOCATION_LABELS = {
-        street: "Улица",
-        tavern: "Трактир",
-        arena: "Арена",
-        market: "Рынок"
+        street: "Причал",
+        tavern: "Камбуз",
+        arena: "Стычка",
+        market: "Верфь"
     };
     const SIMPLE_JOURNAL_EVENTS = [
-        "Случайное событие: на крыше снова воет ледяной ветер.",
-        "Случайное событие: на рынке заговорили о новой дуэльной площадке.",
-        "Случайное событие: соседний генератор пережил ещё один морозный цикл.",
-        "Случайное событие: кто-то оставил ящик с пустыми гильзами у склада.",
-        "Случайное событие: в трактире спорят, кто держит лучшую линию огня.",
-        "Случайное событие: механик обещает скоро открыть тёплую мастерскую.",
-        "Случайное событие: курьер привёз свежие вести с южного коридора.",
-        "Случайное событие: сторож заметил свет в заброшенном ангаре."
+        "Случайное событие: на крыше снова воет соленый ветер.",
+        "Случайное событие: на причале спорят о новой воде для стычек.",
+        "Случайное событие: старый двигатель пережил еще один тяжелый запуск.",
+        "Случайное событие: кто-то оставил ящик с пустыми гильзами у палубного ящика.",
+        "Случайное событие: в камбузе спорят, кто держит лучшую линию огня.",
+        "Случайное событие: механик обещает скоро открыть сухую мастерскую.",
+        "Случайное событие: курьер привёз свежие вести с южной протоки.",
+        "Случайное событие: сторож заметил свет на заброшенном маяке."
     ];
-    const DIRECTION_TERMS = ["по центру", "влево", "вправо"];
+    const DIRECTION_TERMS = ["в нос", "по левому борту", "по правому борту"];
     const ITEM_LIBRARY = {
         cartridges38: { id: "cartridges38", name: "РџР°С‚СЂРѕРЅС‹ .38", description: "РЎС‚Р°РЅРґР°СЂС‚РЅС‹Р№ Р±РѕРµР·Р°РїР°СЃ РґР»СЏ РєРѕСЂРѕС‚РєРѕР№ Р»РёРЅРёРё.", pocket: true },
         medkit: { id: "medkit", name: "РђРїС‚РµС‡РєР°", description: "РџРѕР»РµРІРѕР№ РЅР°Р±РѕСЂ РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ.", pocket: true, usable: true },
@@ -253,7 +253,7 @@
             slot: "defense",
             name: "Р СћР ВµР С—Р В»Р С•Р С•РЎвЂљР Р†Р С•Р Т‘",
             description: "Р СџР ВµРЎР‚Р ВµР Р…Р С•РЎРѓР С‘РЎвЂљ Р В¶Р В°РЎР‚ Р С—Р С•Р Т‘ Р С”РЎС“РЎР‚РЎвЂљР С”РЎС“ Р С‘ Р Т‘Р В°РЎвЂРЎвЂљ Р Т‘Р ВµРЎР‚Р В¶Р В°РЎвЂљРЎРЉ Р Т‘Р В»Р С‘Р Р…Р Р…РЎвЂ№Р в„– Р В±Р С•Р в„–.",
-            effectLabel: "+10 РЎРѓРЎвЂљР В°РЎР‚РЎвЂљР С•Р Р†Р С•Р С–Р С• HP",
+            effectLabel: "+10 РЎРѓРЎвЂљР В°РЎР‚РЎвЂљР С•Р Р†Р С•Р С–Р С• прочн.",
             startHpBonus: 10
         },
         defenseColdMesh: {
@@ -278,7 +278,7 @@
             slot: "support",
             name: "Р РЋРЎвЂљР С‘Р С-Р С”Р С•Р Р…РЎвЂљРЎС“РЎР‚",
             description: "Р вЂ”Р В°Р СР С”Р Р…РЎС“РЎвЂљРЎвЂ№Р в„– Р Р†Р С—РЎР‚РЎвЂ№РЎРѓР С” Р Р†Р С•Р В·Р Р†РЎР‚Р В°РЎвЂ°Р В°Р ВµРЎвЂљ Р Т‘РЎвЂ№РЎвЂ¦Р В°Р Р…Р С‘Р Вµ Р С—Р С•РЎРѓР В»Р Вµ Р С”Р В°Р В¶Р Т‘Р С•Р С–Р С• РЎР‚Р В°РЎС“Р Р…Р Т‘Р В°.",
-            effectLabel: "+4 HP Р С—Р С•РЎРѓР В»Р Вµ Р С”Р В°Р В¶Р Т‘Р С•Р С–Р С• РЎР‚Р В°РЎС“Р Р…Р Т‘Р В°",
+            effectLabel: "+4 прочн. Р С—Р С•РЎРѓР В»Р Вµ Р С”Р В°Р В¶Р Т‘Р С•Р С–Р С• РЎР‚Р В°РЎС“Р Р…Р Т‘Р В°",
             regenPerRound: 4
         },
         supportTargetLink: {
@@ -290,7 +290,7 @@
             centerHitBonus: 0.04
         }
     };
-    const POSITIVE_MARKERS = [/\+\d+\sР СР С•Р Р…Р ВµРЎвЂљ/gi, /\+\d+\sHP/gi];
+    const POSITIVE_MARKERS = [/\+\d+\sР СР С•Р Р…Р ВµРЎвЂљ/gi, /\+\d+\sпрочн./gi];
     const NEGATIVE_MARKERS = [/-\d+\sР СР С•Р Р…Р ВµРЎвЂљ/gi, /Р С—РЎР‚Р С•Р СР В°РЎвЂ¦/gi, /Р С—РЎР‚Р С•Р Р†Р В°Р В»/gi, /Р С—Р С•РЎР‚Р В°Р В¶Р ВµР Р…Р С‘[Р ВµРЎРЏ]/gi, /Р Р…Р Вµ РЎвЂ¦Р Р†Р В°РЎвЂљР В°Р ВµРЎвЂљ/gi, /Р С‘РЎРѓРЎвЂљ[Р ВµРЎвЂ]Р С”/gi, /Р С—Р С•РЎвЂљР ВµРЎР‚[РЎРЏР С‘]/gi, /Р В·Р В°Р С[Р ВµРЎвЂ]РЎР‚Р В·/gi, /РЎР‚Р В°Р Р…[Р В°Р Вµ]Р Р…/gi, /РЎв‚¬РЎС“Р С/gi, /РЎРѓР С•РЎР‚Р Р†Р В°Р Р…/gi, /Р С—РЎС“РЎРѓРЎвЂљР С•/gi];
     const elements = {};
     let state = hydrateState(loadState());
@@ -2616,8 +2616,8 @@
         elements.duelOpponentName.textContent = duel.opponentName;
         elements.duelOpponentMeta.textContent = "";
         elements.duelOpponentAvatar.textContent = duel.opponentName.slice(0, 1).toUpperCase();
-        elements.duelYouHp.textContent = duel.playerHp + " HP";
-        elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+        elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+        elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
         elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, duel.opponentHp)) + "%";
         elements.duelRoundStatus.innerHTML = decorateText(buildDuelStatusText(duel));
@@ -3912,8 +3912,8 @@
         elements.duelOpponentName.textContent = duel.opponentName || "РЎРѕРїРµСЂРЅРёРє";
         elements.duelOpponentMeta.textContent = "";
         elements.duelOpponentAvatar.textContent = (duel.opponentName || "Р РЋ").slice(0, 1).toUpperCase();
-        elements.duelYouHp.textContent = duel.playerHp + " HP";
-        elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+        elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+        elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
         elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
         const duelStatus = buildDuelStatusText(duel);
@@ -4334,8 +4334,8 @@
         elements.duelOpponentName.textContent = duel.opponentName || "РЎРѕРїРµСЂРЅРёРє";
         elements.duelOpponentMeta.textContent = "";
         elements.duelOpponentAvatar.textContent = (duel.opponentName || "Р РЋ").slice(0, 1).toUpperCase();
-        elements.duelYouHp.textContent = duel.playerHp + " HP";
-        elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+        elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+        elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
         elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
         elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
         const duelStatus = buildDuelStatusText(duel);
@@ -4474,8 +4474,8 @@ function repairStateAfterLegacyLoad() {
     if (state.journal && Array.isArray(state.journal.entries)) {
         state.journal.entries = state.journal.entries.map(function (entry) {
             return Object.assign({}, entry, {
-                locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город"),
-                text: sanitizeVisibleText(entry.text, "Старая запись дневника обновлена.")
+                locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал"),
+                text: sanitizeVisibleText(entry.text, "Старая запись бортового журнала обновлена.")
             });
         });
     }
@@ -4498,7 +4498,7 @@ function refreshStaticCopy() {
     };
 
     setText("find-match-button", "Найти матч");
-    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("bot-duel-button", "Тестовая стычка на воде (бот)");
     setText("queue-cancel-button", "Отменить");
     setText("social-chat-close", "Закрыть");
     setText("social-chat-thread-title", "Выбери чат");
@@ -4506,31 +4506,31 @@ function refreshStaticCopy() {
     setText("duel-tab-chat", "Чат");
     setText("duel-clear-log-button", "Очистить");
     setText("duel-close-button", "Выйти");
-    setText("duel-title", "Дуэль");
+    setText("duel-title", "Стычка на воде");
     setText("start-duel-title", "Начать бой?");
     setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
     setText("start-duel-cancel", "Нет, вернуться в хаб");
     setText("start-duel-confirm", "Да, начать бой");
     setText("duel-exit-cancel", "Нет, остаться");
     setText("duel-exit-confirm", "Да, выйти");
-    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-title", "Стычка завершена");
     setText("duel-result-close", "В хаб");
-    setText("journal-zone-label", "Зона");
+    setText("journal-zone-label", "Сектор");
     setText("friend-request-badge", String((state.friendRequests || []).length || 0));
     setPlaceholder("friend-search-input", "Найти игрока по никнейму");
     setPlaceholder("social-chat-input", "Напиши сообщение");
-    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("duel-chat-input", "Напиши сообщение другой лодке");
     setPlaceholder("registration-nickname", "Например, Бакунин");
 
     safeSetText(".panel-kicker", "Профиль");
     safeSetText("#profile-name", state.player && state.player.name ? state.player.name : "Новый игрок");
-    safeSetText(".queue-status-label", "Поиск дуэли");
-    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
-    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
-    safeSetText(".journal-zone-label", "Зона");
-    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
-    safeSetText("#inventory-placeholder h3", "Пока аугментаций нет");
-    safeSetText("#inventory-placeholder p", "Купленные модули будут появляться здесь и распределяться по типам.");
+    safeSetText(".queue-status-label", "Поиск стычки");
+    safeSetText("#queue-status-note", "Ищем чужую лодку в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    safeSetText(".journal-zone-label", "Сектор");
+    safeSetText("#screen-inventory .panel-title", "Модули лодки");
+    safeSetText("#inventory-placeholder h3", "Пока модулей нет");
+    safeSetText("#inventory-placeholder p", "Купленные узлы лодки будут появляться здесь и распределяться по типам.");
     safeSetText("#screen-friends .panel-title", "Друзья");
     safeSetText("#friend-search-form button", "Добавить");
     safeSetText("#screen-shop .panel-title", "Магазин");
@@ -4546,29 +4546,29 @@ function refreshStaticCopy() {
     safeSetText("#registration-modal .panel-title.panel-title-small", "Регистрация игрока");
     safeSetText("#registration-copy", "Ник будет привязан к твоему Telegram ID.");
     safeSetText("label[for='registration-nickname']", "Никнейм");
-    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     safeSetText("#registration-submit", "Создать аккаунт");
 
     safeSetText(".duel-block-title", "Оружие");
     safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
-    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Маневр");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Точечный выстрел и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Дальний выстрел");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
-    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Палубный дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Право");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Право");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Правый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Правый борт");
 
     hideAutoBattleUi();
 }
@@ -4587,7 +4587,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -4603,7 +4603,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = result.title || "Бой завершен";
+    elements.duelResultTitle.textContent = result.title || "Стычка завершена";
     elements.duelResultCopy.textContent = result.copy || "";
     elements.duelResultExp.textContent = formatSignedReward(result.rating ?? result.experience ?? 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -4612,7 +4612,7 @@ function renderDuelResultModal() {
 function openDuelResultModal(config) {
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
-        title: config.title || "Бой завершен",
+        title: config.title || "Стычка завершена",
         copy: config.copy || "",
         rating: Number(config.rating ?? config.experience) || 0,
         money: Number(config.money) || 0
@@ -4625,11 +4625,11 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
         copy: isVictory
-            ? "Ты победил в дуэли."
+            ? "Ты удержал стычку на воде."
             : isDefeat
-                ? "Ты проиграл в дуэли."
+                ? "Твоя лодка уступила в стычке."
                 : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
@@ -4644,29 +4644,29 @@ function closeDuelResult() {
 
 function weaponLabel(code) {
     return {
-        PISTOLS: "Пистоль и щит",
-        RIFLE: "Винтовка",
-        SHOTGUN: "Дробовик"
+        PISTOLS: "Точечный выстрел и щит",
+        RIFLE: "Дальний выстрел",
+        SHOTGUN: "Палубный дробовик"
     }[code] || code;
 }
 
 function weaponInstrumentLabel(code) {
     return {
-        PISTOLS: "из пистоля и щита",
-        RIFLE: "из винтовки",
-        SHOTGUN: "из дробовика"
+        PISTOLS: "из короткого выстрела и щита",
+        RIFLE: "из дальнего выстрела",
+        SHOTGUN: "из палубного дробовика"
     }[code] || "";
 }
 
 function directionLabel(code) {
-    return { LEFT: "влево", CENTER: "по центру", RIGHT: "вправо" }[code] || code;
+    return { LEFT: "по левому борту", CENTER: "в нос", RIGHT: "по правому борту" }[code] || code;
 }
 
 function dodgeLabel(code) {
     return {
-        LEFT: "смещается влево",
-        STAY: "остаётся по центру",
-        RIGHT: "смещается вправо"
+        LEFT: "уходит левым бортом",
+        STAY: "остаётся в нос",
+        RIGHT: "уходит правым бортом"
     }[code] || code;
 }
 
@@ -4822,11 +4822,11 @@ function resolveDuelRound(playerAction, opponentAction) {
         if (playerWon) {
             duel.resultText = "Ты победил.";
             state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
-            openDuelResultModal({ title: "Победа", copy: "Ты победил в дуэли.", rating: 0, money: BATTLE_VICTORY_COINS });
+            openDuelResultModal({ title: "Победа", copy: "Ты удержал стычку на воде.", rating: 0, money: BATTLE_VICTORY_COINS });
         } else if (opponentWon) {
             duel.resultText = "Ты проиграл.";
             state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
-            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в дуэли.", rating: 0, money: BATTLE_DEFEAT_COINS });
+            openDuelResultModal({ title: "Поражение", copy: "Твоя лодка уступила в стычке.", rating: 0, money: BATTLE_DEFEAT_COINS });
         } else {
             duel.resultText = "Ничья.";
             openDuelResultModal({ title: "Ничья", copy: "Оба бойца выбыли одновременно.", rating: 0, money: 0 });
@@ -4887,7 +4887,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -4903,7 +4903,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = duel.chatError || "";
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -4936,7 +4936,7 @@ function renderDuel() {
         return entry.lines.length > 0;
     });
     syncDuelInputs(duel);
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -4945,8 +4945,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
     const duelStatus = buildDuelStatusText(duel);
@@ -4955,7 +4955,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     const submitButtonLabel = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -5023,7 +5023,7 @@ function submitCurrentDuelTurn() {
         return;
     }
     if (!isDuelSelectionComplete(state.duel)) {
-        showToast("Сначала выбери оружие, выстрел и уворот.");
+        showToast("Сначала выбери оружие, направление атаки и маневр лодки.");
         return;
     }
     if (state.duel.mode === "pvp-live") {
@@ -5169,7 +5169,7 @@ function renderProfile() {
 
 function renderInventory() {
     if (elements.inventoryPlaceholder) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
     }
 }
 
@@ -5227,7 +5227,7 @@ function refreshStaticCopy() {
     };
 
     setText("find-match-button", "Найти матч");
-    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("bot-duel-button", "Тестовая стычка на воде (бот)");
     setText("queue-cancel-button", "Отменить");
     setText("social-chat-close", "Закрыть");
     setText("social-chat-thread-title", "Выбери чат");
@@ -5235,30 +5235,30 @@ function refreshStaticCopy() {
     setText("duel-tab-chat", "Чат");
     setText("duel-clear-log-button", "Очистить");
     setText("duel-close-button", "Выйти");
-    setText("duel-title", "Дуэль");
+    setText("duel-title", "Стычка на воде");
     setText("start-duel-title", "Начать бой?");
     setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
     setText("start-duel-cancel", "Нет, вернуться в хаб");
     setText("start-duel-confirm", "Да, начать бой");
     setText("duel-exit-cancel", "Нет, остаться");
     setText("duel-exit-confirm", "Да, выйти");
-    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-title", "Стычка завершена");
     setText("duel-result-close", "В хаб");
-    setText("journal-zone-label", "Зона");
+    setText("journal-zone-label", "Сектор");
     setPlaceholder("friend-search-input", "Найти игрока по никнейму");
     setPlaceholder("social-chat-input", "Напиши сообщение");
-    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("duel-chat-input", "Напиши сообщение другой лодке");
     setPlaceholder("registration-nickname", "Например, Бакунин");
 
     safeSetText(".panel-kicker", "Профиль");
     safeSetText("#profile-name", state.player && state.player.name ? state.player.name : "Новый игрок");
-    safeSetText(".queue-status-label", "Поиск дуэли");
-    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
-    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
-    safeSetText(".journal-zone-label", "Зона");
-    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
-    safeSetText("#inventory-placeholder h3", "Пока аугментаций нет");
-    safeSetText("#inventory-placeholder p", "Купленные модули будут появляться здесь и распределяться по типам.");
+    safeSetText(".queue-status-label", "Поиск стычки");
+    safeSetText("#queue-status-note", "Ищем чужую лодку в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    safeSetText(".journal-zone-label", "Сектор");
+    safeSetText("#screen-inventory .panel-title", "Модули лодки");
+    safeSetText("#inventory-placeholder h3", "Пока модулей нет");
+    safeSetText("#inventory-placeholder p", "Купленные узлы лодки будут появляться здесь и распределяться по типам.");
     safeSetText("#screen-friends .panel-title", "Друзья");
     safeSetText("#friend-search-form button", "Добавить");
     safeSetText("#screen-shop .panel-title", "Магазин");
@@ -5274,25 +5274,25 @@ function refreshStaticCopy() {
     safeSetText("#registration-modal .panel-title.panel-title-small", "Регистрация игрока");
     safeSetText("#registration-copy", "Ник будет привязан к твоему Telegram ID.");
     safeSetText("label[for='registration-nickname']", "Никнейм");
-    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     safeSetText("#registration-submit", "Создать аккаунт");
     safeSetText(".duel-block-title", "Оружие");
     safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
-    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Маневр");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Точечный выстрел и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Дальний выстрел");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
-    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Палубный дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
-    safeSetText(".direction-button[data-value='LEFT']", "Лево");
-    safeSetText(".direction-button[data-value='CENTER']", "Центр");
-    safeSetText(".direction-button[data-value='RIGHT']", "Право");
+    safeSetText(".direction-button[data-value='LEFT']", "Левый борт");
+    safeSetText(".direction-button[data-value='CENTER']", "Нос");
+    safeSetText(".direction-button[data-value='RIGHT']", "Правый борт");
 }
 
 function syncPlayerFromServer(player, resetEconomy) {
@@ -5384,7 +5384,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
     elements.registrationSubmit.disabled = true;
@@ -5449,7 +5449,7 @@ function renderProfile() {
 
 function renderInventory() {
     if (elements.inventoryPlaceholder) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
     }
 }
 
@@ -5559,7 +5559,7 @@ const FINAL_CLEAN_AUGMENT_COPY = {
     weaponBrassSights: { name: "Прицельная рамка", description: "+5 к урону", slot: "weapon", price: 100 },
     weaponDoubleTap: { name: "Рискованный затвор", description: "5% двойной урон · 5% осечка", slot: "weapon", price: 100 },
     defensePlating: { name: "Северная бронепластина", description: "-3 входящего урона", slot: "defense", price: 100 },
-    defenseHeatSink: { name: "Усиленный каркас", description: "+15 здоровья", slot: "defense", price: 100 }
+    defenseHeatSink: { name: "Усиленный каркас", description: "+15 прочности корпуса", slot: "defense", price: 100 }
 };
 
 function looksLikeMojibake(text) {
@@ -5656,7 +5656,7 @@ function repairStateAfterLegacyLoad() {
     });
     state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20).map(function (entry) {
         return Object.assign({}, entry, {
-            text: sanitizeVisibleText(entry.text, "Запись дневника обновлена.")
+            text: sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.")
         });
     }) : [];
     if (state.duel) {
@@ -5700,7 +5700,7 @@ function refreshStaticCopy() {
     };
 
     setText("find-match-button", "Найти матч");
-    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("bot-duel-button", "Тестовая стычка на воде (бот)");
     setText("queue-cancel-button", "Отменить");
     setText("social-chat-close", "Закрыть");
     setText("social-chat-thread-title", "Выбери чат");
@@ -5708,31 +5708,31 @@ function refreshStaticCopy() {
     setText("duel-tab-chat", "Чат");
     setText("duel-clear-log-button", "Очистить");
     setText("duel-close-button", "Выйти");
-    setText("duel-title", "Дуэль");
+    setText("duel-title", "Стычка на воде");
     setText("start-duel-title", "Начать бой?");
     setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
     setText("start-duel-cancel", "Нет, вернуться в хаб");
     setText("start-duel-confirm", "Да, начать бой");
     setText("duel-exit-cancel", "Нет, остаться");
     setText("duel-exit-confirm", "Да, выйти");
-    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-title", "Стычка завершена");
     setText("duel-result-close", "В хаб");
-    setText("journal-zone-label", "Зона");
+    setText("journal-zone-label", "Сектор");
     setText("shop-money", (state.player ? Number(state.player.money || 0) : 0) + " монет");
     setPlaceholder("friend-search-input", "Найти игрока по никнейму");
     setPlaceholder("social-chat-input", "Напиши сообщение");
-    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("duel-chat-input", "Напиши сообщение другой лодке");
     setPlaceholder("registration-nickname", "Например, Бакунин");
 
     safeSetText(".panel-kicker", "Профиль");
     safeSetText("#profile-name", state.player && state.player.name ? state.player.name : "Новый игрок");
-    safeSetText(".queue-status-label", "Поиск дуэли");
-    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
-    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
-    safeSetText(".journal-zone-label", "Зона");
-    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
-    safeSetText("#inventory-placeholder h3", "Пока аугментаций нет");
-    safeSetText("#inventory-placeholder p", "Купленные модули будут появляться здесь и распределяться по типам.");
+    safeSetText(".queue-status-label", "Поиск стычки");
+    safeSetText("#queue-status-note", "Ищем чужую лодку в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    safeSetText(".journal-zone-label", "Сектор");
+    safeSetText("#screen-inventory .panel-title", "Модули лодки");
+    safeSetText("#inventory-placeholder h3", "Пока модулей нет");
+    safeSetText("#inventory-placeholder p", "Купленные узлы лодки будут появляться здесь и распределяться по типам.");
     safeSetText("#screen-friends .panel-title", "Друзья");
     safeSetText("#friend-search-form button", "Добавить");
     safeSetText("#screen-shop .panel-title", "Магазин");
@@ -5747,28 +5747,28 @@ function refreshStaticCopy() {
     safeSetText("#registration-modal .panel-title.panel-title-small", "Регистрация игрока");
     safeSetText("#registration-copy", "Ник будет привязан к твоему Telegram ID.");
     safeSetText("label[for='registration-nickname']", "Никнейм");
-    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     safeSetText("#registration-submit", "Создать аккаунт");
     safeSetText(".duel-block-title", "Оружие");
     safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
-    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Маневр");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Точечный выстрел и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Дальний выстрел");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
-    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Палубный дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Право");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Право");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Правый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Правый борт");
 }
 
 function syncPlayerFromServer(player, resetEconomy) {
@@ -5850,7 +5850,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
     elements.registrationSubmit.disabled = true;
@@ -5905,7 +5905,7 @@ function renderInventory() {
         return Boolean(CLEAN_AUGMENT_COPY[id]);
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -6050,7 +6050,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -6060,7 +6060,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -6073,7 +6073,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -6087,7 +6087,7 @@ function renderDuel() {
     if (!duel) {
         return;
     }
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     if (elements.duelRoundTimer && duel.roundDeadlineAt) {
         elements.duelRoundTimer.textContent = formatDuration(Math.max(0, duel.roundDeadlineAt - Date.now()));
@@ -6096,7 +6096,7 @@ function renderDuel() {
         const hasPending = hasPendingDuelChanges(duel);
         const selectionComplete = isDuelSelectionComplete(duel);
         elements.duelSubmitButton.textContent = duel.finished
-            ? "Бой завершен"
+            ? "Стычка завершена"
             : duel.yourActionSubmitted
                 ? (hasPending ? "Изменить ход" : "Ход сделан")
                 : "Сделать ход";
@@ -6122,8 +6122,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -6146,7 +6146,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -6156,8 +6156,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -6184,14 +6184,14 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (state.matchmaking.status === "QUEUED") {
-        showToast("Ты уже в очереди. Ищем соперника.");
+        showToast("Ты уже в очереди. Ищем чужую лодку.");
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
         showToast("В браузере доступна локальная стычка.");
         openDuel({
             mode: "pvp",
-            title: "Дуэль",
+            title: "Стычка на воде",
             modeLabel: "PvP",
             opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
             opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
@@ -6206,7 +6206,7 @@ async function startQueueDuel(skipConfirm) {
             await refreshLiveDuel(payload.duelId);
             showToast("Соперник найден.");
         } else {
-            showToast(payload.message || "Ищем соперника.");
+            showToast(payload.message || "Ищем чужую лодку.");
         }
     } catch (error) {
         showToast(error && error.message ? error.message : "Не удалось встать в очередь.");
@@ -6224,7 +6224,7 @@ async function cancelQueue() {
         state.matchmaking.queuedAt = null;
         saveState();
         renderAll();
-        showToast("Поиск дуэли отменен.");
+        showToast("Поиск стычки отменен.");
         return;
     }
     if (elements.queueCancelButton) {
@@ -6234,7 +6234,7 @@ async function cancelQueue() {
         const response = await apiFetch("/api/matchmaking/cancel", { method: "POST" });
         applyMatchmakingStatus(await response.json());
         renderAll();
-        showToast("Поиск дуэли отменен.");
+        showToast("Поиск стычки отменен.");
     } catch (error) {
         showToast(error && error.message ? error.message : "Не удалось отменить поиск.");
     } finally {
@@ -6255,13 +6255,13 @@ function sanitizeLogLines(lines) {
 function refreshStaticCopy() {
     document.title = "Полюс";
     setSelectorText(".panel-kicker", "Профиль");
-    setSelectorText("#screen-home .panel-title.panel-title-small", "Дневник");
-    setSelectorText(".journal-zone-label", "Зона");
+    setSelectorText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    setSelectorText(".journal-zone-label", "Сектор");
     setSelectorText('#bottom-nav [data-nav-target="home"] .nav-title', "Хаб");
     setSelectorText('#bottom-nav [data-nav-target="inventory"] .nav-title', "Инвентарь");
     setSelectorText('#bottom-nav [data-nav-target="friends"] .nav-title', "Друзья");
     setSelectorText('#bottom-nav [data-nav-target="shop"] .nav-title', "Магазин");
-    safeSetText(document.querySelector("#screen-inventory .panel-title"), "Доступные аугментации");
+    safeSetText(document.querySelector("#screen-inventory .panel-title"), "Модули лодки");
     safeSetText(document.querySelector("#screen-friends .panel-title"), "Друзья");
     safeSetText(document.querySelector("#screen-shop .panel-title"), "Магазин");
     safeSetText(document.querySelector("#friend-search-form button[type='submit']"), "Добавить");
@@ -6285,13 +6285,13 @@ function refreshStaticCopy() {
     safeSetText(document.querySelector("#duel-clear-log-button"), "Очистить");
     safeSetText(document.querySelector("#duel-close-button"), "Выйти");
     safeSetText(document.querySelector("#find-match-button"), "Найти матч");
-    safeSetText(document.querySelector(".queue-status-label"), "Поиск дуэли");
+    safeSetText(document.querySelector(".queue-status-label"), "Поиск стычки");
     safeSetText(document.querySelector("#queue-cancel-button"), "Отменить");
     if (elements.shopMoney) {
         elements.shopMoney.textContent = String(Number(state.player && state.player.money || 0)) + " монет";
     }
     if (elements.journalZone) {
-        elements.journalZone.textContent = sanitizeVisibleText(elements.journalZone.textContent, "Город") || "Город";
+        elements.journalZone.textContent = sanitizeVisibleText(elements.journalZone.textContent, "Причал") || "Причал";
     }
     const botButton = document.getElementById("bot-duel-button");
     if (botButton) {
@@ -6325,7 +6325,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -6338,26 +6338,26 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " В· " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
 
 const FINAL_JOURNAL_ZONE_LABELS = {
-    street: "Улица",
-    tavern: "Трактир",
-    arena: "Арена",
-    market: "Рынок",
-    city: "Город"
+    street: "Причал",
+    tavern: "Камбуз",
+    arena: "Стычка",
+    market: "Верфь",
+    city: "Причал"
 };
 
 const FINAL_JOURNAL_FALLBACK_EVENTS = [
-    { id: "fallback_street_01", text: "На улице снова спорят о вчерашней дуэли.", location: "street", locationLabel: "Улица", weight: 5, timeTag: "any" },
-    { id: "fallback_street_02", text: "С дальнего квартала доносится гул работающего цеха.", location: "street", locationLabel: "Улица", weight: 4, timeTag: "any" },
-    { id: "fallback_tavern_01", text: "В трактире обсуждают свежие ставки на арену.", location: "tavern", locationLabel: "Трактир", weight: 5, timeTag: "any" },
-    { id: "fallback_arena_01", text: "У арены собираются первые зрители.", location: "arena", locationLabel: "Арена", weight: 5, timeTag: "any" },
-    { id: "fallback_market_01", text: "На рынке спорят о цене северных трофеев.", location: "market", locationLabel: "Рынок", weight: 5, timeTag: "any" }
+    { id: "fallback_street_01", text: "На причале снова спорят о вчерашней стычке.", location: "street", locationLabel: "Причал", weight: 5, timeTag: "any" },
+    { id: "fallback_street_02", text: "С дальнего пирса доносится гул работающего цеха.", location: "street", locationLabel: "Причал", weight: 4, timeTag: "any" },
+    { id: "fallback_tavern_01", text: "В камбузе обсуждают свежие ставки на открытую воду.", location: "tavern", locationLabel: "Камбуз", weight: 5, timeTag: "any" },
+    { id: "fallback_arena_01", text: "У места стычки собираются первые зрители.", location: "arena", locationLabel: "Стычка", weight: 5, timeTag: "any" },
+    { id: "fallback_market_01", text: "На верфи спорят о цене северных трофеев.", location: "market", locationLabel: "Верфь", weight: 5, timeTag: "any" }
 ];
 
 function getCurrentJournalLocation() {
@@ -6478,11 +6478,11 @@ function addJournal(text, meta) {
     state.journal = Array.isArray(state.journal) ? state.journal : [];
     state.journal.unshift({
         id: uid("journal"),
-        text: sanitizeVisibleText(text, "Запись дневника обновлена."),
+        text: sanitizeVisibleText(text, "Запись бортового журнала обновлена."),
         createdAt: createdAt,
         sourceEventId: details.sourceEventId || null,
         location: details.location || getCurrentJournalLocation(),
-        locationLabel: details.locationLabel || FINAL_JOURNAL_ZONE_LABELS[getCurrentJournalLocation()] || "Город"
+        locationLabel: details.locationLabel || FINAL_JOURNAL_ZONE_LABELS[getCurrentJournalLocation()] || "Причал"
     });
     state.journal = state.journal.slice(0, 20);
 }
@@ -6497,7 +6497,7 @@ function triggerRandomJournalEvent(timestamp, options) {
     addJournal(event.text, {
         sourceEventId: event.id,
         location: event.location,
-        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город",
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Причал",
         createdAt: eventTimestamp
     });
     getJournalHistory()[event.id] = eventTimestamp;
@@ -6542,7 +6542,7 @@ function renderJournal() {
     state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
     const location = getCurrentJournalLocation();
     if (elements.journalZone) {
-        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Город";
+        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Причал";
     }
     if (!state.journal.length) {
         elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><p>Записей пока нет.</p></article>';
@@ -6550,8 +6550,8 @@ function renderJournal() {
     }
     elements.journalList.innerHTML = state.journal.map(function (entry) {
         const entryLocation = entry.location || location;
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
@@ -6566,7 +6566,7 @@ function triggerRandomJournalEvent(timestamp, options) {
     addJournal(event.text, {
         sourceEventId: event.id,
         location: event.location,
-        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город",
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Причал",
         createdAt: eventTimestamp
     });
     getJournalHistory()[event.id] = eventTimestamp;
@@ -6611,7 +6611,7 @@ function renderJournal() {
     state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
     const location = getCurrentJournalLocation();
     if (elements.journalZone) {
-        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Город";
+        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Причал";
     }
     if (!state.journal.length) {
         elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><p>Записей пока нет.</p></article>';
@@ -6619,8 +6619,8 @@ function renderJournal() {
     }
     elements.journalList.innerHTML = state.journal.map(function (entry) {
         const entryLocation = entry.location || location;
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
@@ -6675,7 +6675,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -6731,7 +6731,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -6847,7 +6847,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждем соперника.";
+            : "Ход зафиксирован. Ждем чужую лодку.";
     }
     return "";
 }
@@ -6857,7 +6857,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -6870,7 +6870,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -6900,7 +6900,7 @@ function renderDuel() {
     renderDuelControls();
     hideAutoBattleUi();
 
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -6909,8 +6909,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
 
@@ -6921,7 +6921,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -6956,8 +6956,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -6980,7 +6980,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -6990,8 +6990,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -6999,21 +6999,21 @@ function openLiveDuelResult(payload) {
 
 function weaponInstrumentLabel(code) {
     return {
-        PISTOLS: "из пистоля и щита",
-        RIFLE: "из винтовки",
-        SHOTGUN: "из дробовика"
+        PISTOLS: "из короткого выстрела и щита",
+        RIFLE: "из дальнего выстрела",
+        SHOTGUN: "из палубного дробовика"
     }[code] || "";
 }
 
 function directionLabel(code) {
-    return { LEFT: "влево", CENTER: "по центру", RIGHT: "вправо" }[code] || code;
+    return { LEFT: "по левому борту", CENTER: "в нос", RIGHT: "по правому борту" }[code] || code;
 }
 
 function dodgeLabel(code) {
     return {
-        LEFT: "смещается влево",
-        STAY: "остается по центру",
-        RIGHT: "смещается вправо"
+        LEFT: "уходит левым бортом",
+        STAY: "держит курс",
+        RIGHT: "уходит правым бортом"
     }[code] || code;
 }
 
@@ -7085,7 +7085,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
     }
 
     if (lineMatched && shouldSupportEvade(attackerSide === "player" ? "opponent" : "player")) {
-        lines.push("Итог: соперник уходит от урона.");
+        lines.push("Итог: чужая лодка уходит от урона.");
         return { damage: 0, lines: lines };
     }
 
@@ -7187,11 +7187,11 @@ function resolveDuelRound(playerAction, opponentAction) {
         if (playerWon) {
             duel.resultText = "Ты победил.";
             state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
-            openDuelResultModal({ title: "Победа", copy: "Ты победил в дуэли.", rating: 0, money: BATTLE_VICTORY_COINS });
+            openDuelResultModal({ title: "Победа", copy: "Ты удержал стычку на воде.", rating: 0, money: BATTLE_VICTORY_COINS });
         } else if (opponentWon) {
             duel.resultText = "Ты проиграл.";
             state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
-            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в дуэли.", rating: 0, money: BATTLE_DEFEAT_COINS });
+            openDuelResultModal({ title: "Поражение", copy: "Твоя лодка уступила в стычке.", rating: 0, money: BATTLE_DEFEAT_COINS });
         } else {
             duel.resultText = "Ничья.";
             openDuelResultModal({ title: "Ничья", copy: "Оба бойца выбыли одновременно.", rating: 0, money: 0 });
@@ -7234,7 +7234,7 @@ const FINAL_AUGMENT_COPY = {
     weaponBrassSights: { name: "Прицельная рамка", description: "+5 к урону", slot: "weapon", price: 100 },
     weaponDoubleTap: { name: "Рискованный затвор", description: "5% двойной урон · 5% осечка", slot: "weapon", price: 100 },
     defensePlating: { name: "Северная бронепластина", description: "-3 входящего урона", slot: "defense", price: 100 },
-    defenseHeatSink: { name: "Усиленный каркас", description: "+15 здоровья", slot: "defense", price: 100 }
+    defenseHeatSink: { name: "Усиленный каркас", description: "+15 прочности корпуса", slot: "defense", price: 100 }
 };
 
 function looksLikeMojibake(text) {
@@ -7361,15 +7361,15 @@ function repairStateAfterLegacyLoad() {
     if (Array.isArray(state.journal)) {
         state.journal = state.journal.slice(0, 20).map(function (entry) {
             return Object.assign({}, entry, {
-                text: sanitizeVisibleText(entry.text, "Запись дневника обновлена."),
-                locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город")
+                text: sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена."),
+                locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал")
             });
         });
     } else if (state.journal && Array.isArray(state.journal.entries)) {
         state.journal = state.journal.entries.slice(0, 20).map(function (entry) {
             return Object.assign({}, entry, {
-                text: sanitizeVisibleText(entry.text, "Запись дневника обновлена."),
-                locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город")
+                text: sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена."),
+                locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал")
             });
         });
     } else {
@@ -7420,7 +7420,7 @@ function refreshStaticCopy() {
     };
 
     setText("find-match-button", "Найти матч");
-    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("bot-duel-button", "Тестовая стычка на воде (бот)");
     setText("queue-cancel-button", "Отменить");
     setText("social-chat-close", "Закрыть");
     setText("social-chat-thread-title", "Выбери чат");
@@ -7428,28 +7428,28 @@ function refreshStaticCopy() {
     setText("duel-tab-chat", "Чат");
     setText("duel-clear-log-button", "Очистить");
     setText("duel-close-button", "Выйти");
-    setText("duel-title", "Дуэль");
+    setText("duel-title", "Стычка на воде");
     setText("start-duel-title", "Начать бой?");
     setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
     setText("start-duel-cancel", "Нет, вернуться в хаб");
     setText("start-duel-confirm", "Да, начать бой");
     setText("duel-exit-cancel", "Нет, остаться");
     setText("duel-exit-confirm", "Да, выйти");
-    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-title", "Стычка завершена");
     setText("duel-result-close", "В хаб");
     setText("shop-money", String(Number(state.player && state.player.money || 0)) + " монет");
 
     setPlaceholder("friend-search-input", "Найти игрока по никнейму");
     setPlaceholder("social-chat-input", "Напиши сообщение");
-    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("duel-chat-input", "Напиши сообщение другой лодке");
     setPlaceholder("registration-nickname", "Например, Бакунин");
 
     safeSetText(".panel-kicker", "Профиль");
-    safeSetText(".queue-status-label", "Поиск дуэли");
-    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
-    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
-    safeSetText(".journal-zone-label", "Зона");
-    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
+    safeSetText(".queue-status-label", "Поиск стычки");
+    safeSetText("#queue-status-note", "Ищем чужую лодку в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    safeSetText(".journal-zone-label", "Сектор");
+    safeSetText("#screen-inventory .panel-title", "Модули лодки");
     safeSetText("#screen-friends .panel-title", "Друзья");
     safeSetText("#friend-search-form button", "Добавить");
     safeSetText("#screen-shop .panel-title", "Магазин");
@@ -7458,30 +7458,30 @@ function refreshStaticCopy() {
     safeSetText(".social-chat-fab-label", "Чаты");
     safeSetText("#social-chat-panel .panel-title.panel-title-small", "Чаты");
     safeSetText("#registration-modal .panel-title.panel-title-small", "Регистрация игрока");
-    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     safeSetText("#registration-submit", "Создать аккаунт");
     safeSetText(".duel-result-chip:nth-of-type(1) span", "Рейтинг");
     safeSetText(".duel-result-chip:nth-of-type(2) span", "Монеты");
     safeSetText(".duel-block-title", "Оружие");
     safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
-    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Маневр");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Точечный выстрел и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Дальний выстрел");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
-    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Палубный дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Право");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Право");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Правый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Правый борт");
     safeSetText(".nav-button[data-nav-target='home'] .nav-title", "Хаб");
     safeSetText(".nav-button[data-nav-target='inventory'] .nav-title", "Инвентарь");
     safeSetText(".nav-button[data-nav-target='friends'] .nav-title", "Друзья");
@@ -7530,7 +7530,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -7543,8 +7543,8 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город");
-        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись дневника обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал");
+        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
 
@@ -7597,7 +7597,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -7653,7 +7653,7 @@ function renderInventory() {
         return Boolean(getFinalAugmentCopy(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -7769,7 +7769,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -7779,7 +7779,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -7792,7 +7792,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -7822,7 +7822,7 @@ function renderDuel() {
     renderDuelControls();
     hideAutoBattleUi();
 
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -7831,8 +7831,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
 
@@ -7843,7 +7843,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -7879,8 +7879,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -7903,7 +7903,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -7913,8 +7913,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -7984,7 +7984,7 @@ const FINAL_OVERRIDE_AUGMENTS = {
     weaponBrassSights: { name: "Прицельная рамка", description: "+5 к урону", slot: "weapon", price: 100 },
     weaponDoubleTap: { name: "Рискованный затвор", description: "5% двойной урон · 5% осечка", slot: "weapon", price: 100 },
     defensePlating: { name: "Северная бронепластина", description: "-3 входящего урона", slot: "defense", price: 100 },
-    defenseHeatSink: { name: "Усиленный каркас", description: "+15 здоровья", slot: "defense", price: 100 }
+    defenseHeatSink: { name: "Усиленный каркас", description: "+15 прочности корпуса", slot: "defense", price: 100 }
 };
 
 function getOverrideAugment(id) {
@@ -8008,7 +8008,7 @@ function refreshStaticCopy() {
     };
 
     setText("find-match-button", "Найти матч");
-    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("bot-duel-button", "Тестовая стычка на воде (бот)");
     setText("queue-cancel-button", "Отменить");
     setText("social-chat-close", "Закрыть");
     setText("social-chat-thread-title", "Выбери чат");
@@ -8016,29 +8016,29 @@ function refreshStaticCopy() {
     setText("duel-tab-chat", "Чат");
     setText("duel-clear-log-button", "Очистить");
     setText("duel-close-button", "Выйти");
-    setText("duel-title", "Дуэль");
+    setText("duel-title", "Стычка на воде");
     setText("start-duel-title", "Начать бой?");
     setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
     setText("start-duel-cancel", "Нет, вернуться в хаб");
     setText("start-duel-confirm", "Да, начать бой");
     setText("duel-exit-cancel", "Нет, остаться");
     setText("duel-exit-confirm", "Да, выйти");
-    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-title", "Стычка завершена");
     setText("duel-result-close", "В хаб");
-    setText("journal-zone-label", "Зона");
+    setText("journal-zone-label", "Сектор");
     setText("shop-money", String(Number(state.player && state.player.money || 0)) + " монет");
 
     setPlaceholder("friend-search-input", "Найти игрока по никнейму");
     setPlaceholder("social-chat-input", "Напиши сообщение");
-    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("duel-chat-input", "Напиши сообщение другой лодке");
     setPlaceholder("registration-nickname", "Например, Бакунин");
 
     safeSetText(".panel-kicker", "Профиль");
-    safeSetText(".queue-status-label", "Поиск дуэли");
-    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
-    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
-    safeSetText(".journal-zone-label", "Зона");
-    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
+    safeSetText(".queue-status-label", "Поиск стычки");
+    safeSetText("#queue-status-note", "Ищем чужую лодку в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    safeSetText(".journal-zone-label", "Сектор");
+    safeSetText("#screen-inventory .panel-title", "Модули лодки");
     safeSetText("#screen-friends .panel-title", "Друзья");
     safeSetText("#friend-search-form button", "Добавить");
     safeSetText("#screen-shop .panel-title", "Магазин");
@@ -8050,30 +8050,30 @@ function refreshStaticCopy() {
     safeSetText("#registration-copy", state.auth && state.auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
         : "Ник будет привязан к твоему Telegram ID.");
-    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     safeSetText("#registration-submit", "Создать аккаунт");
     safeSetText(".duel-result-chip:nth-of-type(1) span", "Рейтинг");
     safeSetText(".duel-result-chip:nth-of-type(2) span", "Монеты");
     safeSetText(".duel-block-title", "Оружие");
     safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
-    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Маневр");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Точечный выстрел и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Дальний выстрел");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
-    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Палубный дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Право");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Право");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Правый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Правый борт");
     safeSetText(".nav-button[data-nav-target='home'] .nav-title", "Хаб");
     safeSetText(".nav-button[data-nav-target='inventory'] .nav-title", "Инвентарь");
     safeSetText(".nav-button[data-nav-target='friends'] .nav-title", "Друзья");
@@ -8122,7 +8122,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -8135,8 +8135,8 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город");
-        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись дневника обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал");
+        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
 
@@ -8189,7 +8189,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -8245,7 +8245,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -8361,7 +8361,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -8371,7 +8371,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -8384,7 +8384,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -8398,7 +8398,7 @@ function renderDuel() {
     if (!duel) {
         return;
     }
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     if (elements.duelRoundTimer && duel.roundDeadlineAt) {
         elements.duelRoundTimer.textContent = formatDuration(Math.max(0, duel.roundDeadlineAt - Date.now()));
@@ -8407,7 +8407,7 @@ function renderDuel() {
         const hasPending = hasPendingDuelChanges(duel);
         const selectionComplete = isDuelSelectionComplete(duel);
         elements.duelSubmitButton.textContent = duel.finished
-            ? "Бой завершен"
+            ? "Стычка завершена"
             : duel.yourActionSubmitted
                 ? (hasPending ? "Изменить ход" : "Ход сделан")
                 : "Сделать ход";
@@ -8433,8 +8433,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -8457,7 +8457,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -8467,8 +8467,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -8511,36 +8511,36 @@ function refreshStaticCopy() {
     };
 
     setText("find-match-button", "Найти матч");
-    setText("bot-duel-button", "Быстрая дуэль (бот)");
+    setText("bot-duel-button", "Тестовая стычка на воде (бот)");
     setText("queue-cancel-button", "Отменить");
     setText("social-chat-close", "Закрыть");
     setText("social-chat-thread-title", "Выбери чат");
     setText("duel-tab-logs", "Логи");
     setText("duel-tab-chat", "Чат");
     setText("duel-clear-log-button", "Очистить");
-    setText("duel-title", "Дуэль");
+    setText("duel-title", "Стычка на воде");
     setText("start-duel-title", "Начать бой?");
     setText("start-duel-copy", "Подтверди, что хочешь войти в бой.");
     setText("start-duel-cancel", "Нет, вернуться в хаб");
     setText("start-duel-confirm", "Да, начать бой");
     setText("duel-exit-cancel", "Нет, остаться");
     setText("duel-exit-confirm", "Да, выйти");
-    setText("duel-result-title", "Бой завершен");
+    setText("duel-result-title", "Стычка завершена");
     setText("duel-result-close", "В хаб");
-    setText("journal-zone-label", "Зона");
+    setText("journal-zone-label", "Сектор");
     setText("shop-money", String(Number(state.player && state.player.money || 0)) + " монет");
 
     setPlaceholder("friend-search-input", "Найти игрока по никнейму");
     setPlaceholder("social-chat-input", "Напиши сообщение");
-    setPlaceholder("duel-chat-input", "Напиши сообщение сопернику");
+    setPlaceholder("duel-chat-input", "Напиши сообщение другой лодке");
     setPlaceholder("registration-nickname", "Например, Бакунин");
 
     safeSetText(".panel-kicker", "Профиль");
-    safeSetText(".queue-status-label", "Поиск дуэли");
-    safeSetText("#queue-status-note", "Ищем соперника в очереди.");
-    safeSetText("#screen-home .panel-title.panel-title-small", "Дневник");
-    safeSetText(".journal-zone-label", "Зона");
-    safeSetText("#screen-inventory .panel-title", "Доступные аугментации");
+    safeSetText(".queue-status-label", "Поиск стычки");
+    safeSetText("#queue-status-note", "Ищем чужую лодку в очереди.");
+    safeSetText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    safeSetText(".journal-zone-label", "Сектор");
+    safeSetText("#screen-inventory .panel-title", "Модули лодки");
     safeSetText("#screen-friends .panel-title", "Друзья");
     safeSetText("#friend-search-form button", "Добавить");
     safeSetText("#screen-shop .panel-title", "Магазин");
@@ -8552,30 +8552,30 @@ function refreshStaticCopy() {
     safeSetText("#registration-copy", state.auth && state.auth.demoMode
         ? "Введи никнейм. Вне Telegram он сохранится только в этом браузере."
         : "Ник будет привязан к твоему Telegram ID.");
-    safeSetText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    safeSetText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    safeSetText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    safeSetText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     safeSetText("#registration-submit", "Создать аккаунт");
     safeSetText(".duel-result-chip:nth-of-type(1) span", "Рейтинг");
     safeSetText(".duel-result-chip:nth-of-type(2) span", "Монеты");
     safeSetText(".duel-block-title", "Оружие");
     safeSetText(".vector-card:nth-of-type(1) h4", "Выстрел");
-    safeSetText(".vector-card:nth-of-type(2) h4", "Уворот");
-    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Пистоль и щит");
+    safeSetText(".vector-card:nth-of-type(2) h4", "Маневр");
+    safeSetText(".weapon-option[data-value='PISTOLS'] strong", "Точечный выстрел и щит");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-stat", "18 урона");
     safeSetText(".weapon-option[data-value='PISTOLS'] .weapon-trait", "-30% входящего урона");
-    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Винтовка");
+    safeSetText(".weapon-option[data-value='RIFLE'] strong", "Дальний выстрел");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-stat", "30 урона");
     safeSetText(".weapon-option[data-value='RIFLE'] .weapon-trait", "Точный выстрел");
-    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Дробовик");
+    safeSetText(".weapon-option[data-value='SHOTGUN'] strong", "Палубный дробовик");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-stat", "5-25 урона");
     safeSetText(".weapon-option[data-value='SHOTGUN'] .weapon-trait", "Вероятность зацепа 35%");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Право");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Лево");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Центр");
-    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Право");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='CENTER']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='shot'][data-value='RIGHT']", "Правый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='LEFT']", "Левый борт");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='STAY']", "Нос");
+    safeSetText(".duel-toggle[data-duel-select='dodge'][data-value='RIGHT']", "Правый борт");
     safeSetText(".nav-button[data-nav-target='home'] .nav-title", "Хаб");
     safeSetText(".nav-button[data-nav-target='inventory'] .nav-title", "Инвентарь");
     safeSetText(".nav-button[data-nav-target='friends'] .nav-title", "Друзья");
@@ -8624,8 +8624,8 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город");
-        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись дневника обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал");
+        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
 
@@ -8678,7 +8678,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -8734,7 +8734,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -8850,7 +8850,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -8860,7 +8860,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -8873,7 +8873,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -8903,7 +8903,7 @@ function renderDuel() {
     renderDuelControls();
     hideAutoBattleUi();
 
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -8912,8 +8912,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
 
@@ -8924,7 +8924,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -9078,8 +9078,8 @@ function repairStateAfterLegacyLoad() {
 
     state.journal = state.journal.map(function (entry) {
         return Object.assign({}, entry, {
-            text: sanitizeVisibleText(entry.text, "Запись дневника обновлена."),
-            locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город")
+            text: sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена."),
+            locationLabel: sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал")
         });
     }).filter(function (entry) {
         return Boolean(entry.text);
@@ -9157,7 +9157,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -9170,8 +9170,8 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Город");
-        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись дневника обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, JOURNAL_LOCATION_LABELS[entry.location] || "Причал");
+        return '<article class="journal-entry"><p>' + decorateText(sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.")) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
 
@@ -9225,7 +9225,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -9281,7 +9281,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -9397,7 +9397,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -9407,7 +9407,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -9420,7 +9420,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -9450,7 +9450,7 @@ function renderDuel() {
     renderDuelControls();
     hideAutoBattleUi();
 
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -9459,8 +9459,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
 
@@ -9471,7 +9471,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -9507,8 +9507,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -9531,7 +9531,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -9541,8 +9541,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -9577,11 +9577,11 @@ if (window.PolusApp) {
 }
 
 const CLEAN_ZONE_LABELS = {
-    street: "Улица",
-    tavern: "Трактир",
-    arena: "Арена",
-    market: "Рынок",
-    city: "Город"
+    street: "Причал",
+    tavern: "Камбуз",
+    arena: "Стычка",
+    market: "Верфь",
+    city: "Причал"
 };
 
 const CLEAN_AUGMENT_COPY = {
@@ -9610,7 +9610,7 @@ const CLEAN_AUGMENT_COPY = {
         id: "defenseHeatSink",
         slot: "defense",
         name: "Усиленный каркас",
-        description: "+15 здоровья",
+        description: "+15 прочности корпуса",
         price: 100
     }
 };
@@ -9899,8 +9899,8 @@ function repairStateAfterLegacyLoad() {
     state.journal = state.journal.map(function (entry) {
         const cleanText = sanitizeVisibleText(entry.text, "");
         return Object.assign({}, entry, {
-            text: cleanText || "Запись дневника обновлена.",
-            locationLabel: sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Город")
+            text: cleanText || "Запись бортового журнала обновлена.",
+            locationLabel: sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Причал")
         });
     }).filter(function (entry) {
         return Boolean(entry.text);
@@ -9930,13 +9930,13 @@ function repairStateAfterLegacyLoad() {
 function refreshStaticCopy() {
     document.title = "Полюс";
     setSelectorText(".panel-kicker", "Профиль");
-    setSelectorText("#screen-home .panel-title.panel-title-small", "Дневник");
-    setSelectorText(".journal-zone-label", "Зона");
+    setSelectorText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    setSelectorText(".journal-zone-label", "Сектор");
     setSelectorText('#bottom-nav [data-nav-target="home"] .nav-title', "Хаб");
     setSelectorText('#bottom-nav [data-nav-target="inventory"] .nav-title', "Инвентарь");
     setSelectorText('#bottom-nav [data-nav-target="friends"] .nav-title', "Друзья");
     setSelectorText('#bottom-nav [data-nav-target="shop"] .nav-title', "Магазин");
-    safeSetText(document.querySelector("#screen-inventory .panel-title"), "Доступные аугментации");
+    safeSetText(document.querySelector("#screen-inventory .panel-title"), "Модули лодки");
     safeSetText(document.querySelector("#screen-friends .panel-title"), "Друзья");
     safeSetText(document.querySelector("#screen-shop .panel-title"), "Магазин");
     safeSetText(document.querySelector("#friend-search-form button[type='submit']"), "Добавить");
@@ -9960,14 +9960,14 @@ function refreshStaticCopy() {
     safeSetText(document.querySelector("#duel-clear-log-button"), "Очистить");
     safeSetText(document.querySelector("#duel-close-button"), "Выйти");
     safeSetText(document.querySelector("#find-match-button"), "Найти матч");
-    safeSetText(document.querySelector("#bot-duel-button"), "Быстрая дуэль (бот)");
-    safeSetText(document.querySelector(".queue-status-label"), "Поиск дуэли");
+    safeSetText(document.querySelector("#bot-duel-button"), "Тестовая стычка на воде (бот)");
+    safeSetText(document.querySelector(".queue-status-label"), "Поиск стычки");
     safeSetText(document.querySelector("#queue-cancel-button"), "Отменить");
     if (elements.shopMoney) {
         elements.shopMoney.textContent = String(Number(state.player && state.player.money || 0)) + " монет";
     }
     if (elements.journalZone) {
-        elements.journalZone.textContent = sanitizeVisibleText(elements.journalZone.textContent, "Город") || "Город";
+        elements.journalZone.textContent = sanitizeVisibleText(elements.journalZone.textContent, "Причал") || "Причал";
     }
 }
 
@@ -10011,7 +10011,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -10024,8 +10024,8 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
@@ -10080,7 +10080,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -10136,7 +10136,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -10252,7 +10252,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы обновить решение."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -10262,7 +10262,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = duel.chatMessages || [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -10275,7 +10275,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -10305,7 +10305,7 @@ function renderDuel() {
     renderDuelControls();
     hideAutoBattleUi();
 
-    elements.duelTitle.textContent = "Дуэль";
+    elements.duelTitle.textContent = "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -10314,8 +10314,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
 
@@ -10326,7 +10326,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -10362,8 +10362,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -10386,7 +10386,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -10396,8 +10396,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -10433,7 +10433,7 @@ const FINAL_RUNTIME_AUGMENT_COPY = {
         slot: "defense",
         section: "defense",
         name: "Усиленный каркас",
-        description: "+15 здоровья",
+        description: "+15 прочности корпуса",
         price: 100
     }
 };
@@ -10496,14 +10496,14 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (state.matchmaking.status === "QUEUED") {
-        showToast("Ты уже в очереди. Ищем соперника.");
+        showToast("Ты уже в очереди. Ищем чужую лодку.");
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
         showToast("В браузере доступна локальная стычка.");
         openDuel({
             mode: "pvp",
-            title: "Дуэль",
+            title: "Стычка на воде",
             modeLabel: "PvP",
             opponentName: randomFrom(["Рейдер", "Снайпер", "Контрабандист", "Северянин"]),
             opponentWeapon: randomFrom(["PISTOLS", "RIFLE", "SHOTGUN"])
@@ -10560,7 +10560,7 @@ function submitCurrentDuelTurn() {
         return;
     }
     if (!isDuelSelectionComplete(state.duel)) {
-        showToast("Сначала выбери оружие, выстрел и уворот.");
+        showToast("Сначала выбери оружие, направление атаки и маневр лодки.");
         return;
     }
     if (state.duel.mode === "pvp-live") {
@@ -10572,26 +10572,26 @@ function submitCurrentDuelTurn() {
 
 function weaponInstrumentLabel(code) {
     return {
-        PISTOLS: "из пистоля и щита",
-        RIFLE: "из винтовки",
-        SHOTGUN: "из дробовика"
+        PISTOLS: "из короткого выстрела и щита",
+        RIFLE: "из дальнего выстрела",
+        SHOTGUN: "из палубного дробовика"
     }[code] || "";
 }
 
 function directionLabel(code) {
     return {
-        LEFT: "влево",
-        CENTER: "по центру",
-        RIGHT: "вправо"
-    }[code] || "по центру";
+        LEFT: "по левому борту",
+        CENTER: "в нос",
+        RIGHT: "по правому борту"
+    }[code] || "в нос";
 }
 
 function dodgeLabel(code) {
     return {
-        LEFT: "смещается влево",
-        STAY: "остается по центру",
-        RIGHT: "смещается вправо"
-    }[code] || "остается по центру";
+        LEFT: "уходит левым бортом",
+        STAY: "держит курс",
+        RIGHT: "уходит правым бортом"
+    }[code] || "держит курс";
 }
 
 function pelletWord(count) {
@@ -10669,7 +10669,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         return {
             damage: 0,
             outcome: "evaded",
-            summary: "соперник уходит от урона",
+            summary: "чужая лодка уходит от урона",
             lines: resultLines
         };
     }
@@ -10773,19 +10773,19 @@ function summarizeOpponentAttack(attack) {
         case "hit":
         case "piercing-hit":
         case "shotgun-hit":
-            return "соперник попал на " + attack.damage + " урона";
+            return "чужая лодка попал на " + attack.damage + " урона";
         case "graze":
-            return "соперник зацепил на " + attack.damage + " урона";
+            return "чужая лодка зацепил на " + attack.damage + " урона";
         case "blocked":
         case "shotgun-blocked":
-            return "соперник не пробил щит";
+            return "чужая лодка не пробил щит";
         case "evaded":
-            return "соперник ушел от урона";
+            return "чужая лодка ушел от урона";
         case "jammed":
         case "miss":
         case "graze-miss":
         default:
-            return "соперник промахнулся";
+            return "чужая лодка промахнулся";
     }
 }
 
@@ -10828,7 +10828,7 @@ function resolveDuelRound(playerAction, opponentAction) {
             state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
             openDuelResultModal({
                 title: "Победа",
-                copy: "Ты победил в дуэли.",
+                copy: "Ты удержал стычку на воде.",
                 rating: 0,
                 money: BATTLE_VICTORY_COINS
             });
@@ -10837,7 +10837,7 @@ function resolveDuelRound(playerAction, opponentAction) {
             state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
             openDuelResultModal({
                 title: "Поражение",
-                copy: "Ты проиграл в дуэли.",
+                copy: "Твоя лодка уступила в стычке.",
                 rating: 0,
                 money: BATTLE_DEFEAT_COINS
             });
@@ -10867,13 +10867,13 @@ function resolveDuelRound(playerAction, opponentAction) {
 function refreshStaticCopy() {
     document.title = "Полюс";
     setSelectorText(".panel-kicker", "Профиль");
-    setSelectorText("#screen-home .panel-title.panel-title-small", "Дневник");
-    setSelectorText(".journal-zone-label", "Зона");
+    setSelectorText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    setSelectorText(".journal-zone-label", "Сектор");
     setSelectorText('#bottom-nav [data-nav-target="home"] .nav-title', "Хаб");
     setSelectorText('#bottom-nav [data-nav-target="inventory"] .nav-title', "Инвентарь");
     setSelectorText('#bottom-nav [data-nav-target="friends"] .nav-title', "Друзья");
     setSelectorText('#bottom-nav [data-nav-target="shop"] .nav-title', "Магазин");
-    safeSetText(document.querySelector("#screen-inventory .panel-title"), "Доступные аугментации");
+    safeSetText(document.querySelector("#screen-inventory .panel-title"), "Модули лодки");
     safeSetText(document.querySelector("#screen-friends .panel-title"), "Друзья");
     safeSetText(document.querySelector("#screen-shop .panel-title"), "Магазин");
     safeSetText(document.querySelector("#friend-search-form button[type='submit']"), "Добавить");
@@ -10886,9 +10886,9 @@ function refreshStaticCopy() {
     safeSetText(document.querySelector("#registration-modal .panel-title.panel-title-small"), "Регистрация игрока");
     safeSetText(document.querySelector("#registration-copy"), "Ник будет привязан к твоему Telegram ID.");
     safeSetText(document.querySelector('label[for="registration-nickname"]'), "Никнейм");
-    safeSetText(document.querySelector("#registration-style-label"), "В каком стиле вы будете вести дневник?");
-    safeSetText(document.querySelector('.registration-style-option:nth-of-type(1) .registration-style-copy'), "Я прибыл в Полюс.");
-    safeSetText(document.querySelector('.registration-style-option:nth-of-type(2) .registration-style-copy'), "Я прибыла в Полюс.");
+    safeSetText(document.querySelector("#registration-style-label"), "В каком стиле вести бортовой журнал?");
+    safeSetText(document.querySelector('.registration-style-option:nth-of-type(1) .registration-style-copy'), "Я вышел к Большой воде.");
+    safeSetText(document.querySelector('.registration-style-option:nth-of-type(2) .registration-style-copy'), "Я вышла к Большой воде.");
     safeSetText(document.querySelector("#registration-submit"), "Создать аккаунт");
     safeSetText(document.querySelector("#start-duel-title"), "Начать бой?");
     safeSetText(document.querySelector("#start-duel-copy"), "Подтверди, что хочешь войти в бой.");
@@ -10901,26 +10901,26 @@ function refreshStaticCopy() {
     safeSetText(document.querySelector("#duel-clear-log-button"), "Очистить");
     safeSetText(document.querySelector("#duel-close-button"), "Выйти");
     safeSetText(document.querySelector("#find-match-button"), "Найти матч");
-    safeSetText(document.querySelector(".queue-status-label"), "Поиск дуэли");
+    safeSetText(document.querySelector(".queue-status-label"), "Поиск стычки");
     safeSetText(document.querySelector("#queue-cancel-button"), "Отменить");
     safeSetText(document.querySelector(".duel-block-title"), "Оружие");
     safeSetText(document.querySelector(".vector-card:nth-of-type(1) h4"), "Выстрел");
-    safeSetText(document.querySelector(".vector-card:nth-of-type(2) h4"), "Уворот");
-    safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] strong'), "Пистоль и щит");
+    safeSetText(document.querySelector(".vector-card:nth-of-type(2) h4"), "Маневр");
+    safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] strong'), "Точечный выстрел и щит");
     safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] .weapon-stat'), "18 урона");
     safeSetText(document.querySelector('.weapon-option[data-value="PISTOLS"] .weapon-trait'), "-30% входящего урона");
-    safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] strong'), "Винтовка");
+    safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] strong'), "Дальний выстрел");
     safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] .weapon-stat'), "30 урона");
     safeSetText(document.querySelector('.weapon-option[data-value="RIFLE"] .weapon-trait'), "Точный выстрел");
-    safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] strong'), "Дробовик");
+    safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] strong'), "Палубный дробовик");
     safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] .weapon-stat'), "5-25 урона");
     safeSetText(document.querySelector('.weapon-option[data-value="SHOTGUN"] .weapon-trait'), "Вероятность зацепа 35%");
-    safeSetText(document.querySelector('.duel-toggle[data-duel-select="shot"][data-value="LEFT"]'), "Лево");
-    safeSetText(document.querySelector('.duel-toggle[data-duel-select="shot"][data-value="CENTER"]'), "Центр");
-    safeSetText(document.querySelector('.duel-toggle[data-duel-select="shot"][data-value="RIGHT"]'), "Право");
-    safeSetText(document.querySelector('.duel-toggle[data-duel-select="dodge"][data-value="LEFT"]'), "Лево");
-    safeSetText(document.querySelector('.duel-toggle[data-duel-select="dodge"][data-value="STAY"]'), "Центр");
-    safeSetText(document.querySelector('.duel-toggle[data-duel-select="dodge"][data-value="RIGHT"]'), "Право");
+    safeSetText(document.querySelector('.duel-toggle[data-duel-select="shot"][data-value="LEFT"]'), "Левый борт");
+    safeSetText(document.querySelector('.duel-toggle[data-duel-select="shot"][data-value="CENTER"]'), "Нос");
+    safeSetText(document.querySelector('.duel-toggle[data-duel-select="shot"][data-value="RIGHT"]'), "Правый борт");
+    safeSetText(document.querySelector('.duel-toggle[data-duel-select="dodge"][data-value="LEFT"]'), "Левый борт");
+    safeSetText(document.querySelector('.duel-toggle[data-duel-select="dodge"][data-value="STAY"]'), "Нос");
+    safeSetText(document.querySelector('.duel-toggle[data-duel-select="dodge"][data-value="RIGHT"]'), "Правый борт");
 
     const botButton = document.getElementById("bot-duel-button");
     if (botButton) {
@@ -10934,7 +10934,7 @@ function refreshStaticCopy() {
         elements.shopMoney.textContent = String(Number(state.player && state.player.money || 0)) + " монет";
     }
     if (elements.journalZone) {
-        const zoneLabel = CLEAN_ZONE_LABELS[(state.ui && state.ui.journalLocation) || "street"] || "Город";
+        const zoneLabel = CLEAN_ZONE_LABELS[(state.ui && state.ui.journalLocation) || "street"] || "Причал";
         elements.journalZone.textContent = sanitizeVisibleText(elements.journalZone.textContent, zoneLabel) || zoneLabel;
     }
 }
@@ -10963,7 +10963,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -10976,8 +10976,8 @@ function renderJournal() {
         return;
     }
     elements.journalList.innerHTML = state.journal.slice(0, 20).map(function (entry) {
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, CLEAN_ZONE_LABELS[entry.location] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
@@ -11032,7 +11032,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -11088,7 +11088,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = "<h3>Пока аугментаций нет</h3><p>Купленные модули будут появляться здесь и распределяться по типам.</p>";
+        elements.inventoryPlaceholder.innerHTML = "<h3>Пока модулей нет</h3><p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>";
         return;
     }
     const grouped = {
@@ -11204,7 +11204,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Ты изменил выбор. Нажми «Изменить ход», чтобы отправить новый вариант."
-            : "Ход зафиксирован. Ждём соперника.";
+            : "Ход зафиксирован. Ждём чужую лодку.";
     }
     return "";
 }
@@ -11214,7 +11214,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче между двумя игроками.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -11227,7 +11227,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -11272,7 +11272,7 @@ function renderDuel() {
         elements.duelAutoCover.style.display = "none";
     }
 
-    elements.duelTitle.textContent = duel.mode === "pvp-live" ? "Матч" : "Дуэль";
+    elements.duelTitle.textContent = duel.mode === "pvp-live" ? "Стычка" : "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     elements.duelYouName.textContent = sanitizeVisibleText(duel.playerName, "Игрок");
@@ -11281,8 +11281,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = sanitizeVisibleText(duel.opponentName, "Соперник");
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = sanitizeVisibleText(duel.opponentName, "С").slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / getPlayerMaxHp()) * 100))) + "%";
     elements.duelOpponentFill.style.width = Math.max(0, Math.min(100, Math.round((duel.opponentHp / getPlayerMaxHp()) * 100))) + "%";
 
@@ -11293,7 +11293,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -11339,8 +11339,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -11363,7 +11363,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -11373,8 +11373,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -11410,7 +11410,7 @@ function triggerRandomJournalEvent() {
     addJournal(event.text, {
         sourceEventId: event.id,
         location: event.location,
-        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город"
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Причал"
     });
     getJournalHistory()[event.id] = now;
     state.world.lastJournalEventAt = now;
@@ -11441,7 +11441,7 @@ function renderJournal() {
     state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20) : [];
     const location = getCurrentJournalLocation();
     if (elements.journalZone) {
-        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Город";
+        elements.journalZone.textContent = FINAL_JOURNAL_ZONE_LABELS[location] || "Причал";
     }
     if (!state.journal.length) {
         elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><p>Записей пока нет.</p></article>';
@@ -11449,8 +11449,8 @@ function renderJournal() {
     }
     elements.journalList.innerHTML = state.journal.map(function (entry) {
         const entryLocation = entry.location || location;
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, FINAL_JOURNAL_ZONE_LABELS[entryLocation] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></article>';
     }).join("");
 }
@@ -11465,7 +11465,7 @@ function triggerRandomJournalEvent(timestamp, options) {
     addJournal(event.text, {
         sourceEventId: event.id,
         location: event.location,
-        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Город",
+        locationLabel: event.locationLabel || FINAL_JOURNAL_ZONE_LABELS[event.location] || "Причал",
         createdAt: eventTimestamp
     });
     getJournalHistory()[event.id] = eventTimestamp;
@@ -11536,23 +11536,23 @@ var UX_AUGMENT_COPY = {
         slot: "defense",
         section: "defense",
         name: "Усиленный каркас",
-        description: "+15 здоровья",
+        description: "+15 прочности корпуса",
         price: 100
     }
 };
 
 var UX_ZONE_LABELS = {
-    street: "Улица",
-    tavern: "Трактир",
-    arena: "Арена",
-    market: "Рынок",
-    city: "Город"
+    street: "Причал",
+    tavern: "Камбуз",
+    arena: "Стычка",
+    market: "Верфь",
+    city: "Причал"
 };
 
 var UX_WEAPON_HINTS = {
-    PISTOLS: "Пистоль и щит: 18 урона. Щит всегда снижает входящий урон на 30%.",
-    RIFLE: "Винтовка: 30 урона. Точный выстрел по выбранной линии.",
-    SHOTGUN: "Дробовик: 5 дробин по 5 урона. При промахе может зацепить на 5 урона с шансом 35%."
+    PISTOLS: "Точечный выстрел и щит: 18 урона. Щит всегда снижает входящий урон на 30%.",
+    RIFLE: "Дальний выстрел: 30 урона. Точный выстрел по выбранной линии.",
+    SHOTGUN: "Палубный дробовик: 5 дробин по 5 урона. При промахе может зацепить на 5 урона с шансом 35%."
 };
 
 function looksLikeMojibake(text) {
@@ -11617,18 +11617,18 @@ function normalizeResourceText(text) {
 function decorateText(text) {
     let html = escapeHtml(sanitizeVisibleText(normalizeResourceText(text), "Запись обновлена."));
     [
-        /(\+\d+\s*(?:монет|рейтинга|HP))/giu,
+        /(\+\d+\s*(?:монет|рейтинга|прочн.))/giu,
         /\b(попадание|попал|победа|победил|награда|куплено|зацеп)\b/giu
     ].forEach(function (pattern) {
         html = html.replace(pattern, '<span class="text-positive">$1</span>');
     });
     [
-        /(-\d+\s*(?:монет|рейтинга|HP))/giu,
+        /(-\d+\s*(?:монет|рейтинга|прочн.))/giu,
         /\b(промах|промахнулся|поражение|проиграл|осечка|заблокирован|не хватает)\b/giu
     ].forEach(function (pattern) {
         html = html.replace(pattern, '<span class="text-negative">$1</span>');
     });
-    ["по центру", "влево", "вправо", "слева", "справа"].forEach(function (term) {
+    ["в нос", "по левому борту", "по правому борту", "слева", "справа"].forEach(function (term) {
         html = html.replace(new RegExp(escapeRegExp(term), "giu"), '<span class="text-direction">$&</span>');
     });
     return html;
@@ -11690,8 +11690,8 @@ function repairStateAfterLegacyLoad() {
     state.journal = Array.isArray(state.journal) ? state.journal.slice(0, 20).map(function (entry) {
         return Object.assign({}, entry, {
             location: entry.location || "street",
-            locationLabel: sanitizeVisibleText(entry.locationLabel, UX_ZONE_LABELS[entry.location] || "Город"),
-            text: sanitizeVisibleText(entry.text, "Запись дневника обновлена.")
+            locationLabel: sanitizeVisibleText(entry.locationLabel, UX_ZONE_LABELS[entry.location] || "Причал"),
+            text: sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.")
         });
     }) : [];
     state.player.name = sanitizeVisibleText(state.player.name, sanitizeVisibleText(state.auth.nickname, "Новый игрок")) || "Новый игрок";
@@ -11736,7 +11736,7 @@ function setText(selector, value) {
 function renderStaticWeaponOptions() {
     const weapons = {
         PISTOLS: {
-            title: "Пистоль",
+            title: "Точечный выстрел",
             mark: "pistol",
             help: "18 урона. Щит всегда снижает входящий урон на 30%.",
             stats: [
@@ -11745,7 +11745,7 @@ function renderStaticWeaponOptions() {
             ]
         },
         RIFLE: {
-            title: "Винтовка",
+            title: "Дальний выстрел",
             mark: "rifle",
             help: "30 урона. Выстрел пробивает защиту цели.",
             stats: [
@@ -11754,7 +11754,7 @@ function renderStaticWeaponOptions() {
             ]
         },
         SHOTGUN: {
-            title: "Дробовик",
+            title: "Палубный дробовик",
             mark: "shotgun",
             help: "5-25 урона. Есть шанс зацепить цель рядом с выбранной линией.",
             stats: [
@@ -11789,17 +11789,17 @@ function renderStaticDirectionButtons() {
         shot: {
             prefix: "Выстрел",
             values: {
-                LEFT: { symbol: "←", label: "Лево" },
-                CENTER: { symbol: "•", label: "Центр" },
-                RIGHT: { symbol: "→", label: "Право" }
+                LEFT: { symbol: "←", label: "Левый борт" },
+                CENTER: { symbol: "•", label: "Нос" },
+                RIGHT: { symbol: "→", label: "Правый борт" }
             }
         },
         dodge: {
-            prefix: "Уворот",
+            prefix: "Маневр",
             values: {
-                LEFT: { symbol: "←", label: "Лево" },
-                STAY: { symbol: "•", label: "Стоять" },
-                RIGHT: { symbol: "→", label: "Право" }
+                LEFT: { symbol: "←", label: "Левый борт" },
+                STAY: { symbol: "•", label: "Держать курс" },
+                RIGHT: { symbol: "→", label: "Правый борт" }
             }
         }
     };
@@ -11829,13 +11829,13 @@ function scrollDuelLogsToLatest() {
 function refreshStaticCopy() {
     document.title = "Полюс";
     setText(".player-panel .panel-kicker", "Профиль");
-    setText("#screen-home .panel-title.panel-title-small", "Дневник");
-    setText(".journal-zone-label", "Зона");
+    setText("#screen-home .panel-title.panel-title-small", "Бортовой журнал");
+    setText(".journal-zone-label", "Сектор");
     setText('#bottom-nav [data-nav-target="home"] .nav-title', "Хаб");
     setText('#bottom-nav [data-nav-target="inventory"] .nav-title', "Инвентарь");
     setText('#bottom-nav [data-nav-target="friends"] .nav-title', "Друзья");
     setText('#bottom-nav [data-nav-target="shop"] .nav-title', "Магазин");
-    setText("#screen-inventory .panel-title", "Доступные аугментации");
+    setText("#screen-inventory .panel-title", "Модули лодки");
     setText("#screen-friends .panel-title", "Друзья");
     setText("#screen-shop .panel-title", "Магазин");
     setText("#friend-search-form button[type='submit']", "+");
@@ -11848,26 +11848,26 @@ function refreshStaticCopy() {
     setText("#registration-modal .panel-title.panel-title-small", "Регистрация игрока");
     setText("#registration-copy", "Ник будет привязан к твоему Telegram ID.");
     setText('label[for="registration-nickname"]', "Никнейм");
-    setText("#registration-style-label", "В каком стиле вы будете вести дневник?");
-    setText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я прибыл в Полюс.");
-    setText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я прибыла в Полюс.");
+    setText("#registration-style-label", "В каком стиле вести бортовой журнал?");
+    setText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
+    setText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     setText("#registration-submit", "Создать аккаунт");
-    setText("#start-duel-title", "Вступить в стычку?");
-    setText("#start-duel-copy", "Подтверди выход в открытый просвет топи.");
+    setText("#start-duel-title", "Выйти на воду?");
+    setText("#start-duel-copy", "Подтверди выход на открытую воду.");
     setText("#start-duel-cancel", "Нет, вернуться в хаб");
-    setText("#start-duel-confirm", "Вступить в стычку");
+    setText("#start-duel-confirm", "Выйти в плавание");
     setText("#duel-exit-cancel", "Нет, остаться");
     setText("#duel-exit-confirm", "Да, выйти");
     setText("#duel-tab-logs", "Логи");
     setText("#duel-tab-chat", "Чат");
     setText("#duel-clear-log-button", "Очистить");
     setText("#duel-close-button", "Выйти");
-    setText("#find-match-button", "Вступить в стычку");
-    setText(".queue-status-label", "Поиск другого выжившего");
+    setText("#find-match-button", "Выйти в плавание");
+    setText(".queue-status-label", "Поиск другой лодки");
     setText("#queue-cancel-button", "Отменить");
     setText(".duel-block-title", "Оружие");
-    setText(".vector-card:nth-of-type(1) h4", "Куда стрелять по силуэту?");
-    setText(".vector-card:nth-of-type(2) h4", "Куда уйти от выстрела?");
+    setText(".vector-card:nth-of-type(1) h4", "Куда бить по лодке?");
+    setText(".vector-card:nth-of-type(2) h4", "Маневр лодки");
     renderStaticWeaponOptions();
     renderStaticDirectionButtons();
     Object.keys(UX_WEAPON_HINTS || {}).forEach(function (code) {
@@ -11904,7 +11904,7 @@ function refreshStaticCopy() {
     if (elements.journalZone) {
         const location = typeof getCurrentJournalLocation === "function" ? getCurrentJournalLocation() : ((state.ui && state.ui.journalLocation) || "street");
         const zoneLabels = UX_ZONE_LABELS || {};
-        elements.journalZone.textContent = zoneLabels[location] || "Город";
+        elements.journalZone.textContent = zoneLabels[location] || "Причал";
     }
 }
 
@@ -11947,7 +11947,7 @@ function getProfileBadgeLabel() {
         return "Ветеран";
     }
     if (rating >= 20 || level >= 3) {
-        return "Выживший";
+        return "Капитан";
     }
     return "Новичок";
 }
@@ -12021,7 +12021,7 @@ function renderLeaderboardModal() {
     }
     const entries = buildLeaderboardEntries();
     if (!entries.length) {
-        elements.leaderboardList.innerHTML = '<article class="leaderboard-empty"><strong>Рейтинг пуст</strong><span>Сыграй стычку, чтобы появиться в таблице.</span></article>';
+        elements.leaderboardList.innerHTML = '<article class="leaderboard-empty"><strong>Рейтинг пуст</strong><span>Выиграй стычку на воде, чтобы появиться в таблице.</span></article>';
         return;
     }
     elements.leaderboardList.innerHTML = entries.map(function (entry) {
@@ -12097,7 +12097,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем соперника в очереди.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем чужую лодку в очереди.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -12123,7 +12123,7 @@ function renderJournal() {
     const location = typeof getCurrentJournalLocation === "function" ? getCurrentJournalLocation() : ((state.ui && state.ui.journalLocation) || "street");
     if (elements.journalZone) {
         const zoneLabels = UX_ZONE_LABELS || {};
-        elements.journalZone.textContent = zoneLabels[location] || "Город";
+        elements.journalZone.textContent = zoneLabels[location] || "Причал";
     }
     if (!state.journal.length) {
         elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><span class="entry-icon" aria-hidden="true">·</span><div><p>Записей пока нет.</p></div></article>';
@@ -12132,8 +12132,8 @@ function renderJournal() {
     elements.journalList.innerHTML = state.journal.map(function (entry) {
         const entryLocation = entry.location || location;
         const zoneLabels = UX_ZONE_LABELS || {};
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, zoneLabels[entryLocation] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, zoneLabels[entryLocation] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry">'
             + '<span class="entry-icon" aria-hidden="true">' + escapeHtml(journalIcon(entry)) + '</span>'
             + '<div class="entry-body"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></div>'
@@ -12187,7 +12187,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -12244,7 +12244,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = '<div class="inventory-empty-visual" aria-hidden="true">◇</div><h3>Пока аугментаций нет</h3><p>Купленные модули появятся здесь.</p>';
+        elements.inventoryPlaceholder.innerHTML = '<div class="inventory-empty-visual" aria-hidden="true">◇</div><h3>Пока модулей нет</h3><p>Купленные модули появятся здесь.</p>';
         return;
     }
     const grouped = {
@@ -12404,7 +12404,7 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (state.matchmaking.status === "QUEUED") {
-        showToast("Ты уже в очереди. Ищем соперника.");
+        showToast("Ты уже в очереди. Ищем чужую лодку.");
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
@@ -12527,7 +12527,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Выбор изменен. Нажми «Изменить ход», чтобы отправить новый вариант."
-            : "Ход зафиксирован. Ждем соперника.";
+            : "Ход зафиксирован. Ждем чужую лодку.";
     }
     if (duel.yourActionSubmitted && !hasPendingDuelChanges(duel)) {
         return "Ход сделан.";
@@ -12537,26 +12537,26 @@ function buildDuelStatusText(duel) {
 
 function weaponInstrumentLabel(code) {
     return {
-        PISTOLS: "из пистоля и щита",
-        RIFLE: "из винтовки",
-        SHOTGUN: "из дробовика"
+        PISTOLS: "из короткого выстрела и щита",
+        RIFLE: "из дальнего выстрела",
+        SHOTGUN: "из палубного дробовика"
     }[code] || "";
 }
 
 function directionLabel(code) {
     return {
-        LEFT: "влево",
-        CENTER: "по центру",
-        RIGHT: "вправо"
-    }[code] || "по центру";
+        LEFT: "по левому борту",
+        CENTER: "в нос",
+        RIGHT: "по правому борту"
+    }[code] || "в нос";
 }
 
 function dodgeLabel(code) {
     return {
-        LEFT: "смещается влево",
-        STAY: "остается по центру",
-        RIGHT: "смещается вправо"
-    }[code] || "остается по центру";
+        LEFT: "уходит левым бортом",
+        STAY: "держит курс",
+        RIGHT: "уходит правым бортом"
+    }[code] || "держит курс";
 }
 
 function pelletWord(count) {
@@ -12619,7 +12619,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         return { damage: 0, outcome: "miss", summary: "промах мимо линии", lines: resultLines };
     }
     if (lineMatched && typeof shouldSupportEvade === "function" && shouldSupportEvade(defenderSide)) {
-        return { damage: 0, outcome: "evaded", summary: "соперник уходит от урона", lines: resultLines };
+        return { damage: 0, outcome: "evaded", summary: "чужая лодка уходит от урона", lines: resultLines };
     }
     if (attackerAction.weapon === "PISTOLS") {
         let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
@@ -12664,20 +12664,20 @@ function summarizeOpponentAttack(attack) {
         case "hit":
         case "piercing-hit":
         case "shotgun-hit":
-            return "соперник попал на " + attack.damage + " урона";
+            return "чужая лодка попал на " + attack.damage + " урона";
         case "graze":
-            return "соперник зацепил на " + attack.damage + " урона";
+            return "чужая лодка зацепил на " + attack.damage + " урона";
         case "blocked":
         case "shotgun-blocked":
-            return "соперник не пробил щит";
+            return "чужая лодка не пробил щит";
         case "evaded":
-            return "соперник ушел от урона";
+            return "чужая лодка ушел от урона";
         case "jammed":
-            return "у соперника осечка";
+            return "у чужую лодку осечка";
         case "miss":
         case "graze-miss":
         default:
-            return "соперник промахнулся";
+            return "чужая лодка промахнулся";
     }
 }
 
@@ -12690,7 +12690,7 @@ function submitCurrentDuelTurn() {
         return;
     }
     if (!isDuelSelectionComplete(state.duel)) {
-        showToast("Сначала выбери оружие, выстрел и уворот.");
+        showToast("Сначала выбери оружие, направление атаки и маневр лодки.");
         return;
     }
     if (state.duel.mode === "pvp-live") {
@@ -12772,11 +12772,11 @@ function resolveDuelRound(playerAction, opponentAction) {
         if (playerWon) {
             duel.resultText = "Ты победил.";
             state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
-            openDuelResultModal({ title: "Победа", copy: "Ты победил в дуэли.", rating: 0, money: BATTLE_VICTORY_COINS });
+            openDuelResultModal({ title: "Победа", copy: "Ты удержал стычку на воде.", rating: 0, money: BATTLE_VICTORY_COINS });
         } else if (opponentWon) {
             duel.resultText = "Ты проиграл.";
             state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
-            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в дуэли.", rating: 0, money: BATTLE_DEFEAT_COINS });
+            openDuelResultModal({ title: "Поражение", copy: "Твоя лодка уступила в стычке.", rating: 0, money: BATTLE_DEFEAT_COINS });
         } else {
             duel.resultText = "Ничья.";
             openDuelResultModal({ title: "Ничья", copy: "Оба бойца выбыли одновременно.", rating: 0, money: 0 });
@@ -12852,7 +12852,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши сопернику первое сообщение." : "Чат доступен только в PvP-матче.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только в PvP-матче.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -12865,7 +12865,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение сопернику" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши сообщение другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -12955,7 +12955,7 @@ function renderDuel() {
         elements.duelAutoCover.style.display = "none";
     }
 
-    elements.duelTitle.textContent = duel.mode === "pvp-live" ? "Матч" : "Дуэль";
+    elements.duelTitle.textContent = duel.mode === "pvp-live" ? "Стычка" : "Стычка на воде";
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     const youName = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
@@ -12966,8 +12966,8 @@ function renderDuel() {
     elements.duelOpponentName.textContent = opponentName;
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = opponentName.slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     const playerMaxHp = Math.max(1, Number(duel.playerMaxHp || getPlayerMaxHp()));
     const opponentMaxHp = Math.max(1, Number(duel.opponentMaxHp || 100));
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / playerMaxHp) * 100))) + "%";
@@ -12980,7 +12980,7 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
             ? (duelHasPendingChanges ? "Изменить ход" : "Ход сделан")
             : "Сделать ход";
@@ -13015,8 +13015,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в дуэли." : inferredDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -13039,7 +13039,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -13049,8 +13049,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в дуэли." : isDefeat ? "Ты проиграл в дуэли." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });
@@ -13094,7 +13094,7 @@ function finalFriendDuel(friendId) {
     requestStartDuel({
         mode: "friend",
         title: "Вызвать на стычку?",
-        copy: "Другой выживший: " + sanitizeVisibleText(friend.name, "Игрок") + ".",
+        copy: "Другой капитан: " + sanitizeVisibleText(friend.name, "Игрок") + ".",
         execute: function () {
             startQueueDuel(true);
         }
@@ -13251,7 +13251,7 @@ function renderQueueStatus() {
     const queuedAt = state.matchmaking.queuedAt || Date.now();
     const elapsedSeconds = Math.max(0, Math.floor((Date.now() - queuedAt) / 1000));
     elements.queueStatusTime.textContent = formatQueueElapsed(elapsedSeconds);
-    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем другого выжившего.");
+    elements.queueStatusNote.textContent = sanitizeVisibleText(state.matchmaking.message, "Ищем другую лодку.");
     elements.queueCancelButton.disabled = false;
 }
 
@@ -13277,7 +13277,7 @@ function renderJournal() {
     const location = typeof getCurrentJournalLocation === "function" ? getCurrentJournalLocation() : ((state.ui && state.ui.journalLocation) || "street");
     if (elements.journalZone) {
         const zoneLabels = UX_ZONE_LABELS || {};
-        elements.journalZone.textContent = zoneLabels[location] || "Город";
+        elements.journalZone.textContent = zoneLabels[location] || "Причал";
     }
     if (!state.journal.length) {
         elements.journalList.innerHTML = '<article class="journal-entry journal-entry-empty"><span class="entry-icon" aria-hidden="true">.</span><div><p>Записей пока нет.</p></div></article>';
@@ -13286,8 +13286,8 @@ function renderJournal() {
     elements.journalList.innerHTML = state.journal.map(function (entry) {
         const entryLocation = entry.location || location;
         const zoneLabels = UX_ZONE_LABELS || {};
-        const zoneLabel = sanitizeVisibleText(entry.locationLabel, zoneLabels[entryLocation] || "Город");
-        const journalText = sanitizeVisibleText(entry.text, "Запись дневника обновлена.");
+        const zoneLabel = sanitizeVisibleText(entry.locationLabel, zoneLabels[entryLocation] || "Причал");
+        const journalText = sanitizeVisibleText(entry.text, "Запись бортового журнала обновлена.");
         return '<article class="journal-entry">'
             + '<span class="entry-icon" aria-hidden="true">' + escapeHtml(journalIcon(entry)) + '</span>'
             + '<div class="entry-body"><p>' + decorateText(journalText) + '</p><small>' + escapeHtml(zoneLabel + " · " + formatTimestamp(entry.createdAt || Date.now())) + '</small></div>'
@@ -13343,7 +13343,7 @@ async function submitRegistration() {
         return;
     }
     if (!journalStyle) {
-        showRegistrationError("Выбери стиль дневника.");
+        showRegistrationError("Выбери стиль бортового журнала.");
         return;
     }
 
@@ -13400,7 +13400,7 @@ function renderInventory() {
         return Boolean(getOverrideAugment(id));
     });
     if (!unlocked.length) {
-        elements.inventoryPlaceholder.innerHTML = '<div class="inventory-empty-visual" aria-hidden="true">◇</div><h3>Пока аугментаций нет</h3><p>Купленные модули появятся здесь.</p>';
+        elements.inventoryPlaceholder.innerHTML = '<div class="inventory-empty-visual" aria-hidden="true">◇</div><h3>Пока модулей нет</h3><p>Купленные модули появятся здесь.</p>';
         return;
     }
     const grouped = {
@@ -13744,8 +13744,8 @@ async function startQueueDuel(skipConfirm) {
     if (!skipConfirm) {
         requestStartDuel({
             mode: "queue",
-            title: "Вступить в стычку?",
-            copy: "Подтверди выход в открытый просвет топи.",
+            title: "Выйти на воду?",
+            copy: "Подтверди выход на открытую воду.",
             execute: function () {
                 startQueueDuel(true);
             }
@@ -13753,7 +13753,7 @@ async function startQueueDuel(skipConfirm) {
         return;
     }
     if (state.matchmaking.status === "QUEUED") {
-        showToast("Ты уже в очереди. Ищем другого выжившего.");
+        showToast("Ты уже в очереди. Ищем другую лодку.");
         return;
     }
     if (!state.auth.sessionToken || state.auth.demoMode) {
@@ -13773,7 +13773,7 @@ async function startQueueDuel(skipConfirm) {
         applyMatchmakingStatus(payload);
         if (payload.status === "IN_DUEL" && payload.duelId) {
             await refreshLiveDuel(payload.duelId);
-            showToast("Другой выживший найден.");
+            showToast("Другой капитан найден.");
         } else {
             showToast("Очередь запущена.");
         }
@@ -13854,7 +13854,7 @@ function buildDuelStatusText(duel) {
     if (duel.mode === "pvp-live" && duel.yourActionSubmitted) {
         return hasPendingDuelChanges(duel)
             ? "Выбор изменен. Нажми «Изменить ход», чтобы отправить новый вариант."
-            : "Ход зафиксирован. Ждем другого выжившего.";
+            : "Ход зафиксирован. Ждем другую лодку.";
     }
     if (duel.yourActionSubmitted && !hasPendingDuelChanges(duel)) {
         return "Ход сделан.";
@@ -13864,26 +13864,26 @@ function buildDuelStatusText(duel) {
 
 function weaponInstrumentLabel(code) {
     return {
-        PISTOLS: "из пистоля и щита",
-        RIFLE: "из винтовки",
-        SHOTGUN: "из дробовика"
+        PISTOLS: "из короткого выстрела и щита",
+        RIFLE: "из дальнего выстрела",
+        SHOTGUN: "из палубного дробовика"
     }[code] || "";
 }
 
 function directionLabel(code) {
     return {
-        LEFT: "влево",
-        CENTER: "по центру",
-        RIGHT: "вправо"
-    }[code] || "по центру";
+        LEFT: "по левому борту",
+        CENTER: "в нос",
+        RIGHT: "по правому борту"
+    }[code] || "в нос";
 }
 
 function dodgeLabel(code) {
     return {
-        LEFT: "смещается влево",
-        STAY: "остается по центру",
-        RIGHT: "смещается вправо"
-    }[code] || "остается по центру";
+        LEFT: "уходит левым бортом",
+        STAY: "держит курс",
+        RIGHT: "уходит правым бортом"
+    }[code] || "держит курс";
 }
 
 function pelletWord(count) {
@@ -13917,7 +13917,7 @@ function resolveAttack(attackerName, defenderName, attackerAction, defenderActio
         return { damage: 0, outcome: "miss", summary: "промах мимо линии", lines: resultLines };
     }
     if (lineMatched && typeof shouldSupportEvade === "function" && shouldSupportEvade(defenderSide)) {
-        return { damage: 0, outcome: "evaded", summary: "соперник уходит от урона", lines: resultLines };
+        return { damage: 0, outcome: "evaded", summary: "чужая лодка уходит от урона", lines: resultLines };
     }
     if (attackerAction.weapon === "PISTOLS") {
         let damage = 18 + getWeaponDamageBonus(attackerSide, attackerAction.weapon);
@@ -13962,20 +13962,20 @@ function summarizeOpponentAttack(attack) {
         case "hit":
         case "piercing-hit":
         case "shotgun-hit":
-            return "соперник попал на " + attack.damage + " урона";
+            return "чужая лодка попал на " + attack.damage + " урона";
         case "graze":
-            return "соперник зацепил на " + attack.damage + " урона";
+            return "чужая лодка зацепил на " + attack.damage + " урона";
         case "blocked":
         case "shotgun-blocked":
-            return "соперник не пробил щит";
+            return "чужая лодка не пробил щит";
         case "evaded":
-            return "соперник ушел от урона";
+            return "чужая лодка ушел от урона";
         case "jammed":
-            return "у соперника осечка";
+            return "у чужую лодку осечка";
         case "miss":
         case "graze-miss":
         default:
-            return "соперник промахнулся";
+            return "чужая лодка промахнулся";
     }
 }
 
@@ -13988,7 +13988,7 @@ function submitCurrentDuelTurn() {
         return;
     }
     if (!isDuelSelectionComplete(state.duel)) {
-        showToast("Сначала выбери оружие, выстрел и уворот.");
+        showToast("Сначала выбери оружие, направление атаки и маневр лодки.");
         return;
     }
     if (state.duel.mode === "pvp-live") {
@@ -14042,7 +14042,7 @@ function resolveDuelRound(playerAction, opponentAction) {
     }
     const roundNumber = duel.round;
     const playerName = sanitizeVisibleText(duel.playerName, "Игрок");
-    const opponentName = sanitizeVisibleText(duel.opponentName, "Другой выживший");
+    const opponentName = sanitizeVisibleText(duel.opponentName, "Другой капитан");
     const playerAttack = resolveAttack(playerName, opponentName, playerAction, opponentAction, "player");
     const opponentAttack = resolveAttack(opponentName, playerName, opponentAction, playerAction, "opponent");
 
@@ -14070,11 +14070,11 @@ function resolveDuelRound(playerAction, opponentAction) {
         if (playerWon) {
             duel.resultText = "Ты победил.";
             state.player.money = Number(state.player.money || 0) + BATTLE_VICTORY_COINS;
-            openDuelResultModal({ title: "Победа", copy: "Ты победил в стычке.", rating: 0, money: BATTLE_VICTORY_COINS });
+            openDuelResultModal({ title: "Победа", copy: "Ты удержал стычку на воде.", rating: 0, money: BATTLE_VICTORY_COINS });
         } else if (opponentWon) {
             duel.resultText = "Ты проиграл.";
             state.player.money = Number(state.player.money || 0) + BATTLE_DEFEAT_COINS;
-            openDuelResultModal({ title: "Поражение", copy: "Ты проиграл в стычке.", rating: 0, money: BATTLE_DEFEAT_COINS });
+            openDuelResultModal({ title: "Поражение", copy: "Твоя лодка уступила в стычке.", rating: 0, money: BATTLE_DEFEAT_COINS });
         } else {
             duel.resultText = "Ничья.";
             openDuelResultModal({ title: "Ничья", copy: "Оба бойца выбыли одновременно.", rating: 0, money: 0 });
@@ -14103,7 +14103,7 @@ function duelLogKind(lines) {
     if (/зацеп/.test(joined)) {
         return "graze";
     }
-    if (/уворот|уклон|уш[её]л|ушла|ушли|стоит/.test(joined)) {
+    if (/маневр|маневр|уш[её]л|ушла|ушли|стоит/.test(joined)) {
         return "evade";
     }
     if (/попадание|попал|попала|урон/.test(joined)) {
@@ -14133,7 +14133,7 @@ function duelLogIcon(kind) {
 
 function duelLogMeta(line) {
     const text = String(line || "").toLowerCase();
-    if (/лев|центр|прав|стоит|уворот|уклон/.test(text)) {
+    if (/лев|центр|прав|стоит|маневр|маневр/.test(text)) {
         return "направление";
     }
     if (/зацеп/.test(text)) {
@@ -14180,7 +14180,7 @@ function renderDuelChat(duel) {
     const canWrite = isLiveChat && !duel.finished;
     const messages = Array.isArray(duel.chatMessages) ? duel.chatMessages : [];
     if (!messages.length) {
-        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другому выжившему первое сообщение." : "Чат доступен только во время стычки.") + '</p></div>';
+        elements.duelChatList.innerHTML = '<div class="duel-chat-entry"><p class="duel-chat-text">' + (isLiveChat ? "Чат пока пуст. Напиши другой лодке первое сообщение." : "Чат доступен только во время стычки.") + '</p></div>';
     } else {
         elements.duelChatList.innerHTML = messages.map(function (message) {
             const own = message.playerId && state.auth && message.playerId === state.auth.playerId;
@@ -14193,7 +14193,7 @@ function renderDuelChat(duel) {
     }
     elements.duelChatInput.disabled = !canWrite;
     elements.duelChatSendButton.disabled = !canWrite;
-    elements.duelChatInput.placeholder = canWrite ? "Напиши другому выжившему" : "Чат недоступен";
+    elements.duelChatInput.placeholder = canWrite ? "Напиши другой лодке" : "Чат недоступен";
     elements.duelChatError.textContent = sanitizeVisibleText(duel.chatError, "");
     elements.duelChatError.classList.toggle("hidden", !duel.chatError);
     elements.duelChatList.scrollTop = elements.duelChatList.scrollHeight;
@@ -14287,15 +14287,15 @@ function renderDuel() {
     elements.duelRoundPill.textContent = "Раунд " + duel.round;
     elements.duelRoundTimer.textContent = formatDuration(getRoundTimeRemainingMs(duel));
     const youName = sanitizeVisibleText(duel.playerName, sanitizeVisibleText(state.player.name, "Игрок"));
-    const opponentName = sanitizeVisibleText(duel.opponentName, "Другой выживший");
+    const opponentName = sanitizeVisibleText(duel.opponentName, "Другой капитан");
     elements.duelYouName.textContent = youName;
     elements.duelYouMeta.textContent = "";
     elements.duelYouAvatar.textContent = youName.slice(0, 1).toUpperCase();
     elements.duelOpponentName.textContent = opponentName;
     elements.duelOpponentMeta.textContent = "";
     elements.duelOpponentAvatar.textContent = opponentName.slice(0, 1).toUpperCase();
-    elements.duelYouHp.textContent = duel.playerHp + " HP";
-    elements.duelOpponentHp.textContent = duel.opponentHp + " HP";
+    elements.duelYouHp.textContent = duel.playerHp + " прочн.";
+    elements.duelOpponentHp.textContent = duel.opponentHp + " прочн.";
     const playerMaxHp = Math.max(1, Number(duel.playerMaxHp || getPlayerMaxHp()));
     const opponentMaxHp = Math.max(1, Number(duel.opponentMaxHp || 100));
     elements.duelYouFill.style.width = Math.max(0, Math.min(100, Math.round((duel.playerHp / playerMaxHp) * 100))) + "%";
@@ -14308,9 +14308,9 @@ function renderDuel() {
     const duelSelectionComplete = isDuelSelectionComplete(duel);
     const duelHasPendingChanges = hasPendingDuelChanges(duel);
     elements.duelSubmitButton.textContent = duel.finished
-        ? "Бой завершен"
+        ? "Стычка завершена"
         : duel.yourActionSubmitted
-            ? (duelHasPendingChanges ? "Изменить ход" : "Ожидаем другого выжившего")
+            ? (duelHasPendingChanges ? "Изменить ход" : "Ожидаем другую лодку")
             : "Сделать ход";
     elements.duelSubmitButton.disabled = duel.finished || !duelSelectionComplete || (duel.yourActionSubmitted && !duelHasPendingChanges);
     elements.duelSubmitButton.classList.toggle("is-turn-submitted", Boolean(duel.yourActionSubmitted && !duelHasPendingChanges && !duel.finished));
@@ -14350,8 +14350,8 @@ function renderDuel() {
 function openDuelResultModal(config) {
     const inferredVictory = Number(config.rating || 0) > 0 || Number(config.money || 0) >= BATTLE_VICTORY_COINS;
     const inferredDefeat = Number(config.rating || 0) < 0 || Number(config.money || 0) === BATTLE_DEFEAT_COINS;
-    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Бой завершен");
-    const fallbackCopy = inferredVictory ? "Ты победил в стычке." : inferredDefeat ? "Ты проиграл в стычке." : "Раундов больше не осталось.";
+    const fallbackTitle = inferredVictory ? "Победа" : (inferredDefeat ? "Поражение" : "Стычка завершена");
+    const fallbackCopy = inferredVictory ? "Ты удержал стычку на воде." : inferredDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.";
     state.ui.duelExitConfirmOpen = false;
     state.ui.duelResult = {
         title: sanitizeVisibleText(config.title, fallbackTitle),
@@ -14374,7 +14374,7 @@ function renderDuelResultModal() {
     if (!shouldOpen) {
         return;
     }
-    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Бой завершен");
+    elements.duelResultTitle.textContent = sanitizeVisibleText(result.title, "Стычка завершена");
     elements.duelResultCopy.textContent = sanitizeVisibleText(result.copy, "");
     elements.duelResultExp.textContent = formatSignedReward(result.rating || 0, " рейтинга");
     elements.duelResultMoney.textContent = formatSignedReward(result.money || 0, " монет");
@@ -14384,8 +14384,8 @@ function openLiveDuelResult(payload) {
     const isVictory = payload.resultLabel === "VICTORY";
     const isDefeat = payload.resultLabel === "DEFEAT";
     openDuelResultModal({
-        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Бой завершен",
-        copy: isVictory ? "Ты победил в стычке." : isDefeat ? "Ты проиграл в стычке." : "Раундов больше не осталось.",
+        title: isVictory ? "Победа" : isDefeat ? "Поражение" : "Стычка завершена",
+        copy: isVictory ? "Ты удержал стычку на воде." : isDefeat ? "Твоя лодка уступила в стычке." : "Раундов больше не осталось.",
         rating: isVictory ? PVP_RATING_DELTA : isDefeat ? -PVP_RATING_DELTA : 0,
         money: isVictory ? BATTLE_VICTORY_COINS : isDefeat ? BATTLE_DEFEAT_COINS : 0
     });

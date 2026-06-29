@@ -53,7 +53,7 @@ public class DiscoveryService {
                     ));
                     eventLogger.info(
                             AppEventType.DISCOVERY_FOUND,
-                            "Найдена запись для базы",
+                            "Найдена запись для бортового журнала",
                             Map.of(
                                     "playerId", player.getId(),
                                     "discoveryId", discovery.id(),

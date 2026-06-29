@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Полюс</title>
-    <link rel="stylesheet" href="/duel/app.css?v=polus-20260617-profilebar-2">
+    <link rel="stylesheet" href="/duel/app.css?v=polus-20260629-ocean-1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -54,15 +54,15 @@
             </div>
 
             <div class="action-row">
-                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Вступить в стычку</button>
-                <button class="secondary-button hidden" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()" hidden aria-hidden="true">Быстрая дуэль (бот)</button>
+                <button class="primary-button" id="find-match-button" type="button" onclick="window.PolusApp && window.PolusApp.startQueueDuel()">Выйти в плавание</button>
+                <button class="secondary-button hidden" id="bot-duel-button" type="button" onclick="window.PolusApp && window.PolusApp.startBotDuel()" hidden aria-hidden="true">Тестовая стычка на воде (бот)</button>
             </div>
 
             <section class="queue-status hidden" id="queue-status-card" aria-live="polite">
                 <div class="queue-status-copy">
-                    <p class="queue-status-label">Поиск дуэли</p>
+                    <p class="queue-status-label">Поиск стычки</p>
                     <strong class="queue-status-time" id="queue-status-time">0 сек</strong>
-                    <p class="queue-status-note" id="queue-status-note">Ищем соперника в очереди.</p>
+                    <p class="queue-status-note" id="queue-status-note">Ищем чужую лодку в очереди.</p>
                 </div>
                 <button class="ghost-button queue-status-cancel" id="queue-cancel-button" type="button" onclick="window.PolusApp && window.PolusApp.cancelQueue()">Отменить</button>
             </section>
@@ -86,12 +86,12 @@
         <section class="panel exploration-panel" id="exploration-panel" aria-labelledby="exploration-title">
             <div class="exploration-header sr-only">
                 <h1 class="panel-title exploration-title" id="exploration-title">Новый игрок</h1>
-                <span class="exploration-mode-chip" id="exploration-mode-chip">На базе</span>
+                <span class="exploration-mode-chip" id="exploration-mode-chip">У причала</span>
             </div>
 
-            <div class="exploration-vitals" aria-label="Состояние выжившего">
+            <div class="exploration-vitals" aria-label="Состояние лодки">
                 <div class="exploration-vital exploration-vital-hp">
-                    <span>HP</span>
+                    <span>прочн.</span>
                     <strong id="exploration-hp">100 / 100</strong>
                     <span class="exploration-hp-track" aria-hidden="true">
                         <span id="exploration-hp-fill"></span>
@@ -107,44 +107,44 @@
                     <strong id="exploration-supplies">3</strong>
                     <span>припасы</span>
                 </div>
-                <div class="exploration-resource" title="Топяная смола">
+                <div class="exploration-resource" title="Глубинный налет">
                     <span aria-hidden="true">◆</span>
                     <strong id="exploration-resin">0</strong>
-                    <span>смола</span>
+                    <span>налет</span>
                 </div>
             </div>
 
             <div class="exploration-intro" id="exploration-intro">
                 <section class="release-onboarding" aria-labelledby="release-onboarding-title">
-                    <p class="release-onboarding-kicker">Первый выход</p>
-                    <h2 id="release-onboarding-title">Ты у края топи</h2>
-                    <p>База держится на старых досках. Дальше — вода, камыш и чужие следы. Иди скрытно, если хочешь вернуться целым. Перестань скрываться, если готов рискнуть ради большей добычи.</p>
+                    <p class="release-onboarding-kicker">Первое плавание</p>
+                    <h2 id="release-onboarding-title">Ты у края Большой воды</h2>
+                    <p>Лодка держится у старой пристани. Дальше — Большая вода, туман и чужие следы винта. Иди тихим ходом, если хочешь вернуться целым. Выходи на открытую воду, если готов рискнуть ради большего груза.</p>
                     <button class="ghost-button release-help-toggle" id="exploration-help-toggle" type="button" aria-expanded="false" aria-controls="exploration-help-panel">Что это значит?</button>
                     <div class="release-help-panel hidden" id="exploration-help-panel">
-                        <p><strong>Скрытно:</strong> безопаснее, без PvP, меньше добычи.</p>
-                        <p><strong>Открыто:</strong> выше риск, возможны стычки, больше добычи.</p>
+                        <p><strong>Тихий ход:</strong> безопаснее, без PvP, меньше груза.</p>
+                        <p><strong>Открытая вода:</strong> выше риск, возможны стычки, больше груза.</p>
                     </div>
                 </section>
                 <section class="base-preparation" aria-labelledby="base-preparation-title">
                     <div class="base-preparation-header">
                         <div>
                             <span class="base-preparation-kicker">Подготовка</span>
-                            <h2 id="base-preparation-title">База выжившего</h2>
+                            <h2 id="base-preparation-title">Лодка</h2>
                         </div>
                         <span class="base-preparation-summary" id="base-preparation-summary">Загрузка...</span>
                     </div>
-                    <div class="progression-tabs" role="tablist" aria-label="Разделы базы">
-                        <button class="progression-tab is-active" type="button" role="tab" aria-selected="true" data-progression-view="upgrades">Улучшения</button>
-                        <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="equipment">Снаряжение</button>
+                    <div class="progression-tabs" role="tablist" aria-label="Разделы лодки">
+                        <button class="progression-tab is-active" type="button" role="tab" aria-selected="true" data-progression-view="upgrades">Модификации</button>
+                        <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="equipment">Модули</button>
                         <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="map">Карта</button>
                         <button class="progression-tab" type="button" role="tab" aria-selected="false" data-progression-view="discoveries">Находки</button>
                     </div>
                     <div class="progression-content" id="progression-content" aria-live="polite"></div>
                 </section>
                 <div class="exploration-start-actions">
-                    <button class="primary-button" id="exploration-start-hidden" type="button">Начать скрытно</button>
-                    <button class="secondary-button" id="exploration-start-open" type="button">Идти открыто</button>
-                    <button class="ghost-button" id="exploration-direct-pvp" type="button">Вступить в стычку</button>
+                    <button class="primary-button" id="exploration-start-hidden" type="button">Тихий ход</button>
+                    <button class="secondary-button" id="exploration-start-open" type="button">Открытая вода</button>
+                    <button class="ghost-button" id="exploration-direct-pvp" type="button">Открыть стычку</button>
                 </div>
             </div>
 
@@ -152,7 +152,7 @@
                 <div class="exploration-progress-row">
                     <span id="exploration-step-label">Шаг 0 из 8</span>
                     <span class="exploration-chain-label hidden" id="exploration-chain-label">Цепочка</span>
-                    <span id="exploration-collected">В рюкзаке пока пусто</span>
+                    <span id="exploration-collected">В палубном ящике пока пусто</span>
                 </div>
                 <div class="exploration-journal" id="exploration-live-journal" aria-live="polite"></div>
                 <article class="exploration-encounter hidden" id="exploration-encounter">
@@ -165,14 +165,14 @@
                     <div class="exploration-choice-list" id="exploration-choice-list"></div>
                 </article>
                 <div class="exploration-actions">
-                    <button class="primary-button" id="exploration-step" type="button">Идти дальше</button>
-                    <button class="secondary-button hidden" id="exploration-open-pvp" type="button">Перестать скрываться</button>
-                    <button class="ghost-button" id="exploration-return" type="button">Вернуться на базу</button>
+                    <button class="primary-button" id="exploration-step" type="button">Держать курс</button>
+                    <button class="secondary-button hidden" id="exploration-open-pvp" type="button">Выйти на открытую воду</button>
+                    <button class="ghost-button" id="exploration-return" type="button">Вернуться к причалу</button>
                 </div>
             </div>
 
             <details class="exploration-history">
-                <summary>Прошлые записи</summary>
+                <summary>Прошлые вахты</summary>
                 <div class="exploration-history-list" id="exploration-history-list"></div>
             </details>
             <p class="exploration-status hidden" id="exploration-status" role="status"></p>
@@ -181,10 +181,10 @@
         <section class="panel journal-panel hidden" id="home-journal-panel">
             <div class="panel-header journal-panel-header">
                 <div class="journal-header-copy">
-                    <h2 class="panel-title panel-title-small">Дневник</h2>
+                    <h2 class="panel-title panel-title-small">Бортовой журнал</h2>
                     <div class="journal-zone-row">
-                        <span class="journal-zone-label">Зона</span>
-                        <span class="badge badge-muted" id="journal-zone">Город</span>
+                        <span class="journal-zone-label">Сектор</span>
+                        <span class="badge badge-muted" id="journal-zone">Причал</span>
                     </div>
                 </div>
                 <button class="social-chat-fab journal-chat-chip" id="social-chat-fab" type="button" onclick="window.PolusApp && window.PolusApp.openSocialInbox()">
@@ -200,13 +200,13 @@
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Доступные аугментации</h2>
+                    <h2 class="panel-title">Модули лодки</h2>
                 </div>
             </div>
 
             <div class="empty-state-card" id="inventory-placeholder">
-                <h3>Пока аугментаций нет</h3>
-                <p>Купленные модули будут появляться здесь и распределяться по типам.</p>
+                <h3>Пока модулей нет</h3>
+                <p>Купленные узлы лодки будут появляться здесь и распределяться по типам.</p>
             </div>
         </section>
     </section>
@@ -329,15 +329,15 @@
             <label class="field-label" for="registration-nickname">Никнейм</label>
             <input class="text-input" id="registration-nickname" name="nickname" type="text" maxlength="20" autocomplete="nickname" placeholder="Например, Бакунин">
             <div class="field-group">
-                <p class="field-label field-label-spaced" id="registration-style-label">В каком стиле вы будете вести дневник?</p>
+                <p class="field-label field-label-spaced" id="registration-style-label">В каком стиле вести бортовой журнал?</p>
                 <div class="registration-style-grid" role="radiogroup" aria-labelledby="registration-style-label">
                     <label class="registration-style-option">
                         <input type="radio" name="registration-journal-style" value="M">
-                        <span class="registration-style-copy">Я прибыл в Полюс.</span>
+                        <span class="registration-style-copy">Я вышел к Большой воде.</span>
                     </label>
                     <label class="registration-style-option">
                         <input type="radio" name="registration-journal-style" value="W">
-                        <span class="registration-style-copy">Я прибыла в Полюс.</span>
+                        <span class="registration-style-copy">Я вышла к Большой воде.</span>
                     </label>
                 </div>
             </div>
@@ -350,13 +350,13 @@
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="start-duel-title">Вступить в стычку?</h3>
-                <p class="panel-copy duel-exit-copy" id="start-duel-copy">Подтверди выход в открытый просвет топи.</p>
+                <h3 class="panel-title panel-title-small" id="start-duel-title">Выйти на воду?</h3>
+                <p class="panel-copy duel-exit-copy" id="start-duel-copy">Подтверди выход на открытую воду.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
             <button class="secondary-button full-width" id="start-duel-cancel" type="button" onclick="window.PolusApp && window.PolusApp.cancelStartDuel()">Нет, вернуться в хаб</button>
-            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Вступить в стычку</button>
+            <button class="primary-button full-width" id="start-duel-confirm" type="button" onclick="window.PolusApp && window.PolusApp.confirmStartDuel()">Выйти в плавание</button>
         </div>
     </div>
 </section>
@@ -365,8 +365,8 @@
     <div class="modal-sheet modal-sheet-compact duel-exit-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small">Покинуть бой?</h3>
-                <p class="panel-copy duel-exit-copy">Если выйти сейчас, тебе будет засчитано автопоражение.</p>
+                <h3 class="panel-title panel-title-small">Покинуть стычку?</h3>
+                <p class="panel-copy duel-exit-copy">Если выйти сейчас, тебе будет засчитано поражение.</p>
             </div>
         </div>
         <div class="duel-exit-actions">
@@ -396,7 +396,7 @@
                         <div class="duelist-main">
                             <div class="duelist-name-row">
                                 <h3 id="duel-you-name">Игрок</h3>
-                                <p class="hp-copy" id="duel-you-hp">100 HP</p>
+                                <p class="hp-copy" id="duel-you-hp">100 прочн.</p>
                             </div>
                             <div class="duelist-hp-wrap">
                                 <div class="hp-track">
@@ -413,8 +413,8 @@
                         <div class="duelist-avatar duel-avatar-opponent" id="duel-opponent-avatar">С</div>
                         <div class="duelist-main">
                             <div class="duelist-name-row">
-                                <h3 id="duel-opponent-name">Другой выживший</h3>
-                                <p class="hp-copy" id="duel-opponent-hp">100 HP</p>
+                                <h3 id="duel-opponent-name">Другой капитан</h3>
+                                <p class="hp-copy" id="duel-opponent-hp">100 прочн.</p>
                             </div>
                             <div class="duelist-hp-wrap">
                                 <div class="hp-track">
@@ -439,10 +439,10 @@
 
             <div class="duel-control-stack" id="duel-control-stack">
                 <div class="weapon-grid">
-                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" data-help="18 урона. Щит всегда снижает входящий урон на 30%." title="18 урона. Щит всегда снижает входящий урон на 30%." aria-label="Пистоль: 18 урона, щит снижает входящий урон на 30%" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
+                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="PISTOLS" data-help="18 урона. Щит всегда снижает входящий урон на 30%." title="18 урона. Щит всегда снижает входящий урон на 30%." aria-label="Точечный выстрел: 18 урона, щит снижает входящий урон на 30%" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'PISTOLS')">
                         <span class="weapon-face">
                             <span class="weapon-mark weapon-mark-pistol" aria-hidden="true"></span>
-                            <strong>Пистоль</strong>
+                            <strong>Точечный выстрел</strong>
                             <span class="weapon-help" aria-hidden="true">i</span>
                         </span>
                         <span class="weapon-stats">
@@ -450,10 +450,10 @@
                             <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-shield" aria-hidden="true"></span>-30%</span>
                         </span>
                     </button>
-                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="RIFLE" data-help="30 урона. Выстрел пробивает защиту цели." title="30 урона. Выстрел пробивает защиту цели." aria-label="Винтовка: 30 урона, пробитие защиты" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'RIFLE')">
+                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="RIFLE" data-help="30 урона. Выстрел пробивает защиту цели." title="30 урона. Выстрел пробивает защиту цели." aria-label="Дальний выстрел: 30 урона, пробитие защиты" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'RIFLE')">
                         <span class="weapon-face">
                             <span class="weapon-mark weapon-mark-rifle" aria-hidden="true"></span>
-                            <strong>Винтовка</strong>
+                            <strong>Дальний выстрел</strong>
                             <span class="weapon-help" aria-hidden="true">i</span>
                         </span>
                         <span class="weapon-stats">
@@ -461,10 +461,10 @@
                             <span class="weapon-stat-chip"><span class="stat-glyph stat-glyph-break" aria-hidden="true"></span>пробитие</span>
                         </span>
                     </button>
-                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="SHOTGUN" data-help="5-25 урона. Есть шанс зацепить цель рядом с выбранной линией." title="5-25 урона. Есть шанс зацепить цель рядом с выбранной линией." aria-label="Дробовик: 5-25 урона, шанс зацепа" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'SHOTGUN')">
+                    <button class="weapon-option" type="button" data-duel-select="weapon" data-value="SHOTGUN" data-help="5-25 урона. Есть шанс зацепить цель рядом с выбранной линией." title="5-25 урона. Есть шанс зацепить цель рядом с выбранной линией." aria-label="Палубный дробовик: 5-25 урона, шанс зацепа" onclick="window.PolusApp && window.PolusApp.selectDuelOption('weapon', 'SHOTGUN')">
                         <span class="weapon-face">
                             <span class="weapon-mark weapon-mark-shotgun" aria-hidden="true"></span>
-                            <strong>Дробовик</strong>
+                            <strong>Палубный дробовик</strong>
                             <span class="weapon-help" aria-hidden="true">i</span>
                         </span>
                         <span class="weapon-stats">
@@ -476,20 +476,20 @@
 
                 <div class="duel-vector-grid">
                     <section class="vector-card">
-                        <h4>Куда стрелять по силуэту?</h4>
+                        <h4>Куда бить по лодке?</h4>
                         <div class="toggle-row">
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Лево</span></button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Центр</span></button>
-                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')"><span class="direction-symbol" aria-hidden="true">→</span><span class="direction-label">Право</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Левый борт</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="CENTER" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'CENTER')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Нос</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="shot" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('shot', 'RIGHT')"><span class="direction-symbol" aria-hidden="true">→</span><span class="direction-label">Правый борт</span></button>
                         </div>
                     </section>
 
                     <section class="vector-card">
-                        <h4>Куда уйти от выстрела?</h4>
+                        <h4>Маневр лодки</h4>
                         <div class="toggle-row">
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Лево</span></button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Стоять</span></button>
-                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')"><span class="direction-symbol" aria-hidden="true">→</span><span class="direction-label">Право</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="LEFT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'LEFT')"><span class="direction-symbol" aria-hidden="true">←</span><span class="direction-label">Левый борт</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="STAY" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'STAY')"><span class="direction-symbol" aria-hidden="true">•</span><span class="direction-label">Держать курс</span></button>
+                            <button class="duel-toggle" type="button" data-duel-select="dodge" data-value="RIGHT" onclick="window.PolusApp && window.PolusApp.selectDuelOption('dodge', 'RIGHT')"><span class="direction-symbol" aria-hidden="true">→</span><span class="direction-label">Правый борт</span></button>
                         </div>
                     </section>
                 </div>
@@ -516,7 +516,7 @@
             <div class="duel-chat-pane hidden" id="duel-chat-pane" role="tabpanel" aria-labelledby="duel-tab-chat">
                 <div class="duel-chat-list duel-log-track" id="duel-chat-list"></div>
                 <form class="duel-chat-form" id="duel-chat-form">
-                    <input class="text-input duel-chat-input" id="duel-chat-input" type="text" maxlength="300" placeholder="Напиши сообщение сопернику">
+                    <input class="text-input duel-chat-input" id="duel-chat-input" type="text" maxlength="300" placeholder="Напиши сообщение другой лодке">
                     <button class="primary-button duel-chat-send" id="duel-chat-send-button" type="submit">Отправить</button>
                 </form>
                 <p class="duel-chat-error hidden" id="duel-chat-error"></p>
@@ -529,8 +529,8 @@
     <div class="modal-sheet modal-sheet-compact duel-result-sheet">
         <div class="modal-header modal-header-stack">
             <div>
-                <h3 class="panel-title panel-title-small" id="duel-result-title">Бой завершен</h3>
-                <p class="panel-copy duel-exit-copy" id="duel-result-copy">Победа за тобой.</p>
+                <h3 class="panel-title panel-title-small" id="duel-result-title">Стычка завершена</h3>
+                <p class="panel-copy duel-exit-copy" id="duel-result-copy">Твоя лодка удержала воду.</p>
             </div>
         </div>
         <div class="duel-result-rewards">
@@ -560,9 +560,9 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="/duel/journal-events.js?v=polus-20260512-3"></script>
-<script src="/duel/app.js?v=polus-20260617-profilebar-2"></script>
-<script src="/duel/exploration.js?v=polus-20260617-profilebar-2"></script>
+<script src="/duel/journal-events.js?v=polus-20260629-ocean-1"></script>
+<script src="/duel/app.js?v=polus-20260629-ocean-1"></script>
+<script src="/duel/exploration.js?v=polus-20260629-ocean-1"></script>
 </body>
 </html>
 

@@ -36,13 +36,13 @@ public class DuelEngine {
         if (playerOneHpAfter <= 0 || playerTwoHpAfter <= 0) {
             status = DuelStatus.FINISHED;
             if (playerOneHpAfter <= 0 && playerTwoHpAfter <= 0) {
-                lines.add("Итог раунда: оба дуэлянта выбывают одновременно. Ничья.");
+                lines.add("Итог раунда: оба корпуса теряют ход одновременно. Ничья на воде.");
             } else if (playerTwoHpAfter <= 0) {
                 winnerPlayerId = duel.getPlayerOneId();
-                lines.add("Итог раунда: " + duel.getPlayerOneName() + " побеждает.");
+                lines.add("Итог раунда: лодка " + duel.getPlayerOneName() + " удерживает курс.");
             } else {
                 winnerPlayerId = duel.getPlayerTwoId();
-                lines.add("Итог раунда: " + duel.getPlayerTwoName() + " побеждает.");
+                lines.add("Итог раунда: лодка " + duel.getPlayerTwoName() + " удерживает курс.");
             }
         }
 
@@ -122,8 +122,8 @@ public class DuelEngine {
 
     private String buildIntentLine(String playerName, DuelRoundAction action) {
         String prefix = action.source() == DuelActionSource.TIMEOUT_DEFAULT
-                ? playerName + " не успевает выбрать ход и по таймеру стреляет "
-                : playerName + " стреляет ";
+                ? playerName + " не успевает выбрать маневр и по таймеру бьет "
+                : playerName + " бьет ";
         return prefix
                 + shotDirectionPhrase(action.shotDirection())
                 + " "
@@ -139,33 +139,33 @@ public class DuelEngine {
 
     private String opponentOutcomeFragment(AttackResolution opponentAttack) {
         return switch (opponentAttack.outcome()) {
-            case HIT, IGNORE_BLOCK_HIT, SHOTGUN_HIT, GRAZE -> "соперник попал";
-            case BLOCKED, SHOTGUN_BLOCKED -> "соперник не пробил щит";
-            case MISS_LINE, GRAZE_MISS -> "соперник промахнулся";
+            case HIT, IGNORE_BLOCK_HIT, SHOTGUN_HIT, GRAZE -> "чужая лодка попала по корпусу";
+            case BLOCKED, SHOTGUN_BLOCKED -> "чужая лодка не пробила щит";
+            case MISS_LINE, GRAZE_MISS -> "чужая лодка дала воду мимо борта";
         };
     }
 
     private String shotDirectionPhrase(ShotDirection shotDirection) {
         return switch (shotDirection) {
-            case LEFT -> "влево";
-            case CENTER -> "по центру";
-            case RIGHT -> "вправо";
+            case LEFT -> "по левому борту";
+            case CENTER -> "в нос";
+            case RIGHT -> "по правому борту";
         };
     }
 
     private String dodgeDirectionPhrase(DodgeDirection dodgeDirection) {
         return switch (dodgeDirection) {
-            case LEFT -> "смещается влево";
-            case STAY -> "остается по центру";
-            case RIGHT -> "смещается вправо";
+            case LEFT -> "уходит левым бортом";
+            case STAY -> "держит курс";
+            case RIGHT -> "уходит правым бортом";
         };
     }
 
     private String weaponInstrument(WeaponType weaponType) {
         return switch (weaponType) {
-            case PISTOLS -> "из пистоля и щита";
-            case RIFLE -> "из винтовки";
-            case SHOTGUN -> "из дробовика";
+            case PISTOLS -> "коротким точечным выстрелом";
+            case RIFLE -> "дальним выстрелом с палубы";
+            case SHOTGUN -> "палубным дробовиком";
         };
     }
 
@@ -195,16 +195,16 @@ public class DuelEngine {
     public record AttackResolution(int damage, Outcome outcome, int blockedProjectiles, int hitProjectiles) {
         public String summary() {
             return switch (outcome) {
-                case HIT -> "попадание на " + damage + " урона";
-                case IGNORE_BLOCK_HIT -> "попадание на " + damage + " урона";
-                case BLOCKED -> "выстрел заблокирован щитом";
-                case MISS_LINE -> "промах мимо линии";
-                case GRAZE -> "зацеп на " + damage + " урона";
-                case GRAZE_MISS -> "дробь ушла мимо цели";
+                case HIT -> "попадание по корпусу на " + damage + " урона";
+                case IGNORE_BLOCK_HIT -> "попадание по корпусу на " + damage + " урона";
+                case BLOCKED -> "выстрел принят щитом борта";
+                case MISS_LINE -> "вода поднялась рядом с бортом, корпус цел";
+                case GRAZE -> "зацеп по борту на " + damage + " урона";
+                case GRAZE_MISS -> "дробь ушла в воду мимо корпуса";
                 case SHOTGUN_HIT -> blockedProjectiles > 0
-                        ? "попадание на " + damage + " урона, щит блокирует " + blockedProjectiles + pelletWord(blockedProjectiles)
-                        : "попадание на " + damage + " урона";
-                case SHOTGUN_BLOCKED -> "все дробины заблокированы щитом";
+                        ? "попадание по корпусу на " + damage + " урона, щит борта принимает " + blockedProjectiles + pelletWord(blockedProjectiles)
+                        : "попадание по корпусу на " + damage + " урона";
+                case SHOTGUN_BLOCKED -> "вся дробь принята щитом борта";
             };
         }
     }

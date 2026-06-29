@@ -45,9 +45,9 @@ public class EquipmentService {
                 new EquipmentState(
                         player.getId(),
                         WeaponSlot.PISTOL,
-                        armor("swamp_cloak", "Рваный болотный плащ", 1, 5),
-                        charm("bone_charm", "Костяной оберег", 1, 5),
-                        List.of(tool("rope", "Верёвка", 1, 10)),
+                        armor("swamp_cloak", "Брезентовый тент", 1, 5),
+                        charm("bone_charm", "Старый эхолот", 1, 5),
+                        List.of(tool("rope", "Швартовый трос", 1, 10)),
                         Set.of("swamp_cloak", "bone_charm", "rope"),
                         clock.instant()
                 )
@@ -64,12 +64,12 @@ public class EquipmentService {
         EquipmentState state = getOrCreate(player);
         EquipmentCatalogItem item = requireCatalogItem(player, itemId);
         if (!item.unlocked() || item.slot() != slot) {
-            throw new ConflictException("Этот предмет пока нельзя экипировать");
+            throw new ConflictException("Этот модуль пока нельзя экипировать");
         }
         if (!state.owns(itemId)) {
             PlayerState playerState = playerStateService.getOrCreate(player);
             if (!playerState.getResources().canAfford(item.upgradeCost())) {
-                throw new ConflictException("Недостаточно ресурсов для покупки предмета");
+                throw new ConflictException("Недостаточно ресурсов для покупки модульа");
             }
             playerState.setResources(playerState.getResources().subtract(item.upgradeCost()));
             playerStateService.save(playerState);
@@ -85,7 +85,7 @@ public class EquipmentService {
         repository.save(state);
         eventLogger.info(
                 AppEventType.EQUIPMENT_EQUIPPED,
-                "Предмет экипирован",
+                "Модуль экипирован",
                 Map.of("playerId", player.getId(), "itemId", itemId, "slot", slot)
         );
         return view(player);
@@ -98,11 +98,11 @@ public class EquipmentService {
         EquipmentState state = getOrCreate(player);
         EquipmentCatalogItem item = requireCatalogItem(player, itemId);
         if (!item.unlocked() || !item.owned() || !item.equipped()) {
-            throw new ConflictException("Сначала экипируй доступный предмет");
+            throw new ConflictException("Сначала экипируй доступный модуль");
         }
         int currentLevel = currentLevel(state, item);
         if (currentLevel >= item.maxLevel()) {
-            throw new ConflictException("Предмет уже улучшен до максимума");
+            throw new ConflictException("Модуль уже улучшен до максимума");
         }
         PlayerState playerState = playerStateService.getOrCreate(player);
         if (!playerState.getResources().canAfford(item.upgradeCost())) {
@@ -115,7 +115,7 @@ public class EquipmentService {
         repository.save(state);
         eventLogger.info(
                 AppEventType.EQUIPMENT_UPGRADED,
-                "Снаряжение улучшено",
+                "Модуль лодки усилен",
                 Map.of("playerId", player.getId(), "itemId", itemId, "level", currentLevel + 1)
         );
         return view(player);
@@ -147,7 +147,7 @@ public class EquipmentService {
     public void logOpened(PlayerProfile player) {
         eventLogger.info(
                 AppEventType.EQUIPMENT_OPENED,
-                "Снаряжение открыто",
+                "Модули открыто",
                 Map.of("playerId", player.getId())
         );
     }
@@ -156,7 +156,7 @@ public class EquipmentService {
         return view(player).items().stream()
                 .filter(item -> item.id().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Предмет не найден"));
+                .orElseThrow(() -> new NotFoundException("Модуль не найден"));
     }
 
     private int currentLevel(EquipmentState state, EquipmentCatalogItem item) {
@@ -184,14 +184,14 @@ public class EquipmentService {
 
     private ArmorItem armor(String id, String name, int level, double value) {
         String type = id.equals("shell_jacket") ? "danger_damage_reduction" : "danger_damage_reduction";
-        return new ArmorItem(id, name, level, 3, "Защита для экспедиций",
-                List.of(new EquipmentEffect(type, value, "Снижает потерю HP")));
+        return new ArmorItem(id, name, level, 3, "Защита для плаваний",
+                List.of(new EquipmentEffect(type, value, "Снижает потерю прочности")));
     }
 
     private CharmItem charm(String id, String name, int level, double value) {
         String type = id.equals("rusty_token") ? "map_fragment_bonus" : "anomaly_reduction";
-        return new CharmItem(id, name, level, 3, "Оберег для топи",
-                List.of(new EquipmentEffect(type, value, "Меняет исходы экспедиций")));
+        return new CharmItem(id, name, level, 3, "Эхолот для Большой воды",
+                List.of(new EquipmentEffect(type, value, "Меняет исходы плаваний")));
     }
 
     private ToolItem tool(String id, String name, int level, double value) {
@@ -201,6 +201,6 @@ public class EquipmentService {
             default -> "object_damage_reduction";
         };
         return new ToolItem(id, name, level, 3, "Инструмент исследователя",
-                List.of(new EquipmentEffect(type, value, "Открывает преимущество в топи")));
+                List.of(new EquipmentEffect(type, value, "Открывает преимущество на Большой воде")));
     }
 }

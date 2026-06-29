@@ -73,7 +73,7 @@ public class ExplorationModifierService {
         if (route != null && !route.isBlank()) {
             eventLogger.info(
                     AppEventType.MAP_ROUTE_USED,
-                    "Маршрут повлиял на генерацию события",
+                    "Курс повлиял на генерацию события",
                     Map.of("playerId", player.getId(), "routeId", route, "visibilityMode", mode)
             );
         }
@@ -97,7 +97,7 @@ public class ExplorationModifierService {
         PlayerResources reward = choice.reward() == null ? PlayerResources.empty() : choice.reward();
         if (!reward.isEmpty() && exploration.getVisibilityMode() == ExplorationVisibilityMode.OPEN_PVP) {
             reward = scaleReward(reward, contentBalance.openPvpRewardMultiplier());
-            messages.add("Открытый маршрут принёс больше добычи.");
+            messages.add("Открытый курс принёс больше груза.");
             logEffect(
                     AppEventType.OPEN_PVP_REWARD_APPLIED,
                     player,
@@ -134,7 +134,7 @@ public class ExplorationModifierService {
             int reduced = Math.max(1, (int) Math.round(Math.abs(hpDelta) * (1.0d - Math.min(80, reduction) / 100.0d)));
             if (reduced < Math.abs(hpDelta)) {
                 hpDelta = -reduced;
-                messages.add("Снаряжение и база смягчили полученный урон.");
+                messages.add("Модули и лодка смягчили полученный урон.");
                 logEffect(AppEventType.EQUIPMENT_EFFECT_APPLIED, player, exploration, "hpReduction", reduction);
             }
         }
@@ -162,7 +162,7 @@ public class ExplorationModifierService {
         }
         eventLogger.info(
                 AppEventType.RESOURCES_LOST,
-                "Часть добычи потеряна",
+                "Часть груза потеряна",
                 Map.of(
                         "playerId", player.getId(),
                         "explorationId", exploration.getExplorationId(),

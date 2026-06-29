@@ -14,29 +14,29 @@ import org.springframework.stereotype.Component;
 public class EncounterGenerator {
 
     private final List<String> movementEntries = List.of(
-            "Топь не шумит. Даже вода под ногами будто ждет, когда ты ошибешься.",
-            "Доски старого настила уходят под воду. Приходится ступать по корням и ржавому железу.",
-            "Туман становится плотнее. База уже не видна, но ее генератор еще слышен за спиной.",
-            "Камыш расходится узким коридором. На воде нет ряби, хотя ветер усилился.",
-            "Под сапогами хрустит тонкий ледяной налет. Здесь холоднее, чем должно быть."
+            "Большая вода не шумит. Даже вода под ногами будто ждет, когда ты ошибешься.",
+            "Доски старого причала уходят под воду. Приходится ступать по ржавому железу и тросам.",
+            "Туман становится плотнее. Лодка уже не видна, но ее генератор еще слышен за спиной.",
+            "Туман расходится узким коридором. На воде нет ряби, хотя ветер усилился.",
+            "Под обшивкой хрустит тонкий ледяной налет. Здесь холоднее, чем должно быть."
     );
 
     private final List<String> stageFourMovementEntries = List.of(
             "За левым плечом скрипит мокрый настил, хотя там нет ни одной доски.",
             "Вода на секунду становится прозрачной и показывает чужие следы под илом.",
-            "Камыш ложится вперед, будто пропускает тебя по заранее выбранному коридору.",
+            "Туман ложится вперед, будто пропускает тебя по заранее выбранному коридору.",
             "Старый провод тянется из воды и тихо звенит, когда рядом проходит ветер.",
-            "На коре черной ольхи проступает свежая метка, которой не было минуту назад.",
-            "Туман открывает сухую кочку и сразу закрывает путь за спиной.",
-            "Где-то далеко хлопает ставня, хотя ближайший дом давно ушел под воду.",
-            "Северный огонек базы мигает три раза и снова теряется в серой воде."
+            "На ржавом буе проступает свежая метка, которой не было минуту назад.",
+            "Туман открывает сухую сваю и сразу закрывает путь за спиной.",
+            "Где-то далеко хлопает створка маяка, хотя ближайший дом давно ушел под воду.",
+            "Северный огонек лодки мигает три раза и снова теряется в серой воде."
     );
 
     private final List<EncounterTemplate> hiddenEncounters = List.of(
             loot(
                     "hidden_loot_rusted_box",
                     "Ржавый ящик",
-                    "В корнях черной ольхи застрял ржавый ящик. Крышка держится на одном замке.",
+                    "Между сваями застрял ржавый ящик. Крышка держится на одном замке.",
                     choice("take", "Вскрыть и забрать", ChoiceResultType.GAIN_RESOURCE, "низкий",
                             resources(1, 1, 0), 0, "Внутри нашлись сухой бинт и пригодный кусок металла."),
                     choice("inspect", "Проверить ловушки", ChoiceResultType.GAIN_RESOURCE, "низкий",
@@ -45,20 +45,20 @@ public class EncounterGenerator {
             ),
             loot(
                     "hidden_loot_drowned_pack",
-                    "Затонувший рюкзак",
-                    "Ремень рюкзака виден под темной водой. Что-то внутри еще сохраняет форму.",
+                    "Затонувший палубный ящик",
+                    "Ремень палубного ящика виден под темной водой. Что-то внутри еще сохраняет форму.",
                     choice("pull", "Вытащить", ChoiceResultType.GAIN_RESOURCE, "средний",
                             resources(0, 2, 0), -4, "Вода обожгла руку холодом, но часть припасов осталась сухой."),
                     choice("cut", "Срезать внешний карман", ChoiceResultType.GAIN_RESOURCE, "низкий",
-                            resources(1, 0, 0), 0, "В кармане оказался складной инструмент, годный на лом."),
+                            resources(1, 0, 0), 0, "В кармане оказался палубный инструмент, годный на лом."),
                     avoid()
             ),
             loot(
                     "hidden_loot_resin",
-                    "Смола на сваях",
-                    "На старой свае выступила густая янтарная смола. Она движется против силы тяжести.",
-                    choice("collect", "Собрать смолу", ChoiceResultType.GAIN_RESOURCE, "средний",
-                            resources(0, 0, 1), -3, "Смола прожгла перчатку, но образец удалось запечатать."),
+                    "Налет на сваях",
+                    "На старой свае выступил густой янтарный налет. Он движется против силы тяжести.",
+                    choice("collect", "Собрать налет", ChoiceResultType.GAIN_RESOURCE, "средний",
+                            resources(0, 0, 1), -3, "Налет прожгла перчатку, но образец удалось запечатать."),
                     choice("scrape", "Снять тонкий слой", ChoiceResultType.GAIN_RESOURCE, "низкий",
                             resources(0, 0, 1), 0, "Ты взял только холодный внешний слой и не коснулся живой сердцевины."),
                     avoid()
@@ -86,9 +86,9 @@ public class EncounterGenerator {
             object(
                     "hidden_object_tower",
                     "Наблюдательная вышка",
-                    "Над камышом видна площадка старой вышки. Лестница потеряла половину ступеней.",
+                    "Над туманом видна площадка старой вышки. Лестница потеряла половину ступеней.",
                     choice("climb", "Подняться", ChoiceResultType.FIND_OBJECT, "средний",
-                            resources(1, 1, 0), -5, "С высоты виден сухой маршрут. На площадке остался аварийный набор."),
+                            resources(1, 1, 0), -5, "С высоты виден сухой курс. На площадке остался аварийный набор."),
                     choice("search", "Осмотреть основание", ChoiceResultType.GAIN_RESOURCE, "низкий",
                             resources(1, 0, 0), 0, "В креплениях сохранились болты и куски провода."),
                     avoid()
@@ -120,7 +120,7 @@ public class EncounterGenerator {
                     choice("wait", "Замереть", ChoiceResultType.NOTHING, "средний",
                             PlayerResources.empty(), 0, "Через минуту стрелка снова находит север, будто ничего не было."),
                     choice("follow", "Идти против стрелки", ChoiceResultType.GAIN_RESOURCE, "высокий",
-                            resources(0, 0, 1), -6, "Маршрут выводит к холодному сгустку смолы. В висках долго звенит."),
+                            resources(0, 0, 1), -6, "Курс выводит к холодному сгустку налета. В висках долго звенит."),
                     avoid()
             ),
             anomaly(
@@ -128,7 +128,7 @@ public class EncounterGenerator {
                     "Неподвижный дождь",
                     "В просвете между деревьями капли дождя висят в воздухе и не падают.",
                     choice("cross", "Пройти сквозь", ChoiceResultType.LOSE_HP, "высокий",
-                            resources(0, 0, 2), -12, "Капли режут кожу как стекло. На одежде остается редкая смола."),
+                            resources(0, 0, 2), -12, "Капли режут кожу как стекло. На одежде остается редкая налет."),
                     choice("sample", "Собрать крайнюю каплю", ChoiceResultType.GAIN_RESOURCE, "средний",
                             resources(0, 0, 1), -3, "Капля затвердела в колбе и перестала отражать свет."),
                     avoid()
@@ -145,8 +145,8 @@ public class EncounterGenerator {
             ),
             monster(
                     "hidden_monster_under_walkway",
-                    "Под настилом",
-                    "Что-то большое прошло под настилом. Доски выгнулись вверх, а потом медленно легли обратно.",
+                    "Под платформой",
+                    "Что-то большое прошло под платформой. Доски выгнулись вверх, а потом медленно легли обратно.",
                     choice("freeze", "Не двигаться", ChoiceResultType.AVOID, "средний",
                             PlayerResources.empty(), 0, "Тяжесть уходит в глубину. Вода снова становится ровной."),
                     choice("run", "Рвануть к суше", ChoiceResultType.LOSE_HP, "высокий",
@@ -156,10 +156,10 @@ public class EncounterGenerator {
             ),
             monster(
                     "hidden_monster_reed_crawler",
-                    "Камышовый ползун",
+                    "Туманный ползун",
                     "Между стеблями движется низкий силуэт. Он замирает каждый раз, когда ты смотришь прямо.",
                     choice("back", "Медленно отступить", ChoiceResultType.AVOID, "низкий",
-                            PlayerResources.empty(), 0, "Силуэт остается в камыше и не преследует тебя."),
+                            PlayerResources.empty(), 0, "Силуэт остается в тумане и не преследует тебя."),
                     choice("scare", "Ударить по металлу", ChoiceResultType.MONSTER_FIGHT_TEXT, "средний",
                             resources(1, 0, 0), -5, "Ползун бросается вперед и тут же уходит. В траве остается металлический жетон."),
                     choice("circle", "Обойти по воде", ChoiceResultType.NOTHING, "средний",
@@ -168,11 +168,11 @@ public class EncounterGenerator {
             monster(
                     "hidden_monster_white_leech",
                     "Белая пиявка",
-                    "На сапоге раздувается белая пиявка размером с ладонь. Она уже пробила ткань.",
+                    "На корпусе раздувается белая пиявка размером с ладонь. Она уже пробила ткань.",
                     choice("burn", "Прижечь", ChoiceResultType.MONSTER_FIGHT_TEXT, "средний",
                             PlayerResources.empty(), -4, "Запах отпугивает остальных. Рана остается неглубокой."),
                     choice("cut", "Срезать ножом", ChoiceResultType.LOSE_HP, "средний",
-                            resources(0, 0, 1), -7, "Пиявка лопается, оставляя вязкую смолу и болезненный порез."),
+                            resources(0, 0, 1), -7, "Пиявка лопается, оставляя вязкую налет и болезненный порез."),
                     choice("salt", "Потратить припасы", ChoiceResultType.AVOID, "низкий",
                             PlayerResources.empty(), 0, "Соль заставляет существо отпасть. Ты уходишь без новой раны.")
             ),
@@ -181,7 +181,7 @@ public class EncounterGenerator {
                     "Чужая запись",
                     "Радио включается само. Твой голос диктует координаты, которых ты еще не видел.",
                     choice("record", "Записать координаты", ChoiceResultType.FIND_OBJECT, "низкий",
-                            PlayerResources.empty(), 0, "Координаты остаются в дневнике. Радио снова молчит."),
+                            PlayerResources.empty(), 0, "Координаты остаются в бортовом журнале. Радио снова молчит."),
                     choice("break", "Выключить питание", ChoiceResultType.NOTHING, "низкий",
                             resources(1, 0, 0), 0, "Ты вынимаешь батарею и сохраняешь пригодные детали."),
                     avoid()
@@ -194,16 +194,16 @@ public class EncounterGenerator {
             pvpTrace(
                     "open_trace_boot",
                     "Свежий след",
-                    "На грязи свежий след сапога. Не твой. Он идет параллельно твоему маршруту.",
+                    "На грязи свежий след борта. Не твой. Он идет параллельно твоему курсу.",
                     choice("track", "Проверить чужие следы", ChoiceResultType.START_PVP_DUEL, "высокий",
-                            resources(1, 1, 0), 0, "Ты выходишь к просвету в тумане. Другой выживший уже рядом."),
+                            resources(1, 1, 0), 0, "Ты выходишь к просвету в тумане. Другой капитан уже рядом."),
                     choice("ambush", "Занять позицию", ChoiceResultType.START_PVP_DUEL, "высокий",
-                            resources(2, 0, 0), 0, "Ты перестаешь двигаться. Через камыш слышится щелчок предохранителя."),
+                            resources(2, 0, 0), 0, "Ты перестаешь двигаться. Через туман слышится щелчок предохранителя."),
                     avoid()
             ),
             pvpTrace(
                     "open_trace_smoke",
-                    "Дым над камышом",
+                    "Дым над туманом",
                     "За серой стеной тумана поднимается тонкая струя дыма от сухого топлива.",
                     choice("approach", "Подойти открыто", ChoiceResultType.START_PVP_DUEL, "высокий",
                             resources(0, 2, 0), 0, "У огня никого нет, но оружие щелкает у тебя за спиной."),
@@ -225,15 +225,15 @@ public class EncounterGenerator {
                     "open_encounter_safety",
                     "Щелчок предохранителя",
                     "В тумане щелкнул предохранитель. Кто-то увидел тебя раньше, чем ты его.",
-                    choice("fight", "Вступить в стычку", ChoiceResultType.START_PVP_DUEL, "высокий",
+                    choice("fight", "Принять стычку", ChoiceResultType.START_PVP_DUEL, "высокий",
                             resources(2, 1, 0), 0, "Ты поднимаешь оружие и выходишь к чужому силуэту."),
-                    choice("reeds", "Уйти в камыш", ChoiceResultType.AVOID, "средний",
-                            PlayerResources.empty(), -4, "Камыш режет руки, но линия огня остается позади.")
+                    choice("reeds", "Уйти в туман", ChoiceResultType.AVOID, "средний",
+                            PlayerResources.empty(), -4, "Туман режет руки, но линия огня остается позади.")
             ),
             pvpEncounter(
                     "open_encounter_bridge",
-                    "Выживший на мостках",
-                    "Другой выживший стоит между тобой и сухим проходом. Отступать он не собирается.",
+                    "Капитан на мостках",
+                    "Другой капитан стоит между тобой и сухим проходом. Отступать он не собирается.",
                     choice("first_shot", "Выстрелить первым", ChoiceResultType.START_PVP_DUEL, "высокий",
                             resources(2, 2, 0), 0, "Первый выстрел отмечает начало стычки."),
                     choice("offer", "Предложить разойтись", ChoiceResultType.NOTHING, "средний",
@@ -248,18 +248,18 @@ public class EncounterGenerator {
                     choice("take_all", "Забрать все", ChoiceResultType.GAIN_RESOURCE, "высокий",
                             resources(3, 2, 1), -7, "Ты забираешь тайник, но на обратном пути попадаешь под случайный выстрел."),
                     choice("take_part", "Взять часть", ChoiceResultType.GAIN_RESOURCE, "средний",
-                            resources(2, 1, 0), 0, "Ты оставляешь часть запаса и быстро меняешь маршрут."),
+                            resources(2, 1, 0), 0, "Ты оставляешь часть запаса и быстро меняешь курс."),
                     avoid()
             ),
             quiet(
                     "open_reward_crossing",
                     "Открытая переправа",
-                    "Короткий путь проходит по светлой воде. Здесь тебя легко увидеть, зато на сваях блестит смола.",
-                    choice("cross", "Идти открыто", ChoiceResultType.GAIN_RESOURCE, "высокий",
-                            resources(1, 0, 2), -6, "Ты быстро пересекаешь воду и снимаешь смолу со свай."),
+                    "Короткий путь проходит по светлой воде. Здесь тебя легко увидеть, зато на сваях блестит налет.",
+                    choice("cross", "Открытая вода", ChoiceResultType.GAIN_RESOURCE, "высокий",
+                            resources(1, 0, 2), -6, "Ты быстро пересекаешь воду и снимаешь налет со свай."),
                     choice("long_way", "Обойти по тени", ChoiceResultType.GAIN_RESOURCE, "низкий",
                             resources(0, 1, 0), 0, "Обход занимает время, но в сухом кармане находится рацион."),
-                    choice("return", "Вернуться к базе", ChoiceResultType.RETURN_TO_BASE, "низкий",
+                    choice("return", "Вернуться к лодке", ChoiceResultType.RETURN_TO_BASE, "низкий",
                             PlayerResources.empty(), 0, "Ты решаешь не проверять удачу еще раз.")
             )
     );
@@ -267,17 +267,17 @@ public class EncounterGenerator {
     private final List<EncounterTemplate> stageFourOpenPvpEncounters = stageFourOpenPvpEncounters();
 
     private final List<String> returnEntries = List.of(
-            "База принимает добычу молча: сухой стол, теплый свет, запах железа и смолы.",
-            "Дежурный отмечает маршрут в журнале и стирает с твоих сапог серую воду.",
-            "Запорные ворота закрываются за спиной. На этот раз топь отпустила тебя.",
+            "Лодка принимает груз молча: сухой стол, теплый свет, запах железа и налета.",
+            "Дежурный отмечает курс в журнале и смывает с корпуса серую воду.",
+            "Запорные ворота закрываются за спиной. На этот раз большая вода отпустила тебя.",
             "Ты раскладываешь находки на верстаке. Часть пути уже можно восстановить по памяти."
     );
 
     private final List<String> failedEntries = List.of(
             "Туман сжимается слишком быстро. Поисковая группа находит тебя у старой сваи.",
-            "Последняя запись обрывается на шуме воды. База вытаскивает тебя уже на рассвете.",
-            "Камыш закрывает маршрут. Ты возвращаешься не сам, а на чужих плечах.",
-            "Топь забирает часть рюкзака, но оставляет достаточно следов, чтобы найти дорогу домой."
+            "Последняя запись обрывается на шуме воды. Лодка вытаскивает тебя уже на рассвете.",
+            "Туман закрывает курс. Ты возвращаешься не сам, а на чужих плечах.",
+            "Большая вода забирает часть груза, но оставляет достаточно следов, чтобы найти дорогу домой."
     );
 
     public String nextMovementEntry() {
@@ -456,10 +456,10 @@ public class EncounterGenerator {
                 ),
                 loot(
                         "stage4_hidden_loot_resin_nest",
-                        "Смоляное гнездо",
-                        "В корнях блестит комок смолы, сложенный аккуратными слоями.",
+                        "Гнездо налета",
+                        "В корнях блестит комок налета, сложенный аккуратными слоями.",
                         choice("slice", "Срезать внешний слой", ChoiceResultType.GAIN_RESOURCE, "средний",
-                                resources(0, 0, 1), -2, "Смола липнет к ножу, но слой отделяется."),
+                                resources(0, 0, 1), -2, "Налет липнет к ножу, но слой отделяется."),
                         choice("take_core", "Взять сердцевину", ChoiceResultType.LOSE_HP, "высокий",
                                 resources(0, 0, 2), -9, "Сердцевина дергается и жжет ладонь."),
                         avoid()
@@ -477,7 +477,7 @@ public class EncounterGenerator {
                 loot(
                         "stage4_hidden_loot_rope_cache",
                         "Веревочный тайник",
-                        "Кусок веревки уходит под настил и возвращается сухим узлом.",
+                        "Кусок веревки уходит под брезент и возвращается сухим узлом.",
                         choice("pull", "Вытянуть тайник", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(1, 2, 0), -3, "Узел застревает, но сдается после рывка."),
                         choice("cut", "Срезать узел", ChoiceResultType.GAIN_RESOURCE, "низкий",
@@ -489,7 +489,7 @@ public class EncounterGenerator {
                         "Теплый пепел",
                         "В старой жестянке лежит пепел, который не намок под дождем.",
                         choice("sift", "Просеять пепел", ChoiceResultType.GAIN_RESOURCE, "низкий",
-                                resources(1, 0, 1), 0, "На дне остаются смоляные кристаллы и проволока."),
+                                resources(1, 0, 1), 0, "На дне остаются кристаллы налета и проволока."),
                         choice("take_tin", "Забрать жестянку целиком", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(2, 0, 1), -3, "Жестянка обжигает кожу даже через ткань."),
                         avoid()
@@ -507,9 +507,9 @@ public class EncounterGenerator {
                 object(
                         "stage4_hidden_object_north_bell",
                         "Северный колокол",
-                        "Маленький колокол висит на сухой березе и звенит без ветра.",
+                        "Маленький колокол висит на сухой мачте и звенит без ветра.",
                         choice("listen", "Посчитать удары", ChoiceResultType.FIND_OBJECT, "низкий",
-                                PlayerResources.empty(), 0, "Удары складываются в номер старой просеки."),
+                                PlayerResources.empty(), 0, "Удары складываются в номер старого фарватера."),
                         choice("ring", "Позвонить самому", ChoiceResultType.NOTHING, "средний",
                                 PlayerResources.empty(), -2, "Ответный звон приходит из-под воды."),
                         avoid()
@@ -529,35 +529,35 @@ public class EncounterGenerator {
                         "Мертвое радио",
                         "Радио без батареи шепчет прогноз погоды на вчера.",
                         choice("record", "Записать частоту", ChoiceResultType.FIND_OBJECT, "низкий",
-                                PlayerResources.empty(), 0, "Частота остается в дневнике как зацепка."),
+                                PlayerResources.empty(), 0, "Частота остается в бортовом журнале как зацепка."),
                         choice("strip", "Разобрать корпус", ChoiceResultType.GAIN_RESOURCE, "низкий",
                                 resources(1, 0, 0), 0, "Внутри хватает деталей для ремонта."),
                         avoid()
                 ),
                 object(
                         "stage4_hidden_object_glass_reed",
-                        "Стеклянный камыш",
-                        "Один стебель камыша прозрачен, внутри него движется темная точка.",
+                        "Стеклянный туман",
+                        "Один стебель тумана прозрачен, внутри него движется темная точка.",
                         choice("cut", "Срезать стебель", ChoiceResultType.FIND_OBJECT, "средний",
-                                resources(0, 0, 1), -3, "Стебель рассыпается, оставив смоляной знак."),
+                                resources(0, 0, 1), -3, "Стебель рассыпается, оставив знак налета."),
                         choice("observe", "Дождаться точки", ChoiceResultType.NOTHING, "низкий",
-                                PlayerResources.empty(), 0, "Точка повторяет твой маршрут и исчезает."),
+                                PlayerResources.empty(), 0, "Точка повторяет твой курс и исчезает."),
                         avoid()
                 ),
                 object(
                         "stage4_hidden_object_rail_switch",
                         "Стрелка узкоколейки",
-                        "Старая стрелка рельс уходит в воду. Рычаг перемазан свежей смолой.",
+                        "Старая стрелка рельс уходит в воду. Рычаг перемазан свежей налетом.",
                         choice("switch", "Перевести рычаг", ChoiceResultType.FIND_OBJECT, "средний",
                                 resources(1, 0, 0), -4, "Под водой звенит рельс, и на карте проявляется линия."),
-                        choice("scrape", "Снять смолу", ChoiceResultType.GAIN_RESOURCE, "низкий",
-                                resources(0, 0, 1), 0, "Смола легко отходит тонкой пленкой."),
+                        choice("scrape", "Снять налет", ChoiceResultType.GAIN_RESOURCE, "низкий",
+                                resources(0, 0, 1), 0, "Налет легко отходит тонкой пленкой."),
                         avoid()
                 ),
                 object(
                         "stage4_hidden_object_birch_gate",
-                        "Березовые ворота",
-                        "Две березы склонились так ровно, будто образуют вход.",
+                        "Ворота из буев",
+                        "Два старых буя склонились так ровно, будто образуют вход.",
                         choice("enter", "Пройти между ними", ChoiceResultType.FIND_OBJECT, "средний",
                                 PlayerResources.empty(), -2, "За воротами слышен короткий голосовой код."),
                         choice("tie", "Повязать метку", ChoiceResultType.NOTHING, "низкий",
@@ -570,18 +570,18 @@ public class EncounterGenerator {
                         "Карманные часы лежат на дне и идут в обратную сторону.",
                         choice("take", "Достать часы", ChoiceResultType.FIND_OBJECT, "средний",
                                 resources(1, 0, 0), -3, "Стрелки останавливаются на времени твоего выхода."),
-                        choice("watch", "Сверить маршрут", ChoiceResultType.NOTHING, "низкий",
+                        choice("watch", "Сверить курс", ChoiceResultType.NOTHING, "низкий",
                                 PlayerResources.empty(), 0, "Через минуту часы показывают обычное время."),
                         avoid()
                 ),
                 anomaly(
                         "stage4_hidden_anomaly_silent_birds",
                         "Беззвучные птицы",
-                        "Над топью кружат птицы без звука и без отражения в воде.",
-                        choice("hide", "Спрятаться под настил", ChoiceResultType.AVOID, "низкий",
+                        "Над Большой водой кружат птицы без звука и без отражения в воде.",
+                        choice("hide", "Спрятаться под брезент", ChoiceResultType.AVOID, "низкий",
                                 PlayerResources.empty(), 0, "Птицы уходят к северу."),
                         choice("follow_shadow", "Идти за тенью", ChoiceResultType.GAIN_RESOURCE, "высокий",
-                                resources(0, 0, 1), -6, "Тень приводит к смоляной капле."),
+                                resources(0, 0, 1), -6, "Тень приводит к капле глубинного налета."),
                         avoid()
                 ),
                 anomaly(
@@ -597,7 +597,7 @@ public class EncounterGenerator {
                 anomaly(
                         "stage4_hidden_anomaly_return_echo",
                         "Эхо возвращения",
-                        "Твой голос отвечает из стороны базы, хотя ты молчал.",
+                        "Твой голос отвечает из стороны лодки, хотя ты молчал.",
                         choice("answer", "Ответить шепотом", ChoiceResultType.FIND_OBJECT, "средний",
                                 PlayerResources.empty(), 0, "Эхо называет безопасный поворот."),
                         choice("shout", "Крикнуть громче", ChoiceResultType.LOSE_HP, "высокий",
@@ -629,7 +629,7 @@ public class EncounterGenerator {
                         "Неверные звезды",
                         "В воде отражаются звезды, которых нет на небе.",
                         choice("chart", "Сверить с картой", ChoiceResultType.FIND_OBJECT, "низкий",
-                                PlayerResources.empty(), 0, "Звезды отмечают старую линию кордона."),
+                                PlayerResources.empty(), 0, "Звезды отмечают старую линию буев."),
                         choice("touch", "Разбить отражение", ChoiceResultType.LOSE_HP, "средний",
                                 resources(0, 0, 1), -5, "Осколки света остаются на ладони."),
                         avoid()
@@ -646,10 +646,10 @@ public class EncounterGenerator {
                 ),
                 monster(
                         "stage4_hidden_monster_blind_hunter",
-                        "Слепой егерь",
-                        "На просеке стоит фигура в старом плаще. Вместо глаз у нее заросшая кора.",
+                        "Слепой вахтенный",
+                        "На затонувшем пирсе стоит фигура в старом плаще. Вместо глаз у нее соляная корка.",
                         choice("silent", "Пройти без звука", ChoiceResultType.AVOID, "низкий",
-                                PlayerResources.empty(), 0, "Егерь поворачивается на шум воды, но не на тебя."),
+                                PlayerResources.empty(), 0, "Вахтенный поворачивается на шум воды, но не на тебя."),
                         choice("decoy", "Бросить металлическую приманку", ChoiceResultType.MONSTER_FIGHT_TEXT, "средний",
                                 resources(1, 0, 0), -3, "Плащ уходит за звоном, а у пня остается патронташ."),
                         avoid()
@@ -661,27 +661,27 @@ public class EncounterGenerator {
                         choice("stop_count", "Сбить счет", ChoiceResultType.FIND_OBJECT, "средний",
                                 PlayerResources.empty(), 0, "Он забывает число и оставляет знак на воде."),
                         choice("approach", "Подойти ближе", ChoiceResultType.LOSE_HP, "высокий",
-                                resources(0, 1, 0), -8, "Ил хватает за сапог и тянет вниз."),
+                                resources(0, 1, 0), -8, "Ил хватает за корпус и тянет вниз."),
                         avoid()
                 ),
                 monster(
                         "stage4_hidden_monster_birch_mother",
-                        "Берестяная мать",
-                        "Березовая кора на стволах складывается в лицо и шепчет имена пропавших.",
+                        "Мать из коряги",
+                        "Мокрые доски на сваях складываются в лицо и шепчут имена пропавших.",
                         choice("answer_name", "Назвать чужое имя", ChoiceResultType.AVOID, "средний",
                                 PlayerResources.empty(), 0, "Кора закрывает глаза и пропускает тебя."),
                         choice("tear_bark", "Сорвать кусок коры", ChoiceResultType.MONSTER_FIGHT_TEXT, "высокий",
-                                resources(0, 0, 1), -7, "Кора режет пальцы, но под ней есть смоляная жилка."),
+                                resources(0, 0, 1), -7, "Доска режет пальцы, но под ней есть жила налета."),
                         avoid()
                 ),
                 monster(
                         "stage4_hidden_monster_reed_walker",
-                        "Камышовый ходок",
+                        "Туманный ходок",
                         "Высокий силуэт перебирает ногами-стеблями и шагает поверх воды.",
                         choice("lie_down", "Лечь в тень", ChoiceResultType.AVOID, "низкий",
                                 PlayerResources.empty(), 0, "Ходок проходит мимо, не меняя ритма."),
                         choice("trip", "Сбить стебель крюком", ChoiceResultType.MONSTER_FIGHT_TEXT, "высокий",
-                                resources(1, 0, 1), -6, "Существо рассыпается камышом, оставив смолу."),
+                                resources(1, 0, 1), -6, "Существо рассыпается туманом, оставив налет."),
                         avoid()
                 ),
                 monster(
@@ -697,8 +697,8 @@ public class EncounterGenerator {
                 mapFragment(
                         "stage4_hidden_map_fragment_leaf",
                         "Карта на листе",
-                        "На широком листе черной ольхи проступает схема обхода.",
-                        choice("press", "Прижать в дневник", ChoiceResultType.FIND_OBJECT, "низкий",
+                        "На широком листе мокрой кальки проступает схема обхода.",
+                        choice("press", "Прижать в бортовой журнал", ChoiceResultType.FIND_OBJECT, "низкий",
                                 PlayerResources.empty(), 0, "Рисунок переносится на страницу."),
                         choice("copy", "Срисовать линию", ChoiceResultType.NOTHING, "низкий",
                                 PlayerResources.empty(), 0, "Линия выходит неровной, но полезной."),
@@ -711,7 +711,7 @@ public class EncounterGenerator {
                         choice("take", "Забрать пластину", ChoiceResultType.FIND_OBJECT, "средний",
                                 resources(1, 0, 0), -2, "Пластина холоднее воды и оставляет след на карте."),
                         choice("rub", "Снять оттиск", ChoiceResultType.FIND_OBJECT, "низкий",
-                                PlayerResources.empty(), 0, "Оттиск ложится в дневник."),
+                                PlayerResources.empty(), 0, "Оттиск ложится в бортовой журнал."),
                         avoid()
                 ),
                 mapFragment(
@@ -726,8 +726,8 @@ public class EncounterGenerator {
                 ),
                 mapFragment(
                         "stage4_hidden_map_fragment_window",
-                        "Окно маршрута",
-                        "В разбитом окне отражается другой участок топи с четкими ориентирами.",
+                        "Окно курса",
+                        "В разбитом окне отражается другой участок Большой воды с четкими ориентирами.",
                         choice("align", "Совместить отражение", ChoiceResultType.FIND_OBJECT, "низкий",
                                 PlayerResources.empty(), 0, "Ориентиры записаны в карту."),
                         choice("break_more", "Расширить окно", ChoiceResultType.LOSE_HP, "средний",
@@ -737,7 +737,7 @@ public class EncounterGenerator {
                 baseMemory(
                         "stage4_hidden_base_memory_generator",
                         "Память генератора",
-                        "В воде слышен ровный шум генератора базы, хотя до нее слишком далеко.",
+                        "В воде слышен ровный шум генератора лодки, хотя до нее слишком далеко.",
                         choice("sync", "Подстроить шаг под шум", ChoiceResultType.FIND_OBJECT, "низкий",
                                 PlayerResources.empty(), 0, "Ритм помогает запомнить обратный путь."),
                         choice("ignore", "Не слушать", ChoiceResultType.NOTHING, "низкий",
@@ -746,9 +746,9 @@ public class EncounterGenerator {
                 baseMemory(
                         "stage4_hidden_base_memory_names",
                         "Список смены",
-                        "На мокрой двери проступает список людей, которые дежурили здесь до топи.",
+                        "На мокрой двери проступает список людей, которые дежурили здесь до подъема воды.",
                         choice("copy", "Переписать фамилии", ChoiceResultType.FIND_OBJECT, "низкий",
-                                PlayerResources.empty(), 0, "Список станет записью для базы."),
+                                PlayerResources.empty(), 0, "Список станет записью для лодки."),
                         choice("clean", "Стереть грязь", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(1, 0, 0), -2, "Под грязью оказывается металлическая табличка."),
                         avoid()
@@ -765,10 +765,10 @@ public class EncounterGenerator {
                 ),
                 baseMemory(
                         "stage4_hidden_base_memory_photo",
-                        "Фотография базы",
-                        "В рамке под пленкой лежит фотография убежища до перестройки.",
+                        "Фотография лодки",
+                        "В рамке под пленкой лежит фотография старой пристани до перестройки.",
                         choice("take_photo", "Забрать фото", ChoiceResultType.FIND_OBJECT, "низкий",
-                                PlayerResources.empty(), 0, "На обратной стороне отмечен старый склад."),
+                                PlayerResources.empty(), 0, "На обратной стороне отмечен старый тайник у причала."),
                         choice("take_frame", "Снять рамку", ChoiceResultType.GAIN_RESOURCE, "низкий",
                                 resources(1, 0, 0), 0, "Рамка разбирается на тонкий металл."),
                         avoid()
@@ -790,18 +790,18 @@ public class EncounterGenerator {
                 ),
                 pvpTrace(
                         "stage4_open_trace_bait_pack",
-                        "Рюкзак-приманка",
-                        "На сухой кочке лежит открытый рюкзак. Лямка специально выведена на видное место.",
+                        "Палубный ящик-приманка",
+                        "На сухой полосе настила лежит открытый палубный ящик. Лямка специально выведена на видное место.",
                         choice("spring", "Сорвать приманку", ChoiceResultType.START_PVP_DUEL, "высокий",
-                                resources(2, 1, 0), 0, "Камыш рядом отвечает щелчком."),
+                                resources(2, 1, 0), 0, "Туман рядом отвечает щелчком."),
                         choice("mark", "Пометить место", ChoiceResultType.NOTHING, "низкий",
-                                PlayerResources.empty(), 0, "Ты оставляешь знак и обходишь кочку."),
+                                PlayerResources.empty(), 0, "Ты оставляешь знак и обходишь приманку."),
                         avoid()
                 ),
                 pvpTrace(
                         "stage4_open_trace_cut_reed",
-                        "Срезанный камыш",
-                        "Камыш срезан ровной линией на высоте плеча. Кто-то делал коридор для прицела.",
+                        "Срезанный туман",
+                        "Туман срезан ровной линией на высоте плеча. Кто-то делал коридор для прицела.",
                         choice("peek", "Проверить коридор", ChoiceResultType.START_PVP_DUEL, "высокий",
                                 resources(1, 0, 0), 0, "В конце коридора шевелится силуэт."),
                         choice("crawl", "Проползти ниже линии", ChoiceResultType.AVOID, "средний",
@@ -842,7 +842,7 @@ public class EncounterGenerator {
                         "stage4_open_encounter_crossfire",
                         "Перекрестный прострел",
                         "Два выстрела ложатся в воду с разных сторон. Кто-то гонит тебя к центру.",
-                        choice("push_left", "Рвануть влево", ChoiceResultType.START_PVP_DUEL, "высокий",
+                        choice("push_left", "Рвануть по левому борту", ChoiceResultType.START_PVP_DUEL, "высокий",
                                 resources(1, 0, 0), 0, "Слева открывается чужой стрелок."),
                         choice("drop", "Упасть в воду", ChoiceResultType.AVOID, "средний",
                                 PlayerResources.empty(), -5, "Вода скрывает силуэт, но забирает тепло.")
@@ -850,7 +850,7 @@ public class EncounterGenerator {
                 pvpEncounter(
                         "stage4_open_encounter_shared_cache",
                         "Общий тайник",
-                        "Ты и другой выживший одновременно находите один тайник под мостком.",
+                        "Ты и другой капитан одновременно находите один тайник под мостком.",
                         choice("split", "Предложить разделить", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(1, 1, 0), 0, "Вы расходитесь без выстрелов."),
                         choice("claim", "Забрать первым", ChoiceResultType.START_PVP_DUEL, "высокий",
@@ -859,9 +859,9 @@ public class EncounterGenerator {
                 ),
                 pvpEncounter(
                         "stage4_open_encounter_masked_survivor",
-                        "Выживший в маске",
-                        "На сухой полосе стоит человек в старой противогазной маске. Он показывает на твой рюкзак.",
-                        choice("pay", "Оставить часть добычи", ChoiceResultType.AVOID, "средний",
+                        "Капитан в маске",
+                        "На сухой полосе стоит человек в старой противогазной маске. Он показывает на твой груз.",
+                        choice("pay", "Оставить часть груза", ChoiceResultType.AVOID, "средний",
                                 PlayerResources.empty(), 0, "Он пропускает тебя, не опуская ствол."),
                         choice("refuse", "Отказать", ChoiceResultType.START_PVP_DUEL, "высокий",
                                 resources(1, 0, 0), 0, "Маска кивает, и начинается стычка.")
@@ -869,7 +869,7 @@ public class EncounterGenerator {
                 pvpEncounter(
                         "stage4_open_encounter_bridge_tax",
                         "Плата за мост",
-                        "У короткого моста сидит вооруженный выживший и требует припасы за проход.",
+                        "У короткого моста сидит вооруженный капитан и требует припасы за проход.",
                         choice("trade", "Отдать мелочь и пройти", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(0, 1, 0), 0, "Он берет меньше, чем мог, и показывает сухую доску."),
                         choice("fight", "Прорываться", ChoiceResultType.START_PVP_DUEL, "высокий",
@@ -891,15 +891,15 @@ public class EncounterGenerator {
                         "Пустой бинт",
                         "Белый бинт висит на ветке и капает темной водой.",
                         choice("follow_blood", "Пойти по следу", ChoiceResultType.START_PVP_DUEL, "высокий",
-                                PlayerResources.empty(), 0, "Раненый выживший все еще опасен."),
+                                PlayerResources.empty(), 0, "Раненый капитан все еще опасен."),
                         choice("take_cloth", "Снять ткань", ChoiceResultType.GAIN_RESOURCE, "низкий",
-                                resources(0, 1, 0), 0, "Чистая часть пригодится на базе."),
+                                resources(0, 1, 0), 0, "Чистая часть пригодится у причала."),
                         avoid()
                 ),
                 pvpAftermath(
                         "stage4_open_aftermath_spent_trap",
                         "Сработавшая ловушка",
-                        "Проволочная ловушка уже сработала. В воде остались обломки чужого снаряжения.",
+                        "Проволочная ловушка уже сработала. В воде остались обломки чужого модулей.",
                         choice("salvage", "Разобрать ловушку", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(2, 0, 0), -2, "Острый конец все еще натянут."),
                         choice("map", "Отметить ловушку", ChoiceResultType.FIND_OBJECT, "низкий",
@@ -911,7 +911,7 @@ public class EncounterGenerator {
                         "Громкий тайник",
                         "Ящик с припасами обмотан сухими банками. Открыть тихо почти невозможно.",
                         choice("open_fast", "Открыть быстро", ChoiceResultType.GAIN_RESOURCE, "высокий",
-                                resources(3, 2, 0), -6, "Банки гремят, но добыча у тебя."),
+                                resources(3, 2, 0), -6, "Банки гремят, но груз у тебя."),
                         choice("cut_slow", "Срезать банки", ChoiceResultType.GAIN_RESOURCE, "средний",
                                 resources(1, 1, 0), 0, "Ты берешь меньше, зато без шума."),
                         avoid()
@@ -921,15 +921,15 @@ public class EncounterGenerator {
                         "Светлый мост",
                         "Прямой мост экономит время, но виден со всех сторон.",
                         choice("dash", "Пробежать мост", ChoiceResultType.GAIN_RESOURCE, "высокий",
-                                resources(2, 0, 1), -5, "Ты успеваешь снять смолу на другом конце."),
+                                resources(2, 0, 1), -5, "Ты успеваешь снять налет на другом конце."),
                         choice("crawl", "Ползти у перил", ChoiceResultType.AVOID, "средний",
-                                PlayerResources.empty(), -2, "Мост пройден без добычи, зато без стычки."),
+                                PlayerResources.empty(), -2, "Мост пройден без груза, зато без стычки."),
                         avoid()
                 ),
                 riskReward(
                         "stage4_open_risk_reward_flare_box",
                         "Коробка с ракетами",
-                        "Сигнальные ракеты лежат на сухой платформе. Их свет увидит вся топь.",
+                        "Сигнальные ракеты лежат на сухой платформе. Их свет увидит вся большая вода.",
                         choice("fire", "Выстрелить ракетой", ChoiceResultType.START_PVP_DUEL, "высокий",
                                 resources(1, 1, 0), 0, "Свет зовет не только помощь."),
                         choice("pack", "Унести коробку", ChoiceResultType.GAIN_RESOURCE, "средний",

@@ -64,14 +64,14 @@ public class BaseService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Улучшение не найдено"));
         if (!current.isUnlocked() || current.level() >= current.maxLevel()) {
-            throw new ConflictException("Это улучшение сейчас недоступно");
+            throw new ConflictException("Это модификация сейчас недоступно");
         }
 
         PlayerState playerState = playerStateService.getOrCreate(player);
         if (!playerState.getResources().canAfford(current.cost())) {
             eventLogger.info(
                     AppEventType.BASE_UPGRADE_FAILED_NOT_ENOUGH_RESOURCES,
-                    "Недостаточно ресурсов для улучшения",
+                    "Недостаточно ресурсов для модификации",
                     Map.of("playerId", player.getId(), "upgradeId", current.id(), "cost", current.cost())
             );
             throw new ConflictException("Недостаточно ресурсов");
@@ -93,7 +93,7 @@ public class BaseService {
 
         eventLogger.info(
                 AppEventType.BASE_UPGRADE_BOUGHT,
-                "Улучшение базы куплено",
+                "Модификация лодки куплена",
                 Map.of(
                         "playerId", player.getId(),
                         "upgradeId", upgraded.id(),
@@ -109,7 +109,7 @@ public class BaseService {
         if (hasReturnedExploration && upgradedCount == 1) {
             eventLogger.info(
                     AppEventType.FIRST_UPGRADE_AFTER_EXPLORATION,
-                    "Первое улучшение после экспедиции",
+                    "Первое модификация после плавания",
                     Map.of("playerId", player.getId(), "upgradeId", upgraded.id())
             );
         }
@@ -125,6 +125,6 @@ public class BaseService {
     }
 
     public void logOpened(PlayerProfile player) {
-        eventLogger.info(AppEventType.BASE_OPENED, "База открыта", Map.of("playerId", player.getId()));
+        eventLogger.info(AppEventType.BASE_OPENED, "Лодка открыта", Map.of("playerId", player.getId()));
     }
 }

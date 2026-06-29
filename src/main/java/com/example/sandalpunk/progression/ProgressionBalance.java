@@ -15,17 +15,17 @@ public class ProgressionBalance {
 
     public List<BaseUpgrade> initialUpgrades() {
         return List.of(
-                upgrade("storage", BaseUpgradeType.STORAGE, "Склад",
-                        "Сохраняет часть добычи при провале.", 0, 3),
-                upgrade("cartography_table", BaseUpgradeType.CARTOGRAPHY_TABLE, "Картографический стол",
+                upgrade("storage", BaseUpgradeType.STORAGE, "Палубный ящик",
+                        "Сохраняет часть груза при провале.", 0, 3),
+                upgrade("cartography_table", BaseUpgradeType.CARTOGRAPHY_TABLE, "Штурманский стол",
                         "Повышает шанс найти фрагмент карты.", 0, 3),
-                upgrade("reinforced_walkway", BaseUpgradeType.REINFORCED_WALKWAY, "Укреплённый настил",
-                        "Снижает потерю здоровья в опасных событиях.", 0, 3),
-                upgrade("drying_rack", BaseUpgradeType.DRYING_RACK, "Сушилка припасов",
-                        "Иногда добавляет припас к добыче.", 0, 3),
-                upgrade("weapon_workbench", BaseUpgradeType.WEAPON_WORKBENCH, "Оружейный верстак",
-                        "Открывает простые улучшения снаряжения.", 0, 1),
-                upgrade("warding_charm", BaseUpgradeType.WARDING_CHARM, "Оберег у входа",
+                upgrade("reinforced_walkway", BaseUpgradeType.REINFORCED_WALKWAY, "Усиленный корпус",
+                        "Снижает потерю прочности в опасных событиях.", 0, 3),
+                upgrade("drying_rack", BaseUpgradeType.DRYING_RACK, "Сухой отсек",
+                        "Иногда добавляет припас к грузу.", 0, 3),
+                upgrade("weapon_workbench", BaseUpgradeType.WEAPON_WORKBENCH, "Палубный верстак",
+                        "Открывает простые модификации лодочных модулей.", 0, 1),
+                upgrade("warding_charm", BaseUpgradeType.WARDING_CHARM, "Эхолот у входа",
                         "Снижает последствия аномальных событий.", 0, 3)
         );
     }
@@ -86,7 +86,7 @@ public class ProgressionBalance {
             case STORAGE -> List.of(effect(
                     UpgradeEffectType.REDUCE_RESOURCE_LOSS,
                     level * 10,
-                    "Потери добычи меньше на " + (level * 10) + "%"
+                    "Потери груза меньше на " + (level * 10) + "%"
             ));
             case CARTOGRAPHY_TABLE -> List.of(effect(
                     UpgradeEffectType.INCREASE_MAP_FRAGMENT_CHANCE,
@@ -96,7 +96,7 @@ public class ProgressionBalance {
             case REINFORCED_WALKWAY -> List.of(effect(
                     UpgradeEffectType.REDUCE_HP_LOSS,
                     level * 5,
-                    "Потеря HP меньше на " + (level * 5) + "%"
+                    "Потеря прочности меньше на " + (level * 5) + "%"
             ));
             case DRYING_RACK -> List.of(effect(
                     UpgradeEffectType.INCREASE_SUPPLIES_GAIN,
@@ -110,7 +110,7 @@ public class ProgressionBalance {
             case WEAPON_WORKBENCH -> List.of(effect(
                     UpgradeEffectType.UNLOCK_EQUIPMENT_UPGRADE,
                     1,
-                    "Доступны улучшения снаряжения"
+                    "Доступны модификации модулей"
             ));
             case WARDING_CHARM -> List.of(effect(
                     UpgradeEffectType.REDUCE_NEGATIVE_EVENT_CHANCE,
@@ -124,39 +124,39 @@ public class ProgressionBalance {
         int fragments = progress.getFragmentsFound();
         String selected = progress.getSelectedRouteId();
         return List.of(
-                route(ROUTE_QUIET_WALKWAY, "Тихий настил",
-                        "Безопаснее в скрытом режиме.", 2, fragments, selected,
+                route(ROUTE_QUIET_WALKWAY, "Тихая протока",
+                        "Безопаснее на тихом ходу.", 2, fragments, selected,
                         UpgradeEffectType.REDUCE_HP_LOSS, 5, "На 5% меньше опасных событий"),
-                route(ROUTE_BLACK_ALDER, "Обход через чёрную ольху",
-                        "Чаще выводит к объектам и тайникам.", 4, fragments, selected,
+                route(ROUTE_BLACK_ALDER, "Черная протока",
+                        "Чаще выводит к невозможным объектам и плавающим тайникам.", 4, fragments, selected,
                         UpgradeEffectType.INCREASE_SUPPLIES_GAIN, 5, "+5% к loot/object событиям"),
-                route(ROUTE_OLD_CORDON, "Старая линия кордона",
-                        "Чаще оставляет следы других выживших в открытой топи.", 6, fragments, selected,
+                route(ROUTE_OLD_CORDON, "Линия старых буев",
+                        "Чаще оставляет следы других лодок на открытой воде.", 6, fragments, selected,
                         UpgradeEffectType.INCREASE_MAP_FRAGMENT_CHANCE, 5, "+5% к следам в OPEN_PVP")
         );
     }
 
     public List<EquipmentCatalogItem> equipmentCatalog(EquipmentState state, int workbenchLevel) {
         return List.of(
-                item("swamp_cloak", EquipmentSlot.ARMOR, "Рваный болотный плащ", 1, 3,
+                item("swamp_cloak", EquipmentSlot.ARMOR, "Брезентовый тент", 1, 3,
                         "Смягчает урон опасных событий.", "danger_damage_reduction", 5,
                         new PlayerResources(2, 2, 0), true, state, state.getArmor().id().equals("swamp_cloak")),
-                item("shell_jacket", EquipmentSlot.ARMOR, "Панцирная куртка", 1, 3,
-                        "Тяжёлая защита для топи. PvP-эффект отложен.", "danger_damage_reduction", 8,
+                item("shell_jacket", EquipmentSlot.ARMOR, "Бронелисты", 1, 3,
+                        "Тяжёлая защита для открытой воды. PvP-эффект отложен.", "danger_damage_reduction", 8,
                         new PlayerResources(5, 3, 1), workbenchLevel > 0, state, state.getArmor().id().equals("shell_jacket")),
-                item("bone_charm", EquipmentSlot.CHARM, "Костяной оберег", 1, 3,
+                item("bone_charm", EquipmentSlot.CHARM, "Старый эхолот", 1, 3,
                         "Ослабляет аномальные последствия.", "anomaly_reduction", 5,
                         new PlayerResources(2, 1, 1), true, state, state.getCharm().id().equals("bone_charm")),
                 item("rusty_token", EquipmentSlot.CHARM, "Ржавый жетон", 1, 3,
                         "Помогает замечать следы и фрагменты карты.", "map_fragment_bonus", 5,
                         new PlayerResources(4, 2, 1), workbenchLevel > 0, state, state.getCharm().id().equals("rusty_token")),
-                item("rope", EquipmentSlot.TOOL, "Верёвка", 1, 3,
+                item("rope", EquipmentSlot.TOOL, "Швартовый трос", 1, 3,
                         "Смягчает неудачи у объектов и тайников.", "object_damage_reduction", 10,
                         new PlayerResources(2, 2, 0), true, state, hasTool(state, "rope")),
                 item("flashlight", EquipmentSlot.TOOL, "Фонарь", 1, 3,
                         "Чаще выводит к объектам.", "object_event_bonus", 5,
                         new PlayerResources(3, 2, 0), workbenchLevel > 0, state, hasTool(state, "flashlight")),
-                item("hook", EquipmentSlot.TOOL, "Самодельный крюк", 1, 3,
+                item("hook", EquipmentSlot.TOOL, "Носовой крюк", 1, 3,
                         "Даёт дополнительный выбор у некоторых находок.", "hook_choice", 1,
                         new PlayerResources(4, 2, 1), workbenchLevel > 0, state, hasTool(state, "hook"))
         );

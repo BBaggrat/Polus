@@ -287,11 +287,11 @@ public class PlayerService {
 
     private String normalizeJournalStyle(String journalStyle) {
         if (journalStyle == null || journalStyle.isBlank()) {
-            throw new BadRequestException("Выбери стиль дневника");
+            throw new BadRequestException("Выбери стиль бортового журнала");
         }
         String normalized = journalStyle.trim().toUpperCase(Locale.ROOT);
         if (!normalized.equals("M") && !normalized.equals("W")) {
-            throw new BadRequestException("Стиль дневника должен быть M или W");
+            throw new BadRequestException("Стиль бортового журнала должен быть M или W");
         }
         return normalized;
     }
