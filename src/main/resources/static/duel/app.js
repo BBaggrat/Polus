@@ -11852,18 +11852,18 @@ function refreshStaticCopy() {
     setText(".registration-style-option:nth-of-type(1) .registration-style-copy", "Я вышел к Большой воде.");
     setText(".registration-style-option:nth-of-type(2) .registration-style-copy", "Я вышла к Большой воде.");
     setText("#registration-submit", "Создать аккаунт");
-    setText("#start-duel-title", "Выйти на воду?");
-    setText("#start-duel-copy", "Подтверди выход на открытую воду.");
+    setText("#start-duel-title", "Вступить в стычку?");
+    setText("#start-duel-copy", "Подтверди вход в очередь. Бортовой журнал продолжит идти автоматически.");
     setText("#start-duel-cancel", "Нет, вернуться в хаб");
-    setText("#start-duel-confirm", "Выйти в плавание");
+    setText("#start-duel-confirm", "Вступить в стычку");
     setText("#duel-exit-cancel", "Нет, остаться");
     setText("#duel-exit-confirm", "Да, выйти");
     setText("#duel-tab-logs", "Логи");
     setText("#duel-tab-chat", "Чат");
     setText("#duel-clear-log-button", "Очистить");
     setText("#duel-close-button", "Выйти");
-    setText("#find-match-button", "Выйти в плавание");
-    setText(".queue-status-label", "Поиск другой лодки");
+    setText("#find-match-button", "Вступить в стычку");
+    setText(".queue-status-label", "Поиск стычки");
     setText("#queue-cancel-button", "Отменить");
     setText(".duel-block-title", "Оружие");
     setText(".vector-card:nth-of-type(1) h4", "Куда бить по лодке?");
@@ -13744,8 +13744,8 @@ async function startQueueDuel(skipConfirm) {
     if (!skipConfirm) {
         requestStartDuel({
             mode: "queue",
-            title: "Выйти на воду?",
-            copy: "Подтверди выход на открытую воду.",
+            title: "Вступить в стычку?",
+            copy: "Подтверди вход в очередь. Бортовой журнал продолжит идти автоматически.",
             execute: function () {
                 startQueueDuel(true);
             }

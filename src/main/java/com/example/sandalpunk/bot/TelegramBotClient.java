@@ -51,9 +51,9 @@ public class TelegramBotClient {
     public void sendWelcomeMessage(long chatId, String webAppUrl) {
         SendMessageRequest request = new SendMessageRequest(
                 chatId,
-                "Ты выходишь в плавание по Большой воде. Лодка держится, пока держится корпус. "
-                        + "Веди бортовой журнал, собирай детали, отмечай невозможные объекты и возвращайся до темноты.",
-                new ReplyMarkup(List.of(List.of(new InlineKeyboardButton("Выйти в плавание", new WebAppInfo(webAppUrl)))))
+                "Полюс открыт: бортовой журнал сам ведет плавание по Большой воде. "
+                        + "Заходи в хаб, следи за записями и запускай стычку, когда готов.",
+                new ReplyMarkup(List.of(List.of(new InlineKeyboardButton("Открыть Полюс", new WebAppInfo(webAppUrl)))))
         );
         restClient.post()
                 .uri(botPath("/sendMessage"))
